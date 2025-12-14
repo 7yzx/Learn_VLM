@@ -1,0 +1,25 @@
+# config.yaml
+
+# 训练超参数
+hyperparameters:
+  emb_dim: 128
+  lr: 0.001          # 1e-3
+  epochs: 50
+  batch_size: 128
+
+# 视觉编码器参数 (Vision)
+vision:
+  d_model: 32
+  img_size: [80, 80]
+  patch_size: [5, 5]
+  n_channels: 3
+  layers: 8
+  heads: 4
+
+# 文本编码器参数 (Text)
+text:
+  vocab_size: 256
+  d_model: 64
+  max_seq_length: 128
+  layers: 8
+  heads: 8
