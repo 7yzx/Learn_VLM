@@ -1,0 +1,15 @@
+h5py
+scipy
+cython
+plyfile
+numpy==1.26.4
+trimesh>=2.35.39
+networkx==3.2.1
+pytorch3d==0.7.8
+google-generativeai
+peft>=0.7.0
+transformers>=4.35.0
+accelerate>=0.20.0
+tqdm
+orjson
+clip @ git+https://github.com/openai/CLIP.git

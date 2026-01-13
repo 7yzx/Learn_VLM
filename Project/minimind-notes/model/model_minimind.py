@@ -134,6 +134,24 @@ class RMSNorm(torch.nn.Module):
         # 用权重缩放，保持 dtype 与输入一致
         return self.weight * self._norm(x.float()).type_as(x)
 
+class RMSNorm1(torch.nn.Module):
+    """ y = w * x / sqrt(mean(x^2)) + eps
+
+    Args:
+        torch (_type_): _description_
+    """
+    def __init__(self, dim: int, eps:float = 1e-5):
+        super().__init__()
+        self.eps = eps
+        self.weight = nn.Parameter(torch.ones(dim))
+    
+    def _norm(self, x):
+        return x * torch.rsqrt(x.pow(2).mean(-1), keepdim=True) + self.eps
+
+    def forward(self, x):
+        return self.weight * self._norm(x.float()).type_as(x)
+    
+        
 
 def precompute_freqs_cis(dim: int, end: int = int(32 * 1024), theta: float = 1e6):
     """
