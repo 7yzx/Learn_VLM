@@ -322,10 +322,10 @@ def get_parameter_dtype(parameter: Union[nn.Module, "ModuleUtilsMixin"]):
             # and XLA_DOWNCAST_BF16=1 so the conversion would cast it to -inf
             # NOTE: `is_torch_xla_available()` is checked last as it induces a graph break in torch dynamo
             if XLA_USE_BF16 in ENV_VARS_TRUE_VALUES and is_torch_xla_available():
-                return torch.bfloat16
+                return torch.float16
             if XLA_DOWNCAST_BF16 in ENV_VARS_TRUE_VALUES and is_torch_xla_available():
                 if t.dtype == torch.float:
-                    return torch.bfloat16
+                    return torch.float16
                 if t.dtype == torch.double:
                     return torch.float32
             return t.dtype
@@ -524,7 +524,7 @@ str_to_torch_dtype = {
     "I8": torch.int8,
     "I16": torch.int16,
     "F16": torch.float16,
-    "BF16": torch.bfloat16,
+    "BF16": torch.float16,
     "I32": torch.int32,
     "F32": torch.float32,
     "F64": torch.float64,
@@ -2274,9 +2274,9 @@ class PreTrainedModel(nn.Module, ModuleUtilsMixin, GenerationMixin, PushToHubMix
             logger.warning_once(
                 "You are attempting to use Flash Attention 2.0 without specifying a torch dtype. This might lead to unexpected behaviour"
             )
-        elif torch_dtype is not None and torch_dtype not in [torch.float16, torch.bfloat16]:
+        elif torch_dtype is not None and torch_dtype not in [torch.float16, torch.float16]:
             logger.warning_once(
-                "Flash Attention 2.0 only supports torch.float16 and torch.bfloat16 dtypes, but"
+                "Flash Attention 2.0 only supports torch.float16 and torch.float16 dtypes, but"
                 f" the current dype in {cls.__name__} is {torch_dtype}. You should run training or inference using Automatic Mixed-Precision via the `with torch.autocast(device_type='torch_device'):` decorator,"
                 ' or load the model with the `torch_dtype` argument. Example: `model = AutoModel.from_pretrained("openai/whisper-tiny", attn_implementation="flash_attention_2", torch_dtype=torch.float16)`'
             )
@@ -3887,7 +3887,7 @@ class PreTrainedModel(nn.Module, ModuleUtilsMixin, GenerationMixin, PushToHubMix
                 Override the default `torch.dtype` and load the model under a specific `dtype`. The different options
                 are:
 
-                1. `torch.float16` or `torch.bfloat16` or `torch.float`: load in a specified
+                1. `torch.float16` or `torch.float16` or `torch.float`: load in a specified
                   `dtype`, ignoring the model's `config.torch_dtype` if one exists. If not specified
                   - the model will get loaded in `torch.float` (fp32).
 

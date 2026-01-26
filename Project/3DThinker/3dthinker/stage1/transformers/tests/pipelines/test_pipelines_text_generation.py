@@ -559,9 +559,9 @@ class TextGenerationPipelineTests(unittest.TestCase):
         # Classic `model_kwargs`
         pipe = pipeline(
             model="hf-internal-testing/tiny-random-bloom",
-            model_kwargs={"device_map": "auto", "torch_dtype": torch.bfloat16},
+            model_kwargs={"device_map": "auto", "torch_dtype": torch.float16},
         )
-        self.assertEqual(pipe.model.lm_head.weight.dtype, torch.bfloat16)
+        self.assertEqual(pipe.model.lm_head.weight.dtype, torch.float16)
         out = pipe("This is a test")
         self.assertEqual(
             out,
@@ -576,8 +576,8 @@ class TextGenerationPipelineTests(unittest.TestCase):
         )
 
         # Upgraded those two to real pipeline arguments (they just get sent for the model as they're unlikely to mean anything else.)
-        pipe = pipeline(model="hf-internal-testing/tiny-random-bloom", device_map="auto", torch_dtype=torch.bfloat16)
-        self.assertEqual(pipe.model.lm_head.weight.dtype, torch.bfloat16)
+        pipe = pipeline(model="hf-internal-testing/tiny-random-bloom", device_map="auto", torch_dtype=torch.float16)
+        self.assertEqual(pipe.model.lm_head.weight.dtype, torch.float16)
         out = pipe("This is a test")
         self.assertEqual(
             out,

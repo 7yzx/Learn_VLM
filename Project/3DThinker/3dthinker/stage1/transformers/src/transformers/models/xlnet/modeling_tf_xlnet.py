@@ -155,7 +155,7 @@ class TFXLNetRelativeAttention(keras.layers.Layer):
         attn_score = (ac + bd + ef) * self.scale
         if attn_mask is not None:
             # attn_score = attn_score * (1 - attn_mask) - 1e30 * attn_mask
-            if attn_mask.dtype == tf.float16 or attn_mask.dtype == tf.bfloat16:
+            if attn_mask.dtype == tf.float16 or attn_mask.dtype == tf.float16:
                 attn_score = attn_score - 65500 * attn_mask
             else:
                 attn_score = attn_score - 1e30 * attn_mask
@@ -479,7 +479,7 @@ class TFXLNetMainLayer(keras.layers.Layer):
         self.bi_data = config.bi_data
         self.clamp_len = config.clamp_len
         self.n_layer = config.n_layer
-        self.use_bfloat16 = config.use_bfloat16
+        self.use_float16 = config.use_float16
         self.initializer_range = config.initializer_range
 
         self.word_embedding = TFSharedEmbeddings(

@@ -33,17 +33,17 @@ GPT3/4, [Falcon](https://huggingface.co/tiiuae/falcon-40b), [Llama](https://hugg
 
 대규모 언어 모델을 가중치 행렬과 벡터의 집합으로 보고, 텍스트 입력을 벡터의 시퀀스로 본다면, 대규모 언어 모델의 메모리 요구사항을 가장 잘 이해할 수 있습니다. 이어지는 내용에서 *가중치*는 모델의 모든 가중치 행렬과 벡터를 의미합니다.   
 
-이 가이드를 작성하는 시점의 대규모 언어 모델은 최소 몇십억 개의 매개변수로 구성되어 있습니다. 각 매개변수는 `4.5689`와 같은 십진수로 이루어져 있으며, 보통 [float32](https://en.wikipedia.org/wiki/Single-precision_floating-point_format), [bfloat16](https://en.wikipedia.org/wiki/Bfloat16_floating-point_format) 또는 [float16](https://en.wikipedia.org/wiki/Half-precision_floating-point_format) 형식으로 저장됩니다. 이를 통해 대규모 언어 모델을 메모리에 로드하는 데 필요한 메모리의 요구사항을 쉽게 계산할 수 있습니다:
+이 가이드를 작성하는 시점의 대규모 언어 모델은 최소 몇십억 개의 매개변수로 구성되어 있습니다. 각 매개변수는 `4.5689`와 같은 십진수로 이루어져 있으며, 보통 [float32](https://en.wikipedia.org/wiki/Single-precision_floating-point_format), [float16](https://en.wikipedia.org/wiki/float16_floating-point_format) 또는 [float16](https://en.wikipedia.org/wiki/Half-precision_floating-point_format) 형식으로 저장됩니다. 이를 통해 대규모 언어 모델을 메모리에 로드하는 데 필요한 메모리의 요구사항을 쉽게 계산할 수 있습니다:
 
 > *X * 10억 개의 매개변수를 가진 모델의 가중치를 로드하려면 float32 정밀도에서 대략 4 * X GB의 VRAM이 필요합니다.*
 
-요즘에는 모델이 float32 정밀도로 훈련되는 경우는 드물고, 일반적으로 bfloat16 정밀도나 가끔 float16 정밀도로 훈련됩니다. 따라서 경험적으로 알아낸 법칙은 다음과 같습니다:
+요즘에는 모델이 float32 정밀도로 훈련되는 경우는 드물고, 일반적으로 float16 정밀도나 가끔 float16 정밀도로 훈련됩니다. 따라서 경험적으로 알아낸 법칙은 다음과 같습니다:
 
-> *X * 10억 개의 매개변수를 가진 모델의 가중치를 로드하려면 bfloat16/float16 정밀도에서 대략 2 * X GB의 VRAM이 필요합니다.*
+> *X * 10억 개의 매개변수를 가진 모델의 가중치를 로드하려면 float16/float16 정밀도에서 대략 2 * X GB의 VRAM이 필요합니다.*
 
 짧은 텍스트 입력(1024 토큰 미만)의 경우, 추론을 위한 메모리 요구 사항의 대부분은 가중치를 로드하는 데 필요한 메모리 요구 사항입니다. 따라서 지금은 추론을 위한 메모리 요구 사항이 모델의 가중치를 GPU VRAM에 로드하는 데 필요한 메모리 요구 사항과 같다고 가정합시다.
 
-모델을 bfloat16으로 로드하는 데 대략 얼마나 많은 VRAM이 필요한지 몇 가지 예를 들어보겠습니다:
+모델을 float16으로 로드하는 데 대략 얼마나 많은 VRAM이 필요한지 몇 가지 예를 들어보겠습니다:
 
 -   **GPT3**는 2 \* 175 GB = **350 GB** VRAM이 필요합니다.
 -   [**Bloom**](https://huggingface.co/bigscience/bloom)은 2 \* 176 GB = **352 GB** VRAM이 필요합니다.
@@ -73,7 +73,7 @@ model = AutoModelForCausalLM.from_pretrained("bigscience/bloom", device_map="aut
 
 이 가이드에서는 [bigcode/octocoder](https://huggingface.co/bigcode/octocoder)를 사용할 것입니다. 이 모델은 단일 40GB A100 GPU 장치에서 실행할 수 있습니다. 앞으로 적용할 모든 메모리 및 속도 최적화는 모델 또는 텐서 병렬 처리를 필요로 하는 다른 모델에도 동일하게 적용될 수 있습니다.
 
-모델이 bfloat16 정밀도로 로드되기 때문에, 위의 경험적으로 알아낸 법칙을 사용하면 `bigcode/octocoder`를 사용하여 추론을 실행하기 위한 메모리 요구 사항이 약 31GB VRAM일 것으로 예상됩니다. 한 번 시도해 보겠습니다.
+모델이 float16 정밀도로 로드되기 때문에, 위의 경험적으로 알아낸 법칙을 사용하면 `bigcode/octocoder`를 사용하여 추론을 실행하기 위한 메모리 요구 사항이 약 31GB VRAM일 것으로 예상됩니다. 한 번 시도해 보겠습니다.
 
 먼저 모델과 토크나이저를 로드한 다음, 둘 다 Transformers의 [파이프라인](https://huggingface.co/docs/transformers/main_classes/pipelines) 객체에 전달합니다.
 
@@ -81,7 +81,7 @@ model = AutoModelForCausalLM.from_pretrained("bigscience/bloom", device_map="aut
 from transformers import AutoModelForCausalLM, AutoTokenizer, pipeline
 import torch
 
-model = AutoModelForCausalLM.from_pretrained("bigcode/octocoder", torch_dtype=torch.bfloat16, device_map="auto", pad_token_id=0)
+model = AutoModelForCausalLM.from_pretrained("bigcode/octocoder", torch_dtype=torch.float16, device_map="auto", pad_token_id=0)
 tokenizer = AutoTokenizer.from_pretrained("bigcode/octocoder")
 
 pipe = pipeline("text-generation", model=model, tokenizer=tokenizer)
@@ -119,9 +119,9 @@ bytes_to_giga_bytes(torch.cuda.max_memory_allocated())
 
 대략적으로 계산한 결과와 거의 일치합니다! 바이트에서 킬로바이트로 변환할 때 1000이 아닌 1024로 곱해야 하므로 숫자가 정확하지 않은 것을 알 수 있습니다. 따라서 대략적으로 계산할 때 공식은 "최대 X GB"으로 이해할 수 있습니다. 만약 우리가 모델을 float32 정밀도로 실행하려고 했다면 더 큰 크기인 64GB의 VRAM이 필요했을 것입니다.
 
-> 거의 모든 모델이 요즘 bfloat16으로 학습되므로, [GPU가 bfloat16을 지원](https://discuss.pytorch.org/t/bfloat16-native-support/117155/5)한다면 모델을 float32 정밀도로 실행할 이유가 없습니다. float32로 돌리는 모델은 학습할 때 사용했던 정밀도보다 더 나은 추론 결과를 제공하지 않습니다.
+> 거의 모든 모델이 요즘 float16으로 학습되므로, [GPU가 float16을 지원](https://discuss.pytorch.org/t/float16-native-support/117155/5)한다면 모델을 float32 정밀도로 실행할 이유가 없습니다. float32로 돌리는 모델은 학습할 때 사용했던 정밀도보다 더 나은 추론 결과를 제공하지 않습니다.
 
-모델 가중치가 어떤 정밀도 형식으로 Hub에 저장되어 있는지 확실하지 않은 경우, HuggingFace Hub에서 해당 체크포인트 config의 `"torch_dtype"`을 확인하면 됩니다, *예*를 들어 [여기](https://huggingface.co/meta-llama/Llama-2-7b-hf/blob/6fdf2e60f86ff2481f2241aaee459f85b5b0bbb9/config.json#L21)를 확인하세요. 모델을 `from_pretrained(..., torch_dtype=...)`로 로드할 때는 config에 명시된 정밀도 유형과 동일한 정밀도로 설정하는 것이 권장됩니다. 단, 원래 유형이 float32인 경우 추론을 위해 `float16` 또는 `bfloat16`을 둘 다 사용할 수 있습니다.
+모델 가중치가 어떤 정밀도 형식으로 Hub에 저장되어 있는지 확실하지 않은 경우, HuggingFace Hub에서 해당 체크포인트 config의 `"torch_dtype"`을 확인하면 됩니다, *예*를 들어 [여기](https://huggingface.co/meta-llama/Llama-2-7b-hf/blob/6fdf2e60f86ff2481f2241aaee459f85b5b0bbb9/config.json#L21)를 확인하세요. 모델을 `from_pretrained(..., torch_dtype=...)`로 로드할 때는 config에 명시된 정밀도 유형과 동일한 정밀도로 설정하는 것이 권장됩니다. 단, 원래 유형이 float32인 경우 추론을 위해 `float16` 또는 `float16`을 둘 다 사용할 수 있습니다.
 
 이제 `flush(...)` 함수를 정의하여 모든 메모리를 해제하고, GPU 메모리의 최대 할당량을 정확하게 측정하도록 합시다.
 
@@ -155,13 +155,13 @@ release_memory(model)
 
 만약 GPU에 32GB의 VRAM이 없다면 어떻게 될까요? 모델 가중치를 성능에 큰 손실 없이 8비트 또는 4비트로 양자화할 수 있다는 것이 밝혀졌습니다(참고: [Dettmers et al.](https://arxiv.org/abs/2208.07339)). 최근의 [GPTQ 논문](https://arxiv.org/abs/2210.17323) 에서는 모델을 3비트 또는 2비트로 양자화해도 성능 손실이 허용 가능한 수준임을 보여주었습니다🤯.
 
-너무 자세한 내용은 다루지 않고 설명하자면, 양자화는 가중치의 정밀도를 줄이면서 모델의 추론 결과를 가능한 한 정확하게(즉, bfloat16과 최대한 가깝게) 유지하려고 합니다. 양자화는 특히 텍스트 생성에 잘 작동하는데, 이는 우리가 *가장 가능성 있는 다음 토큰 집합*을 선택하는 것에 초점을 두고 있기 때문이며, 다음 토큰의 *logit* 분포값을 정확하게 예측할 필요는 없기 때문입니다. 핵심은 다음 토큰 *logit* 분포가 대략적으로 동일하게 유지되어 `argmax` 또는 `topk` 연산이 동일한 결과를 제공하는 것입니다.
+너무 자세한 내용은 다루지 않고 설명하자면, 양자화는 가중치의 정밀도를 줄이면서 모델의 추론 결과를 가능한 한 정확하게(즉, float16과 최대한 가깝게) 유지하려고 합니다. 양자화는 특히 텍스트 생성에 잘 작동하는데, 이는 우리가 *가장 가능성 있는 다음 토큰 집합*을 선택하는 것에 초점을 두고 있기 때문이며, 다음 토큰의 *logit* 분포값을 정확하게 예측할 필요는 없기 때문입니다. 핵심은 다음 토큰 *logit* 분포가 대략적으로 동일하게 유지되어 `argmax` 또는 `topk` 연산이 동일한 결과를 제공하는 것입니다.
 
 다양한 양자화 기법이 존재하지만, 자세히 다루지는 않을 것입니다. 일반적으로 모든 양자화 기법은 다음과 같이 작동합니다:
 
 -   1.  모든 가중치를 목표 정밀도로 양자화합니다.
--   2.  양자화된 가중치를 로드하고, bfloat16 정밀도의 입력 벡터 시퀀스를 모델에 전달합니다.
--   3.  가중치를 동적으로 bfloat16으로 반대로 양자화(dequantize)하여 입력 벡터와 함께 bfloat16 정밀도로 계산을 수행합니다.
+-   2.  양자화된 가중치를 로드하고, float16 정밀도의 입력 벡터 시퀀스를 모델에 전달합니다.
+-   3.  가중치를 동적으로 float16으로 반대로 양자화(dequantize)하여 입력 벡터와 함께 float16 정밀도로 계산을 수행합니다.
 
 간단히 말해서, *입력-가중치 행렬* 곱셈은, \\( X \\)가 *입력*, \\( W \\)가 가중치 행렬, \\( Y \\)가 출력인 경우 다음과 같습니다:
 
@@ -253,7 +253,7 @@ bytes_to_giga_bytes(torch.cuda.max_memory_allocated())
 
 9.5GB밖에 되지 않습니다! 150억 개 이상의 파라미터를 가진 모델인 것을 감안하면 매우 적은 양입니다.
 
-여기서는 모델의 정확도 저하가 거의 없음을 확인할 수 있지만, 실제로는 4비트 양자화를 8비트 양자화나 `bfloat16`를 사용한 추론 결과와 비교하면 결과가 다를 수 있습니다. 사용자가 직접 시도해 보는 것이 좋겠습니다.
+여기서는 모델의 정확도 저하가 거의 없음을 확인할 수 있지만, 실제로는 4비트 양자화를 8비트 양자화나 `float16`를 사용한 추론 결과와 비교하면 결과가 다를 수 있습니다. 사용자가 직접 시도해 보는 것이 좋겠습니다.
 
 또한 4비트 양자화에 사용된 더 공격적인 양자화 방법으로 인해 추론 시 \\( \text{quantize} \\)와 \\( \text{dequantize} \\) 과정이 더 오래 걸리므로 여기서도 8비트 양자화와 비교하여 추론 속도가 약간 느려졌음을 유의하세요.
 
@@ -290,7 +290,7 @@ $$ \textbf{O} = \text{Attn}(\mathbf{X}) = \mathbf{V} \times \text{Softmax}(\math
 
 \\( \mathbf{X} = (\mathbf{x}1, ... \mathbf{x}{N}) \\)는 어텐션 레이어의 입력 시퀀스입니다. 프로젝션 \\( \mathbf{Q} \\)와 \\( \mathbf{K} \\)는 각각 \\( N \\)개의 벡터로 구성되며, 그 결과 \\( \mathbf{QK}^T \\)의 크기는 \\( N^2 \\)가 됩니다.
 
-대규모 언어 모델은 일반적으로 여러 개의 어텐션 헤드를 가지고 있어 여러 개의 셀프 어텐션 계산을 병렬로 수행합니다. 대규모 언어 모델이 40개의 어텐션 헤드를 가지고 bfloat16 정밀도로 실행된다고 가정하면, \\( \mathbf{QK^T} \\) 행렬을 저장하는 데 필요한 메모리를 \\( 40 * 2 * N^2 \\) 바이트로 계산할 수 있습니다. \\( N=1000 \\)일 때는 약 50MB의 VRAM만 필요하지만, \\( N=16000 \\)일 때는 19GB의 VRAM이 필요하며, \\( N=100,000 \\)일 때는 \\( \mathbf{QK^T} \\) 행렬을 저장하기 위해 거의 1TB의 VRAM이 필요합니다.
+대규모 언어 모델은 일반적으로 여러 개의 어텐션 헤드를 가지고 있어 여러 개의 셀프 어텐션 계산을 병렬로 수행합니다. 대규모 언어 모델이 40개의 어텐션 헤드를 가지고 float16 정밀도로 실행된다고 가정하면, \\( \mathbf{QK^T} \\) 행렬을 저장하는 데 필요한 메모리를 \\( 40 * 2 * N^2 \\) 바이트로 계산할 수 있습니다. \\( N=1000 \\)일 때는 약 50MB의 VRAM만 필요하지만, \\( N=16000 \\)일 때는 19GB의 VRAM이 필요하며, \\( N=100,000 \\)일 때는 \\( \mathbf{QK^T} \\) 행렬을 저장하기 위해 거의 1TB의 VRAM이 필요합니다.
 
 요약하자면, 기본 셀프 어텐션 알고리즘은 큰 입력 컨텍스트에 대해 매우 과도한 메모리 사용을 요구하게 됩니다.
 
@@ -377,10 +377,10 @@ def alternating(list1, list2):
 long_prompt = 10 * system_prompt + prompt
 ```
 
-모델을 다시 bfloat16 정밀도로 인스턴스화합니다.
+모델을 다시 float16 정밀도로 인스턴스화합니다.
 
 ```python
-model = AutoModelForCausalLM.from_pretrained("bigcode/octocoder", torch_dtype=torch.bfloat16, device_map="auto")
+model = AutoModelForCausalLM.from_pretrained("bigcode/octocoder", torch_dtype=torch.float16, device_map="auto")
 tokenizer = AutoTokenizer.from_pretrained("bigcode/octocoder")
 
 pipe = pipeline("text-generation", model=model, tokenizer=tokenizer)

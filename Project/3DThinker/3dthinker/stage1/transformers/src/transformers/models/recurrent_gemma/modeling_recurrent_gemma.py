@@ -81,7 +81,7 @@ class RecurrentGemmaRotaryEmbedding(nn.Module):
         self.inv_freq.to(x.device)
         inv_freq_expanded = self.inv_freq[None, :, None].float().expand(position_ids.shape[0], -1, 1)
         position_ids_expanded = position_ids[:, None, :].float()
-        # Force float32 since bfloat16 loses precision on long contexts
+        # Force float32 since float16 loses precision on long contexts
         # See https://github.com/huggingface/transformers/pull/29285
         device_type = x.device.type
         device_type = device_type if isinstance(device_type, str) and device_type != "mps" else "cpu"
@@ -327,7 +327,7 @@ class RecurrentGemmaRglru(nn.Module):
         gated_inputs = activations * input_gate
 
         # Apply gamma normalization to the input. We need to clip the derivatives of
-        # `sqrt` in order to prevent NaNs during training in bfloat16. TODO a bit annoying
+        # `sqrt` in order to prevent NaNs during training in float16. TODO a bit annoying
         multiplier = 1
         tracing = isinstance(activations, torch.fx.Proxy) or is_torchdynamo_compiling()
         if not torch.jit.is_tracing() and not tracing:
@@ -661,7 +661,7 @@ class RecurrentGemmaModel(RecurrentGemmaPreTrainedModel):
         self.gradient_checkpointing = False
 
         self.register_buffer(
-            "normalizer", torch.tensor(self.config.hidden_size**0.5, dtype=torch.bfloat16), persistent=False
+            "normalizer", torch.tensor(self.config.hidden_size**0.5, dtype=torch.float16), persistent=False
         )
         # Initialize weights and apply final processing
         self.post_init()

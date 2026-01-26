@@ -73,7 +73,7 @@ model = Data2VecVisionForImageClassification.from_pretrained("facebook/data2vec-
 ...
 ```
 
-For the best speedups, we recommend loading the model in half-precision (e.g. `torch.float16` or `torch.bfloat16`).
+For the best speedups, we recommend loading the model in half-precision (e.g. `torch.float16` or `torch.float16`).
 
 For the Data2VecVision model, on a local benchmark (NVIDIA GeForce RTX 2060-8GB, PyTorch 2.5.1, OS Ubuntu 20.04)
 with `float16` and `facebook/data2vec-vision-base` model, we saw the following improvements during training and

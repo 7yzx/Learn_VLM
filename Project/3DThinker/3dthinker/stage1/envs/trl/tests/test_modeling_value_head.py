@@ -267,7 +267,7 @@ class CausalLMValueHeadModelTester(BaseTester.VHeadModelTester, TrlTestCase):
         run a dummy forward pass without any issue.
         """
         for model_name in self.all_model_names:
-            trl_model = self.trl_model_class.from_pretrained(model_name, dtype=torch.bfloat16).to(self.device)
+            trl_model = self.trl_model_class.from_pretrained(model_name, dtype=torch.float16).to(self.device)
 
             lm_head_namings = ["lm_head", "embed_out", "output_layer"]
 
@@ -278,7 +278,7 @@ class CausalLMValueHeadModelTester(BaseTester.VHeadModelTester, TrlTestCase):
 
             for lm_head_naming in lm_head_namings:
                 if hasattr(trl_model.pretrained_model, lm_head_naming):
-                    self.assertEqual(getattr(trl_model.pretrained_model, lm_head_naming).weight.dtype, torch.bfloat16)
+                    self.assertEqual(getattr(trl_model.pretrained_model, lm_head_naming).weight.dtype, torch.float16)
 
             dummy_input = torch.LongTensor([[0, 1, 0, 1]]).to(self.device)
 
@@ -404,7 +404,7 @@ class Seq2SeqValueHeadModelTester(BaseTester.VHeadModelTester, TrlTestCase):
         run a dummy forward pass without any issue.
         """
         for model_name in self.all_model_names:
-            trl_model = self.trl_model_class.from_pretrained(model_name, dtype=torch.bfloat16).to(self.device)
+            trl_model = self.trl_model_class.from_pretrained(model_name, dtype=torch.float16).to(self.device)
 
             lm_head_namings = self.trl_model_class.lm_head_namings
 
@@ -414,7 +414,7 @@ class Seq2SeqValueHeadModelTester(BaseTester.VHeadModelTester, TrlTestCase):
 
             for lm_head_naming in lm_head_namings:
                 if hasattr(trl_model.pretrained_model, lm_head_naming):
-                    self.assertTrue(getattr(trl_model.pretrained_model, lm_head_naming).weight.dtype == torch.bfloat16)
+                    self.assertTrue(getattr(trl_model.pretrained_model, lm_head_naming).weight.dtype == torch.float16)
 
             dummy_input = torch.LongTensor([[0, 1, 0, 1]]).to(self.device)
 

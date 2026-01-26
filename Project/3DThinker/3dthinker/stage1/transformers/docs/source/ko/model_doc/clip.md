@@ -124,7 +124,7 @@ from transformers import CLIPModel
 model = CLIPModel.from_pretrained("openai/clip-vit-base-patch32", torch_dtype=torch.float16, attn_implementation="sdpa")
 ```
 
-최고의 속도향상을 위해서, 반정밀도로 모델을 로드하는 것을 추천합니다. (예를들면 `torch.float16` 또는 `torch.bfloat16`).
+최고의 속도향상을 위해서, 반정밀도로 모델을 로드하는 것을 추천합니다. (예를들면 `torch.float16` 또는 `torch.float16`).
 
 ### 플래시 어텐션과 스케일된 내적 어텐션(SDPA)으로 인해 예상되는 속도향상[[expected-speedups-with-flash-attention-and-sdpa]]
 

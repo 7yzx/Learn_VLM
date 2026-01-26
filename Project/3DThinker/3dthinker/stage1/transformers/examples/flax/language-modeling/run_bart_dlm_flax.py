@@ -164,7 +164,7 @@ class ModelArguments:
         metadata={
             "help": (
                 "Floating-point format in which the model weights should be initialized and trained. Choose one of"
-                " `[float32, float16, bfloat16]`."
+                " `[float32, float16, float16]`."
             )
         },
     )

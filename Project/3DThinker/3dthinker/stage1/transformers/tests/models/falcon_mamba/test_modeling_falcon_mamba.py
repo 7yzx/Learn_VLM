@@ -454,7 +454,7 @@ class FalconMambaIntegrationTests(unittest.TestCase):
         self.text = "Hello today"
 
     def test_generation_bf16(self):
-        model = AutoModelForCausalLM.from_pretrained(self.model_id, torch_dtype=torch.bfloat16, device_map="auto")
+        model = AutoModelForCausalLM.from_pretrained(self.model_id, torch_dtype=torch.float16, device_map="auto")
 
         inputs = self.tokenizer(self.text, return_tensors="pt").to(torch_device)
         out = model.generate(**inputs, max_new_tokens=20, do_sample=False)
@@ -478,7 +478,7 @@ class FalconMambaIntegrationTests(unittest.TestCase):
         )
 
     def test_generation_torch_compile(self):
-        model = AutoModelForCausalLM.from_pretrained(self.model_id, torch_dtype=torch.bfloat16).to(torch_device)
+        model = AutoModelForCausalLM.from_pretrained(self.model_id, torch_dtype=torch.float16).to(torch_device)
         model = torch.compile(model)
 
         inputs = self.tokenizer(self.text, return_tensors="pt").to(torch_device)
@@ -502,7 +502,7 @@ class FalconMambaIntegrationTests(unittest.TestCase):
         ]
 
         inputs = tok(texts, return_tensors="pt", padding=True, return_token_type_ids=False).to(torch_device)
-        model = AutoModelForCausalLM.from_pretrained(model_id, device_map=0, torch_dtype=torch.bfloat16)
+        model = AutoModelForCausalLM.from_pretrained(model_id, device_map=0, torch_dtype=torch.float16)
 
         out = model.generate(**inputs, max_new_tokens=20)
         out = tok.batch_decode(out, skip_special_tokens=True)
@@ -524,7 +524,7 @@ class FalconMambaIntegrationTests(unittest.TestCase):
         model_id = "tiiuae/falcon-mamba-7b"
 
         tokenizer = AutoTokenizer.from_pretrained(model_id)
-        model = AutoModelForCausalLM.from_pretrained(model_id, device_map="auto", torch_dtype=torch.bfloat16)
+        model = AutoModelForCausalLM.from_pretrained(model_id, device_map="auto", torch_dtype=torch.float16)
         tokenizer.pad_token_id = tokenizer.eos_token_id
 
         text = "Hello today"

@@ -942,16 +942,16 @@ class BarkFineModelTest(ModelTesterMixin, unittest.TestCase):
             with tempfile.TemporaryDirectory() as tmpdirname:
                 model.save_pretrained(tmpdirname)
                 model_fa = model_class.from_pretrained(
-                    tmpdirname, torch_dtype=torch.bfloat16, attn_implementation="flash_attention_2"
+                    tmpdirname, torch_dtype=torch.float16, attn_implementation="flash_attention_2"
                 )
                 model_fa.to(torch_device)
 
-                model = model_class.from_pretrained(tmpdirname, torch_dtype=torch.bfloat16)
+                model = model_class.from_pretrained(tmpdirname, torch_dtype=torch.float16)
                 model.to(torch_device)
 
                 dummy_input = inputs_dict["input_ids"][:1]
                 if dummy_input.dtype in [torch.float32, torch.float16]:
-                    dummy_input = dummy_input.to(torch.bfloat16)
+                    dummy_input = dummy_input.to(torch.float16)
 
                 dummy_attention_mask = inputs_dict.get("attention_mask", None)
 
@@ -999,19 +999,19 @@ class BarkFineModelTest(ModelTesterMixin, unittest.TestCase):
             with tempfile.TemporaryDirectory() as tmpdirname:
                 model.save_pretrained(tmpdirname)
                 model_fa = model_class.from_pretrained(
-                    tmpdirname, torch_dtype=torch.bfloat16, attn_implementation="flash_attention_2"
+                    tmpdirname, torch_dtype=torch.float16, attn_implementation="flash_attention_2"
                 )
                 model_fa.to(torch_device)
 
                 model = model_class.from_pretrained(
                     tmpdirname,
-                    torch_dtype=torch.bfloat16,
+                    torch_dtype=torch.float16,
                 )
                 model.to(torch_device)
 
                 dummy_input = inputs_dict["input_ids"][:1]
                 if dummy_input.dtype in [torch.float32, torch.float16]:
-                    dummy_input = dummy_input.to(torch.bfloat16)
+                    dummy_input = dummy_input.to(torch.float16)
 
                 dummy_attention_mask = inputs_dict.get("attention_mask", None)
 

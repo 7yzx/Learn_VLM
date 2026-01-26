@@ -152,14 +152,14 @@ def rename_key_and_reshape_tensor(
 def convert_pytorch_state_dict_to_flax(pt_state_dict, flax_model):
     # convert pytorch tensor to numpy
     from_bin = is_torch_available() and isinstance(next(iter(pt_state_dict.values())), torch.Tensor)
-    bfloat16 = torch.bfloat16 if from_bin else "bfloat16"
+    float16 = torch.float16 if from_bin else "float16"
 
     weight_dtypes = {k: v.dtype for k, v in pt_state_dict.items()}
 
     if from_bin:
         for k, v in pt_state_dict.items():
-            # numpy currently does not support bfloat16, need to go over float32 in this case to not lose precision
-            if v.dtype == bfloat16:
+            # numpy currently does not support float16, need to go over float32 in this case to not lose precision
+            if v.dtype == float16:
                 v = v.float()
             pt_state_dict[k] = v.cpu().numpy()
 
@@ -189,7 +189,7 @@ def convert_pytorch_state_dict_to_flax(pt_state_dict, flax_model):
     # Need to change some parameters name to match Flax names
     for pt_key, pt_tensor in pt_state_dict.items():
         pt_tuple_key = tuple(pt_key.split("."))
-        is_bfloat_16 = weight_dtypes[pt_key] == bfloat16
+        is_bfloat_16 = weight_dtypes[pt_key] == float16
 
         # remove base model prefix if necessary
         has_base_model_prefix = pt_tuple_key[0] == model_prefix
@@ -225,12 +225,12 @@ def convert_pytorch_state_dict_to_flax(pt_state_dict, flax_model):
 
             # also add unexpected weight so that warning is thrown
             flax_state_dict[("params",) + flax_key] = (
-                jnp.asarray(flax_tensor) if not is_bfloat_16 else jnp.asarray(flax_tensor, dtype=jnp.bfloat16)
+                jnp.asarray(flax_tensor) if not is_bfloat_16 else jnp.asarray(flax_tensor, dtype=jnp.float16)
             )
         else:
             # also add unexpected weight so that warning is thrown
             flax_state_dict[flax_key] = (
-                jnp.asarray(flax_tensor) if not is_bfloat_16 else jnp.asarray(flax_tensor, dtype=jnp.bfloat16)
+                jnp.asarray(flax_tensor) if not is_bfloat_16 else jnp.asarray(flax_tensor, dtype=jnp.float16)
             )
 
     return unflatten_dict(flax_state_dict)
@@ -252,7 +252,7 @@ def convert_pytorch_sharded_state_dict_to_flax(shard_filenames, flax_model):
         pt_state_dict = torch.load(shard_file, **weights_only_kwarg)
         weight_dtypes = {k: v.dtype for k, v in pt_state_dict.items()}
         pt_state_dict = {
-            k: v.numpy() if v.dtype != torch.bfloat16 else v.float().numpy() for k, v in pt_state_dict.items()
+            k: v.numpy() if v.dtype != torch.float16 else v.float().numpy() for k, v in pt_state_dict.items()
         }
 
         model_prefix = flax_model.base_model_prefix
@@ -276,7 +276,7 @@ def convert_pytorch_sharded_state_dict_to_flax(shard_filenames, flax_model):
         # Need to change some parameters name to match Flax names
         for pt_key, pt_tensor in pt_state_dict.items():
             pt_tuple_key = tuple(pt_key.split("."))
-            is_bfloat_16 = weight_dtypes[pt_key] == torch.bfloat16
+            is_bfloat_16 = weight_dtypes[pt_key] == torch.float16
 
             # remove base model prefix if necessary
             has_base_model_prefix = pt_tuple_key[0] == model_prefix
@@ -314,13 +314,13 @@ def convert_pytorch_sharded_state_dict_to_flax(shard_filenames, flax_model):
 
                 # also add unexpected weight so that warning is thrown
                 flax_state_dict[("params",) + flax_key] = (
-                    jnp.asarray(flax_tensor) if not is_bfloat_16 else jnp.asarray(flax_tensor, dtype=jnp.bfloat16)
+                    jnp.asarray(flax_tensor) if not is_bfloat_16 else jnp.asarray(flax_tensor, dtype=jnp.float16)
                 )
 
             else:
                 # also add unexpected weight so that warning is thrown
                 flax_state_dict[flax_key] = (
-                    jnp.asarray(flax_tensor) if not is_bfloat_16 else jnp.asarray(flax_tensor, dtype=jnp.bfloat16)
+                    jnp.asarray(flax_tensor) if not is_bfloat_16 else jnp.asarray(flax_tensor, dtype=jnp.float16)
                 )
     return unflatten_dict(flax_state_dict)
 
@@ -366,16 +366,16 @@ def load_flax_weights_in_pytorch_model(pt_model, flax_state):
         raise
 
     # check if we have bf16 weights
-    is_type_bf16 = flatten_dict(jax.tree_util.tree_map(lambda x: x.dtype == jnp.bfloat16, flax_state)).values()
+    is_type_bf16 = flatten_dict(jax.tree_util.tree_map(lambda x: x.dtype == jnp.float16, flax_state)).values()
     if any(is_type_bf16):
         # convert all weights to fp32 if the are bf16 since torch.from_numpy can-not handle bf16
         # and bf16 is not fully supported in PT yet.
         logger.warning(
-            "Found ``bfloat16`` weights in Flax model. Casting all ``bfloat16`` weights to ``float32`` "
+            "Found ``float16`` weights in Flax model. Casting all ``float16`` weights to ``float32`` "
             "before loading those in PyTorch model."
         )
         flax_state = jax.tree_util.tree_map(
-            lambda params: params.astype(np.float32) if params.dtype == jnp.bfloat16 else params, flax_state
+            lambda params: params.astype(np.float32) if params.dtype == jnp.float16 else params, flax_state
         )
 
     flax_state_dict = flatten_dict(flax_state)

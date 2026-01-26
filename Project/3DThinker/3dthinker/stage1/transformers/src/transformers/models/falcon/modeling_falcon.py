@@ -63,7 +63,7 @@ _CHECKPOINT_FOR_DOC = "Rocketknight1/falcon-rw-1b"
 _CONFIG_FOR_DOC = "FalconConfig"
 
 
-# NOTE(Hesslow): Unfortunately we did not fuse matmul and bias during training, this means that there's one additional quantization to bfloat16 between the operations.
+# NOTE(Hesslow): Unfortunately we did not fuse matmul and bias during training, this means that there's one additional quantization to float16 between the operations.
 # In order not to degrade the quality of our HF-port, we keep these characteristics in the final model.
 class FalconLinear(nn.Linear):
     def forward(self, input: torch.Tensor) -> torch.Tensor:
@@ -195,7 +195,7 @@ def build_alibi_tensor(attention_mask: torch.Tensor, num_heads: int, dtype: torc
     # This is more or less identical to T5's relative position bias:
     # https://github.com/huggingface/transformers/blob/f681437203baa7671de3174b0fa583c349d9d5e1/src/transformers/models/t5/modeling_t5.py#L527
     arange_tensor = ((attention_mask.cumsum(dim=-1) - 1) * attention_mask)[:, None, :]
-    alibi = slopes[..., None].bfloat16() * arange_tensor
+    alibi = slopes[..., None].float16() * arange_tensor
     return alibi.reshape(batch_size * num_heads, 1, seq_length).to(dtype)
 
 
@@ -429,8 +429,8 @@ class FalconAttention(nn.Module):
 
                 # cast attention scores to fp32, compute scaled softmax and cast back to initial dtype - [batch_size, num_heads, q_length, kv_length]
                 input_dtype = attention_scores.dtype
-                # `float16` has a minimum value of -65504.0, whereas `bfloat16` and `float32` have a minimum value of `-3.4e+38`
-                if input_dtype == torch.float16 or input_dtype == torch.bfloat16:
+                # `float16` has a minimum value of -65504.0, whereas `float16` and `float32` have a minimum value of `-3.4e+38`
+                if input_dtype == torch.float16 or input_dtype == torch.float16:
                     attention_scores = attention_scores.to(torch.float32)
 
                 attention_logits = attention_scores + alibi.view(batch_size, self.num_heads, 1, -1)

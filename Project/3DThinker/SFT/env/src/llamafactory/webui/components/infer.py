@@ -35,7 +35,7 @@ def create_infer_tab(engine: "Engine") -> dict[str, "Component"]:
 
     with gr.Row():
         infer_backend = gr.Dropdown(choices=["huggingface", "vllm", "sglang"], value="huggingface")
-        infer_dtype = gr.Dropdown(choices=["auto", "float16", "bfloat16", "float32"], value="auto")
+        infer_dtype = gr.Dropdown(choices=["auto", "float16", "float16", "float32"], value="auto")
 
     with gr.Row():
         load_btn = gr.Button()

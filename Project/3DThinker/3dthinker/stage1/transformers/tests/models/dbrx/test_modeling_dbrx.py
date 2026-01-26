@@ -67,7 +67,7 @@ class DbrxModelTester:
         output_router_logits=False,
         resid_pdrop=0.0,
         tie_word_embeddings=False,
-        torch_dtype="bfloat16",
+        torch_dtype="float16",
         vocab_size=99,
         is_decoder=True,
         pad_token_id=0,

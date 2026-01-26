@@ -61,7 +61,7 @@ from transformers import FalconMambaForCausalLM, AutoTokenizer
 import torch
 
 tokenizer = AutoTokenizer.from_pretrained("tiiuae/falcon-mamba-7b")
-model = FalconMambaForCausalLM.from_pretrained("tiiuae/falcon-mamba-7b", torch_dtype=torch.bfloat16).to(0)
+model = FalconMambaForCausalLM.from_pretrained("tiiuae/falcon-mamba-7b", torch_dtype=torch.float16).to(0)
 model = torch.compile(model)
 
 input_ids = tokenizer("Hey how are you doing?", return_tensors= "pt")["input_ids"]

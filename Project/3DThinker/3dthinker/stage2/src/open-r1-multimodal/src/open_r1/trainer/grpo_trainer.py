@@ -318,7 +318,7 @@ class VLMGRPOTrainer(Trainer):
         peft_config: Optional["PeftConfig"] = None,
         freeze_vision_modules: Optional[bool] = False,
         attn_implementation: str = "flash_attention_2",
-        torch_dtype: str = "bfloat16",
+        torch_dtype: str = "float16",
         **kwargs,
     ):
         # Args

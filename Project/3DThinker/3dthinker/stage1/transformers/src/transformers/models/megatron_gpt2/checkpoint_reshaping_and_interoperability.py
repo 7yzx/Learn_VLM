@@ -684,7 +684,7 @@ def convert_checkpoint_from_transformers_to_megatron(args):
     if args.target_params_dtype == "fp16":
         dtype = torch.float16
     elif args.target_params_dtype == "bf16":
-        dtype = torch.bfloat16
+        dtype = torch.float16
     else:
         dtype = torch.float32
     setattr(margs, "params_dtype", dtype)

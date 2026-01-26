@@ -2269,7 +2269,7 @@ class GenerationTesterMixin:
             config, original_inputs_dict = self.prepare_config_and_inputs_for_generate()
             inputs_dict = {}
             for input_name, input_data in original_inputs_dict.items():
-                if isinstance(input_data, torch.Tensor) and input_data.dtype in [torch.float32, torch.bfloat16]:
+                if isinstance(input_data, torch.Tensor) and input_data.dtype in [torch.float32, torch.float16]:
                     inputs_dict[input_name] = input_data.to(torch.float16)
                 else:
                     inputs_dict[input_name] = input_data
@@ -4195,7 +4195,7 @@ class GenerationIntegrationTests(unittest.TestCase):
         non-slow tests to prevent regressions!
         """
         model = AutoModelForCausalLM.from_pretrained(
-            "hf-internal-testing/tiny-random-LlamaForCausalLM", torch_dtype=torch.bfloat16, device_map="auto"
+            "hf-internal-testing/tiny-random-LlamaForCausalLM", torch_dtype=torch.float16, device_map="auto"
         )
         tokenizer = AutoTokenizer.from_pretrained("hf-internal-testing/tiny-random-LlamaForCausalLM")
 

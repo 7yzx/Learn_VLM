@@ -177,7 +177,7 @@ class Siglip2VisionEmbeddings(nn.Module):
         # (height, width, embed_dim) -> (1, embed_dim, height, width) for interpolation
         positional_embeddings = positional_embeddings.permute(2, 0, 1).unsqueeze(0)
 
-        # Upcast to float32 on CPU because antialias is not supported for bfloat16/float16 on CPU
+        # Upcast to float32 on CPU because antialias is not supported for float16/float16 on CPU
         if positional_embeddings.device.type == "cpu":
             positional_embeddings = positional_embeddings.to(torch.float32)
 

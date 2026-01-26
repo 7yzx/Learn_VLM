@@ -192,8 +192,8 @@ def has_tokenized_data(path: "os.PathLike") -> bool:
 
 def infer_optim_dtype(model_dtype: "torch.dtype") -> "torch.dtype":
     r"""Infer the optimal dtype according to the model_dtype and device compatibility."""
-    if _is_bf16_available and model_dtype == torch.bfloat16:
-        return torch.bfloat16
+    if _is_bf16_available and model_dtype == torch.float16:
+        return torch.float16
     elif _is_fp16_available:
         return torch.float16
     else:
@@ -214,7 +214,7 @@ def numpify(inputs: Union["NDArray", "torch.Tensor"]) -> "NDArray":
     r"""Cast a torch tensor or a numpy array to a numpy array."""
     if isinstance(inputs, torch.Tensor):
         inputs = inputs.cpu()
-        if inputs.dtype == torch.bfloat16:  # numpy does not support bfloat16 until 1.21.4
+        if inputs.dtype == torch.float16:  # numpy does not support float16 until 1.21.4
             inputs = inputs.to(torch.float32)
 
         inputs = inputs.numpy()

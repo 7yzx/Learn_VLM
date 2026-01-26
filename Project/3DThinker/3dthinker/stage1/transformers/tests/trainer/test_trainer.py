@@ -4491,7 +4491,7 @@ class TrainerIntegrationTest(TestCasePlus, TrainerIntegrationCommon):
             "complex64",
             "complex128",
             "float16",
-            "bfloat16",
+            "float16",
             "uint8",
             "int8",
             "int16",
@@ -5371,7 +5371,7 @@ if is_torch_available():
         "use_kahan_summation": False,
         "momentum_dtype": torch.float32,
         "variance_dtype": torch.float32,
-        "compensation_buffer_dtype": torch.bfloat16,
+        "compensation_buffer_dtype": torch.float16,
     }
 
     optim_test_params = [

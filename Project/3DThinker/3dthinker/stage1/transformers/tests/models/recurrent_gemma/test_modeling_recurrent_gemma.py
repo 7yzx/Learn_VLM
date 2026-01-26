@@ -454,7 +454,7 @@ class RecurrentGemmaIntegrationTest(unittest.TestCase):
         EXPECTED_TEXTS = ['<bos>Hello I am doing a project on the topic of "The impact of the internet on the society" and I am looking', "<bos>Hi today<pad><pad> I'm going to show you how to make a simple and easy to use <strong><em><u>"]  # fmt: skip
 
         model = AutoModelForCausalLM.from_pretrained(
-            "gg-hf/recurrent-gemma-2b-hf", device_map={"": torch_device}, load_in_8bit=True, torch_dtype=torch.bfloat16
+            "gg-hf/recurrent-gemma-2b-hf", device_map={"": torch_device}, load_in_8bit=True, torch_dtype=torch.float16
         )
 
         tokenizer = AutoTokenizer.from_pretrained(self.model_id)

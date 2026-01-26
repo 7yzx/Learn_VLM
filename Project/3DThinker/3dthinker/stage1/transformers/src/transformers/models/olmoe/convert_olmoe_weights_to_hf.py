@@ -23,7 +23,7 @@ rm -rf olmoe; mkdir olmoe; python /data/niklas/transformers/src/transformers/mod
 ```
 from transformers import OlmoeForCausalLM, AutoTokenizer
 import torch
-model = OlmoeForCausalLM.from_pretrained("../transformers/olmoe", torch_dtype=torch.bfloat16).cuda()
+model = OlmoeForCausalLM.from_pretrained("../transformers/olmoe", torch_dtype=torch.float16).cuda()
 model = OlmoeForCausalLM.from_pretrained("../transformers/olmoe").cuda()
 tokenizer = AutoTokenizer.from_pretrained("../transformers/olmoe")
 inputs = tokenizer("Bitcoin is", return_tensors="pt")
@@ -46,7 +46,7 @@ from olmo.model import OLMo
 import torch
 model = OLMo.from_checkpoint("/data/niklas/llm/checkpoints/olmoe-step1200000-unsharded-pt")
 model = model.cuda()
-model = model.to(torch.bfloat16)
+model = model.to(torch.float16)
 from transformers import AutoTokenizer
 tokenizer = AutoTokenizer.from_pretrained("../transformers/olmoe")
 inputs = tokenizer("Bitcoin is", return_tensors="pt")
@@ -207,7 +207,7 @@ def write_model(model_path, input_base_path, tokenizer_path=None, safe_serializa
         _write_tokenizer(model_path, config, tokenizer_path, fix_eos_token_id)
 
     print("Loading the checkpoint in a OLMoE model.")
-    model = OlmoeForCausalLM.from_pretrained(tmp_model_path, torch_dtype=torch.bfloat16)
+    model = OlmoeForCausalLM.from_pretrained(tmp_model_path, torch_dtype=torch.float16)
     # Avoid saving this as part of the config.
     del model.config._name_or_path
     print("Saving in the Transformers format.")

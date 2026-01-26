@@ -195,7 +195,7 @@ class AwqTest(unittest.TestCase):
         """
         input_ids = self.tokenizer(self.input_text, return_tensors="pt").to(torch_device)
 
-        quantized_model = AutoModelForCausalLM.from_pretrained(self.model_name, torch_dtype=torch.bfloat16).to(
+        quantized_model = AutoModelForCausalLM.from_pretrained(self.model_name, torch_dtype=torch.float16).to(
             torch_device
         )
 

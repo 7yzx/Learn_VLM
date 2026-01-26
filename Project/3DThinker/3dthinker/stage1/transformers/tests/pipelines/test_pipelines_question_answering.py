@@ -189,7 +189,7 @@ class QAPipelineTests(unittest.TestCase):
         question_answerer = pipeline(
             "question-answering",
             model="sshleifer/tiny-distilbert-base-cased-distilled-squad",
-            torch_dtype=torch.bfloat16,
+            torch_dtype=torch.float16,
         )
 
         outputs = question_answerer(

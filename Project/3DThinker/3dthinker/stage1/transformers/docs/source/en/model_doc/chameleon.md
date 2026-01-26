@@ -68,7 +68,7 @@ The original code can be found [here](https://github.com/facebookresearch/chamel
 ### Single image inference
 
 Chameleon is a gated model so make sure to have access and login to Hugging Face Hub using a token.
-Here's how to load the model and perform inference in half-precision (`torch.bfloat16`):
+Here's how to load the model and perform inference in half-precision (`torch.float16`):
 
 ```python
 from transformers import ChameleonProcessor, ChameleonForConditionalGeneration
@@ -77,14 +77,14 @@ from PIL import Image
 import requests
 
 processor = ChameleonProcessor.from_pretrained("facebook/chameleon-7b")
-model = ChameleonForConditionalGeneration.from_pretrained("facebook/chameleon-7b", torch_dtype=torch.bfloat16, device_map="cuda")
+model = ChameleonForConditionalGeneration.from_pretrained("facebook/chameleon-7b", torch_dtype=torch.float16, device_map="cuda")
 
 # prepare image and text prompt
 url = 'http://images.cocodataset.org/val2017/000000039769.jpg'
 image = Image.open(requests.get(url, stream=True).raw)
 prompt = "What do you see in this image?<image>"
 
-inputs = processor(images=image, text=prompt, return_tensors="pt").to(model.device, dtype=torch.bfloat16)
+inputs = processor(images=image, text=prompt, return_tensors="pt").to(model.device, dtype=torch.float16)
 
 # autoregressively complete prompt
 output = model.generate(**inputs, max_new_tokens=50)
@@ -103,7 +103,7 @@ import requests
 
 processor = ChameleonProcessor.from_pretrained("facebook/chameleon-7b")
 
-model = ChameleonForConditionalGeneration.from_pretrained("facebook/chameleon-7b", torch_dtype=torch.bfloat16, device_map="cuda")
+model = ChameleonForConditionalGeneration.from_pretrained("facebook/chameleon-7b", torch_dtype=torch.float16, device_map="cuda")
 
 # Get three different images
 url = "https://www.ilankelman.org/stopsigns/australia.jpg"
@@ -123,7 +123,7 @@ prompts = [
 
 # We can simply feed images in the order they have to be used in the text prompt
 # Each "<image>" token uses one image leaving the next for the subsequent "<image>" tokens
-inputs = processor(images=[image_stop, image_cats, image_snowman], text=prompts, padding=True, return_tensors="pt").to(device="cuda", dtype=torch.bfloat16)
+inputs = processor(images=[image_stop, image_cats, image_snowman], text=prompts, padding=True, return_tensors="pt").to(device="cuda", dtype=torch.float16)
 
 # Generate
 generate_ids = model.generate(**inputs, max_new_tokens=50)
@@ -153,7 +153,7 @@ from transformers import ChameleonForConditionalGeneration, BitsAndBytesConfig
 quantization_config = BitsAndBytesConfig(
     load_in_4bit=True,
     bnb_4bit_quant_type="nf4",
-    bnb_4bit_compute_dtype=torch.bfloat16,
+    bnb_4bit_compute_dtype=torch.float16,
 )
 
 model = ChameleonForConditionalGeneration.from_pretrained("facebook/chameleon-7b", quantization_config=quantization_config, device_map="cuda")
@@ -169,7 +169,7 @@ from transformers import ChameleonForConditionalGeneration
 model_id = "facebook/chameleon-7b"
 model = ChameleonForConditionalGeneration.from_pretrained(
     model_id,
-    torch_dtype=torch.bfloat16,
+    torch_dtype=torch.float16,
     low_cpu_mem_usage=True,
     attn_implementation="flash_attention_2"
 ).to(0)

@@ -533,7 +533,7 @@ class UdopLayerNorm(nn.Module):
         hidden_states = hidden_states * torch.rsqrt(variance + self.variance_epsilon)
 
         # convert into half-precision if necessary
-        if self.weight.dtype in [torch.float16, torch.bfloat16]:
+        if self.weight.dtype in [torch.float16, torch.float16]:
             hidden_states = hidden_states.to(self.weight.dtype)
 
         return self.weight * hidden_states

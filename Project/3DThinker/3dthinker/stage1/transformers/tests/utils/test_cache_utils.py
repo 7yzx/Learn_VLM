@@ -184,7 +184,7 @@ class CacheTest(unittest.TestCase):
 
         set_seed(0)
         device = "cpu"
-        dtype = "bfloat16"
+        dtype = "float16"
         cache_implementation = "static"
         attn_implementation = "sdpa"  # Export and ExecuTorch only works for SdpaAttention
         batch_size = 1
@@ -303,7 +303,7 @@ class CacheIntegrationTest(unittest.TestCase):
         model = AutoModelForCausalLM.from_pretrained(
             "google/gemma-2-9b",
             device_map="auto",
-            torch_dtype=torch.bfloat16,
+            torch_dtype=torch.float16,
             attn_implementation="eager",
         )
 
@@ -398,7 +398,7 @@ class CacheIntegrationTest(unittest.TestCase):
         )
         model = AutoModelForCausalLM.from_pretrained(
             "NousResearch/Llama-2-7b-chat-hf",
-            torch_dtype=torch.bfloat16,
+            torch_dtype=torch.float16,
             attn_implementation=attn_implementation,
         ).to(torch_device)
         inputs = tokenizer(
@@ -443,7 +443,7 @@ class CacheIntegrationTest(unittest.TestCase):
         )
         model = AutoModelForCausalLM.from_pretrained(
             "NousResearch/Llama-2-7b-chat-hf",
-            torch_dtype=torch.bfloat16,
+            torch_dtype=torch.float16,
             attn_implementation=attn_implementation,
         ).to(torch_device)
         inputs = tokenizer(
@@ -475,7 +475,7 @@ class CacheIntegrationTest(unittest.TestCase):
         )
         model = AutoModelForCausalLM.from_pretrained(
             "NousResearch/Llama-2-7b-chat-hf",
-            torch_dtype=torch.bfloat16,
+            torch_dtype=torch.float16,
         ).to(torch_device)
         inputs = tokenizer(
             ["The best color is", "We should not undermind the issues at hand"], padding=True, return_tensors="pt"
@@ -514,7 +514,7 @@ class CacheIntegrationTest(unittest.TestCase):
         )
         model = AutoModelForCausalLM.from_pretrained(
             "NousResearch/Llama-2-7b-chat-hf",
-            torch_dtype=torch.bfloat16,
+            torch_dtype=torch.float16,
         ).to(torch_device)
         inputs = tokenizer(
             ["The best color is", "We should not undermind the issues at hand"], padding=True, return_tensors="pt"
@@ -597,10 +597,10 @@ class CacheIntegrationTest(unittest.TestCase):
     def test_cache_copy(self):
         model_name = "microsoft/Phi-3-mini-4k-instruct"
         tokenizer = AutoTokenizer.from_pretrained(model_name)
-        model = AutoModelForCausalLM.from_pretrained(model_name, device_map="cuda", torch_dtype=torch.bfloat16)
+        model = AutoModelForCausalLM.from_pretrained(model_name, device_map="cuda", torch_dtype=torch.float16)
 
         prompt_cache = StaticCache(
-            config=model.config, max_batch_size=1, max_cache_len=1024, device="cuda", dtype=torch.bfloat16
+            config=model.config, max_batch_size=1, max_cache_len=1024, device="cuda", dtype=torch.float16
         )
 
         INITIAL_PROMPT = "You are a helpful assistant. "
@@ -688,7 +688,7 @@ class CacheIntegrationTest(unittest.TestCase):
 
         model = AutoModelForCausalLM.from_pretrained(
             model_id,
-            torch_dtype="bfloat16",
+            torch_dtype="float16",
             device_map=device_map,
         )
         inputs = tokenizer("Today is a beautiful day!", return_tensors="pt").to(0)

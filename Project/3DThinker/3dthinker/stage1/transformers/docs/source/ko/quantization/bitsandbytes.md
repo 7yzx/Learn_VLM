@@ -252,7 +252,7 @@ model_8bit = AutoModelForCausalLM.from_pretrained(
 import torch
 from transformers import BitsAndBytesConfig
 
-quantization_config = BitsAndBytesConfig(load_in_4bit=True, bnb_4bit_compute_dtype=torch.bfloat16)
+quantization_config = BitsAndBytesConfig(load_in_4bit=True, bnb_4bit_compute_dtype=torch.float16)
 ```
 
 ### Normal Float 4 (NF4)[[normal-float-4-(nf4)]]

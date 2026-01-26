@@ -154,8 +154,8 @@ def collator(data):
 set_seed(config.seed)
 
 # Now let's build the model, the reference model, and the tokenizer. We first load the model
-# in bfloat16 to save memory using `transformers`.
-model = AutoModelForCausalLM.from_pretrained(config.model_name, dtype=torch.bfloat16)
+# in float16 to save memory using `transformers`.
+model = AutoModelForCausalLM.from_pretrained(config.model_name, dtype=torch.float16)
 # And then we pass the loaded model to `AutoModelForCausalLMWithValueHead`.
 model = AutoModelForCausalLMWithValueHead.from_pretrained(model)
 

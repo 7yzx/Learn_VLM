@@ -125,27 +125,27 @@ class Siglip2ModelTesterMixin(ModelTesterMixin):
         if torch_dtype == "float16" and not is_torch_fp16_available_on_device(torch_device):
             self.skipTest(f"float16 not supported on {torch_device} (on the specific device currently used)")
 
-        if torch_dtype == "bfloat16" and not is_torch_bf16_available_on_device(torch_device):
+        if torch_dtype == "float16" and not is_torch_bf16_available_on_device(torch_device):
             self.skipTest(
-                f"bfloat16 not supported on {torch_device} (on the specific device currently used, e.g. Nvidia T4 GPU)"
+                f"float16 not supported on {torch_device} (on the specific device currently used, e.g. Nvidia T4 GPU)"
             )
 
         # Convert to torch dtype
         dtypes = {
             "float16": torch.float16,
-            "bfloat16": torch.bfloat16,
+            "float16": torch.float16,
             "float32": torch.float32,
         }
         torch_dtype = dtypes[torch_dtype]
 
         atols = {
             torch.float32: 1e-5,
-            torch.bfloat16: 3e-2,
+            torch.float16: 3e-2,
             torch.float16: 5e-3,
         }
         rtols = {
             torch.float32: 1e-4,
-            torch.bfloat16: 3e-2,
+            torch.float16: 3e-2,
             torch.float16: 5e-3,
         }
 
@@ -505,7 +505,7 @@ class Siglip2VisionModelTest(Siglip2ModelTesterMixin, unittest.TestCase):
         model = Siglip2VisionModel.from_pretrained(model_name)
         self.assertIsNotNone(model)
 
-    @parameterized.expand([("float16",), ("bfloat16",), ("float32",)])
+    @parameterized.expand([("float16",), ("float16",), ("float32",)])
     @require_torch_sdpa
     @slow
     @is_flaky()
@@ -664,7 +664,7 @@ class Siglip2TextModelTest(Siglip2ModelTesterMixin, unittest.TestCase):
         model = Siglip2TextModel.from_pretrained(model_name)
         self.assertIsNotNone(model)
 
-    @parameterized.expand([("float16",), ("bfloat16",), ("float32",)])
+    @parameterized.expand([("float16",), ("float16",), ("float32",)])
     @require_torch_sdpa
     @slow
     @is_flaky()
@@ -812,7 +812,7 @@ class Siglip2ModelTest(Siglip2ModelTesterMixin, PipelineTesterMixin, unittest.Te
     def test_flash_attn_2_inference_equivalence_right_padding(self):
         self.skipTest("Siglip2 does not support right padding")
 
-    @parameterized.expand([("float16",), ("bfloat16",), ("float32",)])
+    @parameterized.expand([("float16",), ("float16",), ("float32",)])
     @require_torch_sdpa
     @slow
     @is_flaky()
@@ -897,7 +897,7 @@ class Siglip2ForImageClassificationModelTest(Siglip2ModelTesterMixin, PipelineTe
     def test_initialization(self):
         pass
 
-    @parameterized.expand([("float16",), ("bfloat16",), ("float32",)])
+    @parameterized.expand([("float16",), ("float16",), ("float32",)])
     @require_torch_sdpa
     @slow
     @is_flaky()

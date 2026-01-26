@@ -507,7 +507,7 @@ def peft_module_casting_to_bf16(model):
         elif any(x in name for x in ["lm_head", "embed_tokens", "wte", "wpe"]):
             if hasattr(module, "weight"):
                 if module.weight.dtype == torch.float32:
-                    module = module.to(torch.bfloat16)
+                    module = module.to(torch.float16)
 
 
 def prepare_peft_model(

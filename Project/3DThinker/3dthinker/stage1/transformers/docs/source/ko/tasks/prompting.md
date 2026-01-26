@@ -107,14 +107,14 @@ pip install -q transformers accelerate
 ...     "text-generation",
 ...     model=model,
 ...     tokenizer=tokenizer,
-...     torch_dtype=torch.bfloat16,
+...     torch_dtype=torch.float16,
 ...     device_map="auto",
 ... )
 ```
 
 <Tip>
 
-Falcon 모델은 bfloat16 데이터 타입을 사용하여 훈련되었으므로, 같은 타입을 사용하는 것을 권장합니다. 이를 위해서는 최신 버전의 CUDA가 필요하며, 최신 그래픽 카드에서 가장 잘 작동합니다.
+Falcon 모델은 float16 데이터 타입을 사용하여 훈련되었으므로, 같은 타입을 사용하는 것을 권장합니다. 이를 위해서는 최신 버전의 CUDA가 필요하며, 최신 그래픽 카드에서 가장 잘 작동합니다.
 
 </Tip>
 

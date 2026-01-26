@@ -98,9 +98,9 @@ def parse_args():
     )
 
     parser.add_argument(
-        "--bfloat16",
+        "--float16",
         action="store_true",
-        help="Use mixed-precision bfloat16 for training. This is the recommended lower-precision format for TPU.",
+        help="Use mixed-precision float16 for training. This is the recommended lower-precision format for TPU.",
     )
 
     parser.add_argument(
@@ -222,8 +222,8 @@ def main(args):
     else:
         strategy = tf.distribute.OneDeviceStrategy(device="/gpu:0")
 
-    if args.bfloat16:
-        keras.mixed_precision.set_global_policy("mixed_bfloat16")
+    if args.float16:
+        keras.mixed_precision.set_global_policy("mixed_float16")
 
     tokenizer = AutoTokenizer.from_pretrained(args.tokenizer)
     config = AutoConfig.from_pretrained(args.pretrained_model_config)

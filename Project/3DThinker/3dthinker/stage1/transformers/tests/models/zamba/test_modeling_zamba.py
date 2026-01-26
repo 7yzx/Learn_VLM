@@ -535,7 +535,7 @@ class ZambaModelTest(ModelTesterMixin, GenerationTesterMixin, PipelineTesterMixi
 
                 for _, param in model.named_parameters():
                     # upcast only layer norms
-                    if (param.dtype == torch.float16) or (param.dtype == torch.bfloat16):
+                    if (param.dtype == torch.float16) or (param.dtype == torch.float16):
                         param.data = param.data.to(torch.float32)
 
                 _ = model(dummy_input)
@@ -564,7 +564,7 @@ class ZambaModelIntegrationTest(unittest.TestCase):
     def setUpClass(cls):
         model_id = "Zyphra/Zamba-7B-v1"
         cls.model = ZambaForCausalLM.from_pretrained(
-            model_id, torch_dtype=torch.bfloat16, low_cpu_mem_usage=True, use_mamba_kernels=False
+            model_id, torch_dtype=torch.float16, low_cpu_mem_usage=True, use_mamba_kernels=False
         )
         cls.tokenizer = AutoTokenizer.from_pretrained(model_id)
 

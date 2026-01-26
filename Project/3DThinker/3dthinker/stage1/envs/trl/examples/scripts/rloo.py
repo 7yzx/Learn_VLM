@@ -116,7 +116,7 @@ def main():
     # Training
     training_args = RLOOConfig(
         output_dir="Qwen3-0.6B-RLOO",
-        model_init_kwargs={"dtype": torch.bfloat16},
+        model_init_kwargs={"dtype": torch.float16},
         learning_rate=1e-5,
         gradient_checkpointing_kwargs=dict(use_reentrant=False),
         log_completions=True,

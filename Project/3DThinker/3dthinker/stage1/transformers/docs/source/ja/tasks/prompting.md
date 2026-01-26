@@ -128,14 +128,14 @@ pip install -q transformers accelerate
 ...     "text-generation",
 ...     model=model,
 ...     tokenizer=tokenizer,
-...     torch_dtype=torch.bfloat16,
+...     torch_dtype=torch.float16,
 ...     device_map="auto",
 ... )
 ```
 
 <Tip>
 
-Falcon モデルは `bfloat16` データ型を使用してトレーニングされたため、同じものを使用することをお勧めします。これには、最近の
+Falcon モデルは `float16` データ型を使用してトレーニングされたため、同じものを使用することをお勧めします。これには、最近の
 CUDA のバージョンに準拠しており、最新のカードで最適に動作します。
 
 </Tip>

@@ -398,7 +398,7 @@ def write_model(model_path, input_base_path, model_size, chameleon_version=1):
     print("Loading the checkpoint in a Chameleon model...")
     print("*" * 100)
     model = ChameleonForConditionalGeneration.from_pretrained(
-        model_path, attn_implementation="eager", torch_dtype=torch.bfloat16, device_map="auto"
+        model_path, attn_implementation="eager", torch_dtype=torch.float16, device_map="auto"
     )
     processor = ChameleonProcessor.from_pretrained(model_path)
 
@@ -408,7 +408,7 @@ def write_model(model_path, input_base_path, model_size, chameleon_version=1):
             "https://uploads4.wikiart.org/images/paul-klee/death-for-the-idea-1915.jpg!Large.jpg", stream=True
         ).raw
     )
-    inputs = processor(prompt, images=image, return_tensors="pt").to(model.device, torch.bfloat16)
+    inputs = processor(prompt, images=image, return_tensors="pt").to(model.device, torch.float16)
     length = inputs.input_ids.shape[1]
 
     out = model.generate(**inputs, max_new_tokens=40, do_sample=False)
@@ -426,7 +426,7 @@ def write_model(model_path, input_base_path, model_size, chameleon_version=1):
         requests.get("https://www.kxan.com/wp-content/uploads/sites/40/2020/10/ORION.jpg", stream=True).raw
     )
 
-    inputs = processor(prompt, images=[image, image_2], return_tensors="pt").to(model.device, dtype=torch.bfloat16)
+    inputs = processor(prompt, images=[image, image_2], return_tensors="pt").to(model.device, dtype=torch.float16)
     length = inputs.input_ids.shape[1]
     out = model.generate(**inputs, max_new_tokens=50, do_sample=False)
     generated_text = processor.batch_decode(out[:, length:], skip_special_tokens=True)[0]

@@ -46,7 +46,7 @@ import torch
 from transformers import AutoTokenizer, AutoModelForCausalLM, DynamicCache
 
 model_id = "meta-llama/Llama-2-7b-chat-hf"
-model = AutoModelForCausalLM.from_pretrained(model_id, torch_dtype=torch.bfloat16, device_map="cuda:0")
+model = AutoModelForCausalLM.from_pretrained(model_id, torch_dtype=torch.float16, device_map="cuda:0")
 tokenizer = AutoTokenizer.from_pretrained(model_id)
 
 past_key_values = DynamicCache()

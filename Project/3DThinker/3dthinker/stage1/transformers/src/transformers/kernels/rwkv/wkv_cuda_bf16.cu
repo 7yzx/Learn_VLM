@@ -2,7 +2,7 @@
 #include <assert.h>
 #include "ATen/ATen.h"
 #define MIN_VALUE (-1e38)
-typedef at::BFloat16 bf16;
+typedef at::float16 bf16;
 
 __global__ void kernel_forward_bf16(
     const int B, const int T, const int C, const float *__restrict__ const _w, const bf16 *__restrict__ const _u,

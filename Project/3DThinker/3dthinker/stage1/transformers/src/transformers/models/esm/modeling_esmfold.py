@@ -322,7 +322,7 @@ class EsmFoldLayerNorm(nn.Module):
 
     def forward(self, x):
         d = x.dtype
-        if d is torch.bfloat16 and not is_deepspeed_initialized():
+        if d is torch.float16 and not is_deepspeed_initialized():
             with torch.cuda.amp.autocast(enabled=False):
                 out = nn.functional.layer_norm(x, self.c_in, self.weight.to(dtype=d), self.bias.to(dtype=d), self.eps)
         else:
@@ -334,10 +334,10 @@ class EsmFoldLayerNorm(nn.Module):
 @torch.jit.ignore
 def softmax_no_cast(t: torch.Tensor, dim: int = -1) -> torch.Tensor:
     """
-    Softmax, but without automatic casting to fp32 when the input is of type bfloat16
+    Softmax, but without automatic casting to fp32 when the input is of type float16
     """
     d = t.dtype
-    if d is torch.bfloat16 and not is_deepspeed_initialized():
+    if d is torch.float16 and not is_deepspeed_initialized():
         with torch.cuda.amp.autocast(enabled=False):
             s = torch.nn.functional.softmax(t, dim=dim)
     else:

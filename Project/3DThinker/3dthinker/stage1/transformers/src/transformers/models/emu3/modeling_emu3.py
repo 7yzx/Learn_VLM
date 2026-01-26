@@ -1684,7 +1684,7 @@ class Emu3ForCausalLM(Emu3PreTrainedModel, GenerationMixin):
         >>> import requests
         >>> from PIL import Image
 
-        >>> model = Emu3ForCausalLM.from_pretrained("BAAI/Emu3-Chat-hf", torch_dtype=torch.bfloat16)
+        >>> model = Emu3ForCausalLM.from_pretrained("BAAI/Emu3-Chat-hf", torch_dtype=torch.float16)
         >>> processor = Emu3Processor.from_pretrained("BAAI/Emu3-Chat-hf")
 
         >>> inputs = processor(text=["Can you write me a poem about winter."], return_tensors="pt").to(model.device)
@@ -1911,7 +1911,7 @@ class Emu3ForConditionalGeneration(Emu3PreTrainedModel, GenerationMixin):
         >>> import requests
         >>> from PIL import Image
 
-        >>> model = Emu3ForConditionalGeneration.from_pretrained("BAAI/Emu3-Chat-hf", torch_dtype=torch.bfloat16)
+        >>> model = Emu3ForConditionalGeneration.from_pretrained("BAAI/Emu3-Chat-hf", torch_dtype=torch.float16)
         >>> processor = Emu3Processor.from_pretrained("BAAI/Emu3-Chat-hf")
 
         >>> conversation = [
@@ -1933,7 +1933,7 @@ class Emu3ForConditionalGeneration(Emu3PreTrainedModel, GenerationMixin):
         >>> prompt = processor.apply_chat_template(conversation, add_generation_prompt=True)
         >>> image = Image.open(requests.get("https://www.ilankelman.org/stopsigns/australia.jpg", stream=True).raw)
 
-        >>> inputs = processor(images=[image], text=[prompt], return_tensors="pt").to(model.device, torch.bfloat16)
+        >>> inputs = processor(images=[image], text=[prompt], return_tensors="pt").to(model.device, torch.float16)
 
         >>> generated_ids = model.generate(**inputs, max_new_tokens=100, do_sample=False)
         >>> processor.batch_decode(generated_ids, skip_special_tokens=True)[0]

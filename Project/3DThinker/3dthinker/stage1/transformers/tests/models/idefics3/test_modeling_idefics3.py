@@ -531,7 +531,7 @@ class Idefics3ForConditionalGenerationIntegrationTest(unittest.TestCase):
     def test_integration_test(self):
         model = Idefics3ForConditionalGeneration.from_pretrained(
             "HuggingFaceM4/Idefics3-8B-Llama3",
-            torch_dtype=torch.bfloat16,
+            torch_dtype=torch.float16,
             device_map="auto",
         )
 

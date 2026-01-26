@@ -31,7 +31,7 @@ accelerate launch \
     --model_name_or_path google/gemma-3-4b-it \
     --per_device_train_batch_size 1 \
     --output_dir Gemma-3-4B-SFT-MMIU \
-    --dtype bfloat16 \
+    --dtype float16 \
     --use_peft \
     --lora_target_modules all-linear \
     --attn_implementation eager
@@ -46,7 +46,7 @@ accelerate launch \
     --model_name_or_path google/gemma-3-4b-it \
     --per_device_train_batch_size 1 \
     --output_dir Gemma-3-4B-SFT-MMIU \
-    --dtype bfloat16 \
+    --dtype float16 \
     --use_peft \
     --lora_target_modules all-linear \
     --attn_implementation eager

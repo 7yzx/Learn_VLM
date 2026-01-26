@@ -54,7 +54,7 @@ model = AutoModelForObjectDetection.from_pretrained("hustvl/yolos-base", attn_im
 ...
 ```
 
-For the best speedups, we recommend loading the model in half-precision (e.g. `torch.float16` or `torch.bfloat16`).
+For the best speedups, we recommend loading the model in half-precision (e.g. `torch.float16` or `torch.float16`).
 
 On a local benchmark (A100-40GB, PyTorch 2.3.0, OS Ubuntu 22.04) with `float32` and `hustvl/yolos-base` model, we saw the following speedups during inference.
 

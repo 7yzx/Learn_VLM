@@ -706,7 +706,7 @@ class MoshiTest(ModelTesterMixin, GenerationTesterMixin, unittest.TestCase):
             config, inputs_dict = self.model_tester.prepare_config_and_inputs_for_common()
 
             dummy_input = inputs_dict[model_class.main_input_name]
-            if dummy_input.dtype in [torch.float32, torch.bfloat16]:
+            if dummy_input.dtype in [torch.float32, torch.float16]:
                 dummy_input = dummy_input.to(torch.float16)
 
             inputs_dict[model_class.main_input_name] = dummy_input

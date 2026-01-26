@@ -313,7 +313,7 @@ class ColPaliModelIntegrationTest(unittest.TestCase):
         """
         model = ColPaliForRetrieval.from_pretrained(
             self.model_name,
-            torch_dtype=torch.bfloat16,
+            torch_dtype=torch.float16,
             device_map=torch_device,
         ).eval()
 

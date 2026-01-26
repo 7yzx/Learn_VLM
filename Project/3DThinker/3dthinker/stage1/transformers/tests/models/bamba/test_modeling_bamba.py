@@ -486,7 +486,7 @@ class BambaModelIntegrationTest(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         model_id = "ibm-fms/Bamba-9B"
-        cls.model = BambaForCausalLM.from_pretrained(model_id, torch_dtype=torch.bfloat16, low_cpu_mem_usage=True)
+        cls.model = BambaForCausalLM.from_pretrained(model_id, torch_dtype=torch.float16, low_cpu_mem_usage=True)
         cls.tokenizer = AutoTokenizer.from_pretrained(model_id)
 
         # feels a bit forced to have to do this for the generation test
@@ -533,7 +533,7 @@ class BambaModelIntegrationTest(unittest.TestCase):
                     147., 145., 145., 145., 145., 144., 144., 144.,
                     144., 145., 147., 146., 144., 144., 148., 147.,
                     148., 147., 147., 147., 146., 146., 148., 148.
-                ], dtype=torch.bfloat16)  # fmt: skip
+                ], dtype=torch.float16)  # fmt: skip
 
             torch.testing.assert_close(logits[0, -1, :40].cpu(), EXPECTED_LOGITS_NO_GRAD, rtol=1e-3, atol=1)
 
@@ -578,7 +578,7 @@ class BambaModelIntegrationTest(unittest.TestCase):
                     147., 145., 145., 145., 145., 144., 144., 144.,
                     144., 145., 147., 146., 144., 144., 148., 147.,
                     148., 147., 147., 147., 146., 146., 148., 148.
-                ], dtype=torch.bfloat16)  # fmt: skip
+                ], dtype=torch.float16)  # fmt: skip
 
             EXPECTED_LOGITS_NO_GRAD_1 = torch.tensor(
                 [
@@ -587,7 +587,7 @@ class BambaModelIntegrationTest(unittest.TestCase):
                     178., 176., 176., 175., 175., 175., 174., 173.,
                     174., 182., 180., 176., 177., 177., 180., 176.,
                     178., 177., 177., 175., 176., 177., 175., 177.
-                ], dtype=torch.bfloat16)  # fmt: skip
+                ], dtype=torch.float16)  # fmt: skip
 
             torch.testing.assert_close(logits[0, -1, :40].cpu(), EXPECTED_LOGITS_NO_GRAD_0, rtol=1e-3, atol=1)
             torch.testing.assert_close(logits[1, -1, :40].cpu(), EXPECTED_LOGITS_NO_GRAD_1, rtol=1e-3, atol=1)

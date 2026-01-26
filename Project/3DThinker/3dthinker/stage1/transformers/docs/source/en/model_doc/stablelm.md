@@ -68,7 +68,7 @@ First, make sure to install the latest version of Flash Attention v2.
 pip install -U flash-attn --no-build-isolation
 ```
 
-Also make sure that your hardware is compatible with Flash-Attention 2. Read more about it in the official documentation of the [`flash-attn`](https://github.com/Dao-AILab/flash-attention) repository. Note: you must load your model in half-precision (e.g. `torch.bfloat16`).
+Also make sure that your hardware is compatible with Flash-Attention 2. Read more about it in the official documentation of the [`flash-attn`](https://github.com/Dao-AILab/flash-attention) repository. Note: you must load your model in half-precision (e.g. `torch.float16`).
 
 Now, to run the model with Flash Attention 2, refer to the snippet below:
 
@@ -80,7 +80,7 @@ Now, to run the model with Flash Attention 2, refer to the snippet below:
 >>> set_seed(0)
 
 >>> tokenizer = AutoTokenizer.from_pretrained("stabilityai/stablelm-3b-4e1t")
->>> model = AutoModelForCausalLM.from_pretrained("stabilityai/stablelm-3b-4e1t", torch_dtype=torch.bfloat16, attn_implementation="flash_attention_2")  # doctest: +SKIP
+>>> model = AutoModelForCausalLM.from_pretrained("stabilityai/stablelm-3b-4e1t", torch_dtype=torch.float16, attn_implementation="flash_attention_2")  # doctest: +SKIP
 >>> model.to(device)  # doctest: +SKIP
 
 >>> model_inputs = tokenizer("The weather is always wonderful in", return_tensors="pt").to(model.device)

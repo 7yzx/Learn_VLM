@@ -410,12 +410,12 @@ class ImageProcessingTestMixin:
                 self.assertEqual(encoding.pixel_values.device, torch.device("cpu"))
                 self.assertEqual(encoding.pixel_values.dtype, torch.float16)
 
-                encoding = image_processor(image_inputs, return_tensors="pt").to("cpu", torch.bfloat16)
+                encoding = image_processor(image_inputs, return_tensors="pt").to("cpu", torch.float16)
                 self.assertEqual(encoding.pixel_values.device, torch.device("cpu"))
-                self.assertEqual(encoding.pixel_values.dtype, torch.bfloat16)
+                self.assertEqual(encoding.pixel_values.dtype, torch.float16)
 
                 with self.assertRaises(TypeError):
-                    _ = image_processor(image_inputs, return_tensors="pt").to(torch.bfloat16, "cpu")
+                    _ = image_processor(image_inputs, return_tensors="pt").to(torch.float16, "cpu")
 
                 # Try with text + image feature
                 encoding = image_processor(image_inputs, return_tensors="pt")

@@ -32,7 +32,7 @@ python examples/scripts/mpo_vlm.py \
     --gradient_accumulation_steps 8 \
     --dataset_num_proc 1 \
     --output_dir dpo_idefics_rlaif-v \
-    --dtype bfloat16 \
+    --dtype float16 \
     --gradient_checkpointing \
     --use_peft \
     --lora_target_modules down_proj, o_proj, k_proj, q_proj, gate_proj, up_proj, v_proj \

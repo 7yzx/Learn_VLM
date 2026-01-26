@@ -531,7 +531,7 @@ class JambaModelTest(ModelTesterMixin, GenerationTesterMixin, PipelineTesterMixi
 
                 for _, param in model.named_parameters():
                     # upcast only layer norms
-                    if (param.dtype == torch.float16) or (param.dtype == torch.bfloat16):
+                    if (param.dtype == torch.float16) or (param.dtype == torch.float16):
                         param.data = param.data.to(torch.float32)
 
                 _ = model(dummy_input)
@@ -561,7 +561,7 @@ class JambaModelIntegrationTest(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         model_id = "ai21labs/Jamba-tiny-dev"
-        cls.model = JambaForCausalLM.from_pretrained(model_id, torch_dtype=torch.bfloat16, low_cpu_mem_usage=True)
+        cls.model = JambaForCausalLM.from_pretrained(model_id, torch_dtype=torch.float16, low_cpu_mem_usage=True)
         cls.tokenizer = AutoTokenizer.from_pretrained(model_id)
         if is_torch_available() and torch.cuda.is_available():
             # 8 is for A100 / A10 and 7 for T4

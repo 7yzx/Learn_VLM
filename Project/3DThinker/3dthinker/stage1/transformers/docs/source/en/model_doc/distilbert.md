@@ -79,7 +79,7 @@ from transformers import DistilBertModel
 model = DistilBertModel.from_pretrained("distilbert-base-uncased", torch_dtype=torch.float16, attn_implementation="sdpa")
 ```
 
-For the best speedups, we recommend loading the model in half-precision (e.g. `torch.float16` or `torch.bfloat16`).
+For the best speedups, we recommend loading the model in half-precision (e.g. `torch.float16` or `torch.float16`).
 
 On a local benchmark (NVIDIA GeForce RTX 2060-8GB, PyTorch 2.3.1, OS Ubuntu 20.04) with `float16` and the `distilbert-base-uncased` model with
 a MaskedLM head, we saw the following speedups during training and inference.

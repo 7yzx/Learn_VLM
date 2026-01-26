@@ -144,14 +144,14 @@ if args.stage in ['stage1']:
     model = Qwen2_5_VLForConditionalGeneration.from_pretrained(
         model_path, 
         config=config, 
-        torch_dtype=torch.bfloat16, 
+        torch_dtype=torch.float16, 
         cache_dir=cache_dir
     )
 elif args.stage in ['stage2']:
     model = Qwen2_5_VLForConditionalGeneration.from_pretrained(
         model_path, 
         config=config, 
-        torch_dtype=torch.bfloat16
+        torch_dtype=torch.float16
     )
 
 model.config.use_cache = False  # unable cache -> gradient checkpointing

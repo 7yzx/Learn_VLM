@@ -75,7 +75,7 @@ model = ViTMAEModel.from_pretrained("facebook/vit-mae-base", attn_implementation
 ...
 ```
 
-For the best speedups, we recommend loading the model in half-precision (e.g. `torch.float16` or `torch.bfloat16`).
+For the best speedups, we recommend loading the model in half-precision (e.g. `torch.float16` or `torch.float16`).
 
 On a local benchmark (A100-40GB, PyTorch 2.3.0, OS Ubuntu 22.04) with `float32` and `facebook/vit-mae-base` model, we saw the following speedups during inference.
 

@@ -63,7 +63,7 @@ model_path = 'nvidia/Minitron-4B-Base'
 tokenizer  = AutoTokenizer.from_pretrained(model_path)
 
 device = 'cuda'
-dtype  = torch.bfloat16
+dtype  = torch.float16
 model  = AutoModelForCausalLM.from_pretrained(model_path, torch_dtype=dtype, device_map=device)
 
 # Prepare the input text

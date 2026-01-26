@@ -315,6 +315,6 @@ for model_id, model_class in [
     if isinstance(config, Idefics2Config):
         config.perceiver_config.hidden_size = 16
 
-    model = model_class(config).to(dtype=torch.bfloat16)
+    model = model_class(config).to(dtype=torch.float16)
 
     push_to_hub(model, processor, "tiny")

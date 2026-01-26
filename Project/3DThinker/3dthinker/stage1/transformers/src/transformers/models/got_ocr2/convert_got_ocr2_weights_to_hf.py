@@ -127,7 +127,7 @@ def write_model(
     print("Loading the checkpoint in a GotOcr2ForConditionalGeneration model.")
     model = GotOcr2ForConditionalGeneration(config)
     missing_keys, unexpected_keys = model.load_state_dict(state_dict, strict=False)
-    model = model.to(torch.bfloat16)
+    model = model.to(torch.float16)
     print("model dtype:", model.dtype)
     print("Missing keys:", missing_keys)
     print("Unexpected keys:", unexpected_keys)

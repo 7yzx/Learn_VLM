@@ -3,6 +3,10 @@ import os
 os.environ["HF_ENDPOINT"] = "https://hf-mirror.com"
 from huggingface_hub import snapshot_download
 
+
+from huggingface_hub import login
+login()
+
 def download_dataset(repo_id, local_dir, filenames=None):
     """
     下载指定数据集仓库到本地目录。
@@ -56,7 +60,8 @@ local_dir = '/mnt/sevenT/zixiaoy/dataset'
 
 # repo_id = 'gongjy/minimind-v_dataset'
 # repo_id = "gongjy/minimind_dataset"
-repo_id = "Inevitablevalor/MindCube"
+# repo_id = "Inevitablevalor/MindCube"
+repo_id = "shijiezhou/VLM4D"
 
 
 

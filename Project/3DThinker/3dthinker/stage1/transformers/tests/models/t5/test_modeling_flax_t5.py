@@ -675,8 +675,8 @@ class FlaxT5ModelIntegrationTests(unittest.TestCase):
         self.assertTrue(output_str == "Hello there!")
 
     @slow
-    def test_small_generation_bfloat16(self):
-        model = FlaxT5ForConditionalGeneration.from_pretrained("google-t5/t5-small", dtype=jnp.bfloat16)
+    def test_small_generation_float16(self):
+        model = FlaxT5ForConditionalGeneration.from_pretrained("google-t5/t5-small", dtype=jnp.float16)
         model.config.max_length = 8
         model.config.num_beams = 1
         model.config.do_sample = False

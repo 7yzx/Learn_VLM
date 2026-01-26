@@ -55,7 +55,7 @@ logging.set_verbosity_info()
 logger = logging.get_logger(__name__)
 
 
-ORIGINAL_DTYPE = torch.bfloat16
+ORIGINAL_DTYPE = torch.float16
 
 
 def rename_state_dict_keys(state_dict: Dict[str, Any]) -> Dict[str, Any]:

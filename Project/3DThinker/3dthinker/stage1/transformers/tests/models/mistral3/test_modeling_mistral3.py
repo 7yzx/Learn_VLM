@@ -167,7 +167,7 @@ class Mistral3VisionText2TextModelTester:
         logits = model(
             input_ids=input_ids,
             attention_mask=attention_mask,
-            pixel_values=pixel_values.to(torch.bfloat16),
+            pixel_values=pixel_values.to(torch.float16),
             return_dict=True,
         )["logits"]
         self.parent.assertFalse(torch.isnan(logits).any().item())
@@ -181,7 +181,7 @@ class Mistral3VisionText2TextModelTester:
             logits = model(
                 input_ids=input_ids,
                 attention_mask=attention_mask,
-                pixel_values=pixel_values.to(torch.bfloat16),
+                pixel_values=pixel_values.to(torch.float16),
                 return_dict=True,
             )["logits"]
         self.parent.assertFalse(torch.isnan(logits).any().item())
@@ -318,7 +318,7 @@ class Mistral3IntegrationTest(unittest.TestCase):
     def test_mistral3_integration_generate_text_only(self):
         processor = AutoProcessor.from_pretrained(self.model_checkpoint)
         model = Mistral3ForConditionalGeneration.from_pretrained(
-            self.model_checkpoint, device_map=torch_device, torch_dtype=torch.bfloat16
+            self.model_checkpoint, device_map=torch_device, torch_dtype=torch.float16
         )
 
         messages = [
@@ -332,7 +332,7 @@ class Mistral3IntegrationTest(unittest.TestCase):
 
         inputs = processor.apply_chat_template(
             messages, add_generation_prompt=True, tokenize=True, return_dict=True, return_tensors="pt"
-        ).to(torch_device, dtype=torch.bfloat16)
+        ).to(torch_device, dtype=torch.float16)
 
         with torch.no_grad():
             generate_ids = model.generate(**inputs, max_new_tokens=200, do_sample=False)
@@ -345,7 +345,7 @@ class Mistral3IntegrationTest(unittest.TestCase):
     def test_mistral3_integration_generate(self):
         processor = AutoProcessor.from_pretrained(self.model_checkpoint)
         model = Mistral3ForConditionalGeneration.from_pretrained(
-            self.model_checkpoint, device_map=torch_device, torch_dtype=torch.bfloat16
+            self.model_checkpoint, device_map=torch_device, torch_dtype=torch.float16
         )
         messages = [
             {
@@ -359,7 +359,7 @@ class Mistral3IntegrationTest(unittest.TestCase):
 
         inputs = processor.apply_chat_template(
             messages, add_generation_prompt=True, tokenize=True, return_dict=True, return_tensors="pt"
-        ).to(torch_device, dtype=torch.bfloat16)
+        ).to(torch_device, dtype=torch.float16)
         with torch.no_grad():
             generate_ids = model.generate(**inputs, max_new_tokens=20, do_sample=False)
             decoded_output = processor.decode(
@@ -371,7 +371,7 @@ class Mistral3IntegrationTest(unittest.TestCase):
     def test_mistral3_integration_batched_generate(self):
         processor = AutoProcessor.from_pretrained(self.model_checkpoint)
         model = Mistral3ForConditionalGeneration.from_pretrained(
-            self.model_checkpoint, device_map=torch_device, torch_dtype=torch.bfloat16
+            self.model_checkpoint, device_map=torch_device, torch_dtype=torch.float16
         )
         messages = [
             [
@@ -396,7 +396,7 @@ class Mistral3IntegrationTest(unittest.TestCase):
 
         inputs = processor.apply_chat_template(
             messages, padding=True, add_generation_prompt=True, tokenize=True, return_dict=True, return_tensors="pt"
-        ).to(model.device, dtype=torch.bfloat16)
+        ).to(model.device, dtype=torch.float16)
 
         output = model.generate(**inputs, do_sample=False, max_new_tokens=25)
 

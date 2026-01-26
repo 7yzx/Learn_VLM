@@ -122,7 +122,7 @@ To follow the example of the following image, `"Hello, I'm Moshi"` could be tran
 >>> feature_extractor = AutoFeatureExtractor.from_pretrained("kyutai/moshiko-pytorch-bf16")
 >>> tokenizer = AutoTokenizer.from_pretrained("kyutai/moshiko-pytorch-bf16")
 >>> device = "cuda"
->>> dtype = torch.bfloat16
+>>> dtype = torch.float16
 
 >>> # prepare user input audio 
 >>> librispeech_dummy = librispeech_dummy.cast_column("audio", Audio(sampling_rate=feature_extractor.sampling_rate))

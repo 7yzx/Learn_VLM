@@ -506,8 +506,8 @@ class Pipeline4BitTest(Base4bitTest):
             model_kwargs={
                 "device_map": "auto",
                 "load_in_4bit": True,
-                # float16 isn't supported on CPU, use bfloat16 instead
-                "torch_dtype": torch.bfloat16 if torch_device == "cpu" else torch.float16,
+                # float16 isn't supported on CPU, use float16 instead
+                "torch_dtype": torch.float16 if torch_device == "cpu" else torch.float16,
             },
             max_new_tokens=self.MAX_NEW_TOKENS,
         )
@@ -634,7 +634,7 @@ class BaseSerializationTest(unittest.TestCase):
             load_in_4bit=True,
             bnb_4bit_quant_type=quant_type,
             bnb_4bit_use_double_quant=double_quant,
-            bnb_4bit_compute_dtype=torch.bfloat16,
+            bnb_4bit_compute_dtype=torch.float16,
         )
         model_0 = AutoModelForCausalLM.from_pretrained(
             self.model_name,

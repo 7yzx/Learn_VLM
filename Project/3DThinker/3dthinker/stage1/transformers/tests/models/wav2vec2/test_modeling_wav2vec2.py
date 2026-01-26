@@ -2000,7 +2000,7 @@ class Wav2Vec2ModelIntegrationTest(unittest.TestCase):
     @mark.flash_attn_test
     def test_inference_ctc_fa2(self):
         model_fa = Wav2Vec2ForCTC.from_pretrained(
-            "facebook/wav2vec2-base-960h", attn_implementation="flash_attention_2", torch_dtype=torch.bfloat16
+            "facebook/wav2vec2-base-960h", attn_implementation="flash_attention_2", torch_dtype=torch.float16
         )
         model_fa.to(torch_device)
         processor = Wav2Vec2Processor.from_pretrained("facebook/wav2vec2-base-960h", do_lower_case=True)
@@ -2009,7 +2009,7 @@ class Wav2Vec2ModelIntegrationTest(unittest.TestCase):
         input_values = processor(input_speech, return_tensors="pt").input_values.to(torch_device)
 
         with torch.no_grad():
-            logits = model_fa(input_values.to(torch.bfloat16)).logits
+            logits = model_fa(input_values.to(torch.float16)).logits
 
         predicted_ids = torch.argmax(logits, dim=-1)
         predicted_trans = processor.batch_decode(predicted_ids)
@@ -2022,7 +2022,7 @@ class Wav2Vec2ModelIntegrationTest(unittest.TestCase):
     @mark.flash_attn_test
     def test_inference_ctc_fa2_batched(self):
         model_fa = Wav2Vec2ForCTC.from_pretrained(
-            "facebook/wav2vec2-base-960h", attn_implementation="flash_attention_2", torch_dtype=torch.bfloat16
+            "facebook/wav2vec2-base-960h", attn_implementation="flash_attention_2", torch_dtype=torch.float16
         )
         model_fa.to(torch_device)
         processor = Wav2Vec2Processor.from_pretrained("facebook/wav2vec2-base-960h", do_lower_case=True)
@@ -2033,7 +2033,7 @@ class Wav2Vec2ModelIntegrationTest(unittest.TestCase):
         inputs = inputs.to(torch_device)
 
         with torch.no_grad():
-            logits = model_fa(inputs.input_values.to(torch.bfloat16), attention_mask=inputs.attention_mask).logits
+            logits = model_fa(inputs.input_values.to(torch.float16), attention_mask=inputs.attention_mask).logits
 
         predicted_ids = torch.argmax(logits, dim=-1)
         predicted_trans = processor.batch_decode(predicted_ids)

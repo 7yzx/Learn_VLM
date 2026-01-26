@@ -208,7 +208,7 @@ def convert_checkpoint(
     """
     device = _grab_best_device()
 
-    mimi_model = MimiModel.from_pretrained(mimi_repo_id, torch_dtype=torch.bfloat16)
+    mimi_model = MimiModel.from_pretrained(mimi_repo_id, torch_dtype=torch.float16)
 
     if config_path is not None:
         config = MoshiConfig.from_pretrained(config_path)
@@ -216,7 +216,7 @@ def convert_checkpoint(
         audio_encoder_config = mimi_model.config
         config = MoshiConfig.from_audio_encoder_config(audio_encoder_config)
 
-    model = MoshiForConditionalGeneration(config).to(torch.bfloat16)
+    model = MoshiForConditionalGeneration(config).to(torch.float16)
 
     depth_decoder_generation_config = GenerationConfig(
         do_sample=True,

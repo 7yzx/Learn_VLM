@@ -162,7 +162,7 @@ class DocumentQuestionAnsweringPipelineTests(unittest.TestCase):
         dqa_pipeline = pipeline(
             "document-question-answering",
             model="hf-internal-testing/tiny-random-layoutlmv2-for-dqa-test",
-            torch_dtype=torch.bfloat16,
+            torch_dtype=torch.float16,
         )
         image = INVOICE_URL
         question = "How many cats are there?"

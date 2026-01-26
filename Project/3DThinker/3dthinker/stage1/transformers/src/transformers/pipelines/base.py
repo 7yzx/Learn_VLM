@@ -832,7 +832,7 @@ def build_pipeline_init_args(
             the associated CUDA device id. You can pass native `torch.device` or a `str` too
         torch_dtype (`str` or `torch.dtype`, *optional*):
             Sent directly as `model_kwargs` (just a simpler shortcut) to use the available precision for this model
-            (`torch.float16`, `torch.bfloat16`, ... or `"auto"`)"""
+            (`torch.float16`, `torch.float16`, ... or `"auto"`)"""
     if supports_binary_output:
         docstring += r"""
         binary_output (`bool`, *optional*, defaults to `False`):

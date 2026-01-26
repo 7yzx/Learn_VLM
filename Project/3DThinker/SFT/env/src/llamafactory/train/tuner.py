@@ -134,7 +134,7 @@ def export_model(args: Optional[dict[str, Any]] = None) -> None:
         if model_args.infer_dtype == "auto":
             output_dtype = getattr(model.config, "torch_dtype", torch.float32)
             if output_dtype == torch.float32:  # if infer_dtype is auto, try using half precision first
-                output_dtype = infer_optim_dtype(torch.bfloat16)
+                output_dtype = infer_optim_dtype(torch.float16)
         else:
             output_dtype = getattr(torch, model_args.infer_dtype)
 

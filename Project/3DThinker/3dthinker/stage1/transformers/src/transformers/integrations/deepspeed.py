@@ -201,7 +201,7 @@ class HfTrainerDeepSpeedConfig(HfDeepSpeedConfig):
 
         # deepspeed's default mode is fp16 unless there is a config that says differently
         if self.is_true("bf16.enabled"):
-            self._dtype = torch.bfloat16
+            self._dtype = torch.float16
         elif self.is_false("fp16.enabled"):
             self._dtype = torch.float32
         else:

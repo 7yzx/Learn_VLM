@@ -46,7 +46,7 @@ accelerate launch \
     --warmup_ratio 0.1 \
     --lr_scheduler_type cosine \
     --push_to_hub False \
-    --dtype bfloat16 \
+    --dtype float16 \
     --gradient_checkpointing True
 """
 
@@ -194,7 +194,7 @@ if __name__ == "__main__":
         load_in_4bit=True,
         bnb_4bit_use_double_quant=True,
         bnb_4bit_quant_type="nf4",
-        bnb_4bit_compute_dtype=torch.bfloat16,
+        bnb_4bit_compute_dtype=torch.float16,
     )
 
     # Model initialization

@@ -68,7 +68,7 @@ def benchmark_fn(func: Callable, *args, **kwargs) -> float:
 MAX_NEW_TOKENS = 1000
 print("int4wo-128 model:", benchmark_fn(quantized_model.generate, **input_ids, max_new_tokens=MAX_NEW_TOKENS, cache_implementation="static"))
 
-bf16_model = AutoModelForCausalLM.from_pretrained(model_name, device_map="auto", torch_dtype=torch.bfloat16)
+bf16_model = AutoModelForCausalLM.from_pretrained(model_name, device_map="auto", torch_dtype=torch.float16)
 output = bf16_model.generate(**input_ids, max_new_tokens=10, cache_implementation="static") # auto-compile
 print("bf16 model:", benchmark_fn(bf16_model.generate, **input_ids, max_new_tokens=MAX_NEW_TOKENS, cache_implementation="static"))
 ```
@@ -121,7 +121,7 @@ def benchmark_fn(func: Callable, *args, **kwargs) -> float:
 MAX_NEW_TOKENS = 1000
 print("autoquantized model:", benchmark_fn(quantized_model.generate, **input_ids, max_new_tokens=MAX_NEW_TOKENS, cache_implementation="static"))
 
-bf16_model = AutoModelForCausalLM.from_pretrained(model_name, device_map="auto", torch_dtype=torch.bfloat16)
+bf16_model = AutoModelForCausalLM.from_pretrained(model_name, device_map="auto", torch_dtype=torch.float16)
 output = bf16_model.generate(**input_ids, max_new_tokens=10, cache_implementation="static") # auto-compile
 print("bf16 model:", benchmark_fn(bf16_model.generate, **input_ids, max_new_tokens=MAX_NEW_TOKENS, cache_implementation="static"))
 ```

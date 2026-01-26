@@ -507,7 +507,7 @@ class FlaxModelTesterMixin:
             types = flatten_dict(jax.tree_util.tree_map(lambda x: x.dtype, params))
             # test if all params are in bf16
             for name, type_ in types.items():
-                self.assertEqual(type_, jnp.bfloat16, msg=f"param {name} is not in bf16.")
+                self.assertEqual(type_, jnp.float16, msg=f"param {name} is not in bf16.")
 
             # test masking
             flat_params = flatten_dict(params)
@@ -522,7 +522,7 @@ class FlaxModelTesterMixin:
                 if name == key:
                     self.assertEqual(type_, jnp.float32, msg=f"param {name} should be in fp32.")
                 else:
-                    self.assertEqual(type_, jnp.bfloat16, msg=f"param {name} is not in bf16.")
+                    self.assertEqual(type_, jnp.float16, msg=f"param {name} is not in bf16.")
 
     def test_to_fp16(self):
         config, _ = self.model_tester.prepare_config_and_inputs_for_common()
@@ -617,7 +617,7 @@ class FlaxModelTesterMixin:
             model = model_class.from_pretrained(tmpdirname)
             types = flatten_dict(jax.tree_util.tree_map(lambda x: x.dtype, model.params))
             for name, type_ in types.items():
-                self.assertEqual(type_, jnp.bfloat16, msg=f"param {name} is not in bf16.")
+                self.assertEqual(type_, jnp.float16, msg=f"param {name} is not in bf16.")
 
     def test_model_main_input_name(self):
         for model_class in self.all_model_classes:

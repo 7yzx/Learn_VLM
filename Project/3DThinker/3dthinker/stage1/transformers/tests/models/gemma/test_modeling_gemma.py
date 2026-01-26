@@ -533,7 +533,7 @@ class GemmaIntegrationTest(unittest.TestCase):
             "Hi today I am going to share with you a very easy and simple recipe of <strong><em>Khichdi",
         ]
 
-        model = AutoModelForCausalLM.from_pretrained(model_id, low_cpu_mem_usage=True, torch_dtype=torch.bfloat16).to(
+        model = AutoModelForCausalLM.from_pretrained(model_id, low_cpu_mem_usage=True, torch_dtype=torch.float16).to(
             torch_device
         )
 
@@ -555,7 +555,7 @@ class GemmaIntegrationTest(unittest.TestCase):
         ]
 
         model = AutoModelForCausalLM.from_pretrained(
-            model_id, low_cpu_mem_usage=True, torch_dtype=torch.bfloat16, attn_implementation="eager"
+            model_id, low_cpu_mem_usage=True, torch_dtype=torch.float16, attn_implementation="eager"
         )
         model.to(torch_device)
 
@@ -578,7 +578,7 @@ class GemmaIntegrationTest(unittest.TestCase):
         ]
 
         model = AutoModelForCausalLM.from_pretrained(
-            model_id, low_cpu_mem_usage=True, torch_dtype=torch.bfloat16, attn_implementation="sdpa"
+            model_id, low_cpu_mem_usage=True, torch_dtype=torch.float16, attn_implementation="sdpa"
         )
         model.to(torch_device)
 
@@ -601,7 +601,7 @@ class GemmaIntegrationTest(unittest.TestCase):
         ]
 
         model = AutoModelForCausalLM.from_pretrained(
-            model_id, low_cpu_mem_usage=True, torch_dtype=torch.bfloat16, attn_implementation="flash_attention_2"
+            model_id, low_cpu_mem_usage=True, torch_dtype=torch.float16, attn_implementation="flash_attention_2"
         )
         model.to(torch_device)
 
@@ -700,7 +700,7 @@ class GemmaIntegrationTest(unittest.TestCase):
             ],
         }
 
-        model = AutoModelForCausalLM.from_pretrained(model_id, low_cpu_mem_usage=True, torch_dtype=torch.bfloat16).to(
+        model = AutoModelForCausalLM.from_pretrained(model_id, low_cpu_mem_usage=True, torch_dtype=torch.float16).to(
             torch_device
         )
 
@@ -813,7 +813,7 @@ class GemmaIntegrationTest(unittest.TestCase):
 
         # Load model
         device = "cpu"
-        dtype = torch.bfloat16
+        dtype = torch.float16
         cache_implementation = "static"
         attn_implementation = "sdpa"
         batch_size = 1
@@ -861,7 +861,7 @@ class GemmaIntegrationTest(unittest.TestCase):
             "Hi today we have the review for a <strong>2016/2017</strong> season of",
         ]
 
-        model = AutoModelForCausalLM.from_pretrained(model_id, low_cpu_mem_usage=True, torch_dtype=torch.bfloat16).to(
+        model = AutoModelForCausalLM.from_pretrained(model_id, low_cpu_mem_usage=True, torch_dtype=torch.float16).to(
             torch_device
         )
 

@@ -54,7 +54,7 @@ Here is how you can use the `image-text-to-text` pipeline to perform inference w
 ...     },
 ... ]
 
->>> pipe = pipeline("image-text-to-text", model="mistralai/Mistral-Small-3.1-24B-Instruct-2503", torch_dtype=torch.bfloat16)
+>>> pipe = pipeline("image-text-to-text", model="mistralai/Mistral-Small-3.1-24B-Instruct-2503", torch_dtype=torch.float16)
 >>> outputs = pipe(text=messages, max_new_tokens=50, return_full_text=False)
 >>> outputs[0]["generated_text"]
 'The image depicts a vibrant and lush garden scene featuring a variety of wildflowers and plants. The central focus is on a large, pinkish-purple flower, likely a Greater Celandine (Chelidonium majus), with a'
@@ -70,7 +70,7 @@ This example demonstrates how to perform inference on a single image with the Mi
 >>> torch_device = "cuda"
 >>> model_checkpoint = "mistralai/Mistral-Small-3.1-24B-Instruct-2503"
 >>> processor = AutoProcessor.from_pretrained(model_checkpoint)
->>> model = AutoModelForImageTextToText.from_pretrained(model_checkpoint, device_map=torch_device, torch_dtype=torch.bfloat16)
+>>> model = AutoModelForImageTextToText.from_pretrained(model_checkpoint, device_map=torch_device, torch_dtype=torch.float16)
 
 >>> messages = [
 ...     {
@@ -82,7 +82,7 @@ This example demonstrates how to perform inference on a single image with the Mi
 ...     }
 ... ]
 
->>> inputs = processor.apply_chat_template(messages, add_generation_prompt=True, tokenize=True, return_dict=True, return_tensors="pt").to(model.device, dtype=torch.bfloat16)
+>>> inputs = processor.apply_chat_template(messages, add_generation_prompt=True, tokenize=True, return_dict=True, return_tensors="pt").to(model.device, dtype=torch.float16)
 
 >>> generate_ids = model.generate(**inputs, max_new_tokens=20)
 >>> decoded_output = processor.decode(generate_ids[0, inputs["input_ids"].shape[1] :], skip_special_tokens=True)
@@ -102,7 +102,7 @@ This example shows how to generate text using the Mistral3 model without providi
 >>> torch_device = "cuda"
 >>> model_checkpoint = ".mistralai/Mistral-Small-3.1-24B-Instruct-2503"
 >>> processor = AutoProcessor.from_pretrained(model_checkpoint)
->>> model = AutoModelForImageTextToText.from_pretrained(model_checkpoint, device_map=torch_device, torch_dtype=torch.bfloat16)
+>>> model = AutoModelForImageTextToText.from_pretrained(model_checkpoint, device_map=torch_device, torch_dtype=torch.float16)
 
 >>> SYSTEM_PROMPT = "You are a conversational agent that always answers straight to the point, always end your accurate response with an ASCII drawing of a cat."
 >>> user_prompt = "Give me 5 non-formal ways to say 'See you later' in French."
@@ -141,7 +141,7 @@ Mistral3 models also support batched image and text inputs.
 >>> torch_device = "cuda"
 >>> model_checkpoint = "mistralai/Mistral-Small-3.1-24B-Instruct-2503"
 >>> processor = AutoProcessor.from_pretrained(model_checkpoint)
->>> model = AutoModelForImageTextToText.from_pretrained(model_checkpoint, device_map=torch_device, torch_dtype=torch.bfloat16)
+>>> model = AutoModelForImageTextToText.from_pretrained(model_checkpoint, device_map=torch_device, torch_dtype=torch.float16)
 
 >>> messages = [
 ...     [
@@ -165,7 +165,7 @@ Mistral3 models also support batched image and text inputs.
 ... ]
 
 
->>> inputs = processor.apply_chat_template(messages, padding=True, add_generation_prompt=True, tokenize=True, return_dict=True, return_tensors="pt").to(model.device, dtype=torch.bfloat16)
+>>> inputs = processor.apply_chat_template(messages, padding=True, add_generation_prompt=True, tokenize=True, return_dict=True, return_tensors="pt").to(model.device, dtype=torch.float16)
 
 >>> output = model.generate(**inputs, max_new_tokens=25)
 
@@ -213,7 +213,7 @@ This example also how to use `BitsAndBytes` to load the model in 4bit quantizati
 ...     ],
 >>> ]
 
->>> inputs = processor.apply_chat_template(messages, padding=True, add_generation_prompt=True, tokenize=True, return_dict=True, return_tensors="pt").to(model.device, dtype=torch.bfloat16)
+>>> inputs = processor.apply_chat_template(messages, padding=True, add_generation_prompt=True, tokenize=True, return_dict=True, return_tensors="pt").to(model.device, dtype=torch.float16)
 
 >>> output = model.generate(**inputs, max_new_tokens=25)
 

@@ -58,7 +58,7 @@ load_model_path = "../models/3DThinker-S1-Qwen2.5-VL-3B_mlp6_lr1e-4_latent12"
 
 # processor = AutoProcessor.from_pretrained(load_model_path, trust_remote_code=True, cache_dir=cache_dir)
 processor = AutoProcessor.from_pretrained(load_model_path, trust_remote_code=True)
-model = Qwen2_5_VLForConditionalGeneration.from_pretrained(load_model_path, device_map="auto", torch_dtype=torch.bfloat16)
+model = Qwen2_5_VLForConditionalGeneration.from_pretrained(load_model_path, device_map="auto", torch_dtype=torch.float32)
 
 processor.tokenizer.add_tokens("<|latent_pad|>", special_tokens=True)
 processor.tokenizer.add_tokens("<|latent_start|>", special_tokens=True)

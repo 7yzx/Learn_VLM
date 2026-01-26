@@ -13,7 +13,7 @@
   },
   "gradient_clipping": "auto",
   "bf16": {
-    "enabled": "auto"
+    "enabled": false
   },
   "zero_allow_untested_optimizer": true,
   "wall_clock_breakdown": false,

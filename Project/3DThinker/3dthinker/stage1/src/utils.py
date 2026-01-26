@@ -152,7 +152,7 @@ def replace_visual_spectial_tokens(texts):
     update_texts = []
     for i, text in enumerate(texts):
         prev, after = text.split("<|im_start|>assistant")
-        update_texts.append(prev + "<|im_start|>assistant" + after.replace("<|vision_start|><|image_pad|><|vision_end|>", "<|latent_start|><|image_pad|><|latent_end|>"))
+        update_texts.append(prev + "<|im_start|>assistant" + after.replace("<|vision_start|><|image_pad|><|vision_end|>", "<|latent_start|><|latent_pad|><|latent_end|>"))
         
     return update_texts
 

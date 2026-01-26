@@ -179,7 +179,7 @@ class Gemma2IntegrationTest(unittest.TestCase):
         ]
 
         model = AutoModelForCausalLM.from_pretrained(
-            model_id, low_cpu_mem_usage=True, torch_dtype=torch.bfloat16, attn_implementation="eager"
+            model_id, low_cpu_mem_usage=True, torch_dtype=torch.float16, attn_implementation="eager"
         ).to(torch_device)
 
         tokenizer = AutoTokenizer.from_pretrained(model_id)
@@ -223,7 +223,7 @@ class Gemma2IntegrationTest(unittest.TestCase):
         ]
 
         model = AutoModelForCausalLM.from_pretrained(
-            model_id, low_cpu_mem_usage=True, torch_dtype=torch.bfloat16, attn_implementation="flex_attention"
+            model_id, low_cpu_mem_usage=True, torch_dtype=torch.float16, attn_implementation="flex_attention"
         ).to(torch_device)
         tokenizer = AutoTokenizer.from_pretrained(model_id)
         pipe = pipeline("text-generation", model=model, tokenizer=tokenizer)
@@ -244,7 +244,7 @@ class Gemma2IntegrationTest(unittest.TestCase):
         ]
 
         model = AutoModelForCausalLM.from_pretrained(
-            model_id, low_cpu_mem_usage=True, torch_dtype=torch.bfloat16, attn_implementation="flex_attention"
+            model_id, low_cpu_mem_usage=True, torch_dtype=torch.float16, attn_implementation="flex_attention"
         ).to(torch_device)
         tokenizer = AutoTokenizer.from_pretrained(model_id)
         pipe = pipeline("text-generation", model=model, tokenizer=tokenizer)
@@ -300,7 +300,7 @@ class Gemma2IntegrationTest(unittest.TestCase):
 
         # Load model
         device = "cpu"
-        dtype = torch.bfloat16
+        dtype = torch.float16
         cache_implementation = "static"
         attn_implementation = "sdpa"
         batch_size = 1
@@ -343,7 +343,7 @@ class Gemma2IntegrationTest(unittest.TestCase):
         ]
 
         model = AutoModelForCausalLM.from_pretrained(
-            model_id, low_cpu_mem_usage=True, torch_dtype=torch.bfloat16, attn_implementation="flex_attention"
+            model_id, low_cpu_mem_usage=True, torch_dtype=torch.float16, attn_implementation="flex_attention"
         ).to(torch_device)
         assert model.config._attn_implementation == "flex_attention"
         tokenizer = AutoTokenizer.from_pretrained(model_id)

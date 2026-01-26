@@ -136,7 +136,7 @@ class AlignPropTrainer(PyTorchModelHubMixin):
         if self.accelerator.mixed_precision == "fp16":
             inference_dtype = torch.float16
         elif self.accelerator.mixed_precision == "bf16":
-            inference_dtype = torch.bfloat16
+            inference_dtype = torch.float16
         else:
             inference_dtype = torch.float32
 

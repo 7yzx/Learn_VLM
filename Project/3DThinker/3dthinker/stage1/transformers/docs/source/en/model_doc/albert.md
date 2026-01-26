@@ -75,7 +75,7 @@ model = AlbertModel.from_pretrained("albert/albert-base-v1", torch_dtype=torch.f
 ...
 ```
 
-For the best speedups, we recommend loading the model in half-precision (e.g. `torch.float16` or `torch.bfloat16`).
+For the best speedups, we recommend loading the model in half-precision (e.g. `torch.float16` or `torch.float16`).
 
 On a local benchmark (GeForce RTX 2060-8GB, PyTorch 2.3.1, OS Ubuntu 20.04) with `float16`, we saw the 
 following speedups during training and inference.

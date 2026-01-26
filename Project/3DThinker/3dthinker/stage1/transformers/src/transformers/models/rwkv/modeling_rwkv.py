@@ -128,13 +128,13 @@ class RwkvLinearAttention(torch.autograd.Function):
                 state[:, :, 2] -= 1e38
             else:
                 state = torch.cat([s.unsqueeze(2) for s in state], dim=2).contiguous()
-            if key.dtype == torch.bfloat16:
+            if key.dtype == torch.float16:
                 forward_func = rwkv_cuda_kernel.forward_with_state_bf16
             else:
                 forward_func = rwkv_cuda_kernel.forward_with_state
             forward_func(time_decay, time_first, key, value, output, state)
         else:
-            forward_func = rwkv_cuda_kernel.forward_bf16 if key.dtype == torch.bfloat16 else rwkv_cuda_kernel.forward
+            forward_func = rwkv_cuda_kernel.forward_bf16 if key.dtype == torch.float16 else rwkv_cuda_kernel.forward
             forward_func(time_decay, time_first, key, value, output)
 
         ctx.save_for_backward(time_decay, time_first, key, value, output)
@@ -154,7 +154,7 @@ class RwkvLinearAttention(torch.autograd.Function):
         g_time_decay = torch.empty_like(
             time_decay,
             memory_format=torch.contiguous_format,
-            dtype=torch.bfloat16 if input_dtype == torch.bfloat16 else torch.float32,
+            dtype=torch.float16 if input_dtype == torch.float16 else torch.float32,
         )
         g_time_first = torch.empty_like(time_first, memory_format=torch.contiguous_format)
         g_key = torch.empty_like(key, memory_format=torch.contiguous_format)
@@ -162,7 +162,7 @@ class RwkvLinearAttention(torch.autograd.Function):
 
         if input_dtype == torch.float16:
             g_output = g_output.float()
-        backward_func = rwkv_cuda_kernel.backward_bf16 if input_dtype == torch.bfloat16 else rwkv_cuda_kernel.backward
+        backward_func = rwkv_cuda_kernel.backward_bf16 if input_dtype == torch.float16 else rwkv_cuda_kernel.backward
         backward_func(
             time_decay,
             time_first,

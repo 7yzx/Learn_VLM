@@ -721,7 +721,7 @@ def pipeline(
 
         torch_dtype (`str` or `torch.dtype`, *optional*):
             Sent directly as `model_kwargs` (just a simpler shortcut) to use the available precision for this model
-            (`torch.float16`, `torch.bfloat16`, ... or `"auto"`).
+            (`torch.float16`, `torch.float16`, ... or `"auto"`).
         trust_remote_code (`bool`, *optional*, defaults to `False`):
             Whether or not to allow for custom code defined on the Hub in their own modeling, configuration,
             tokenization or even pipeline files. This option should only be set to `True` for repositories you trust

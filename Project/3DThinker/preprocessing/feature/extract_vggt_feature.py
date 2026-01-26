@@ -53,9 +53,9 @@ def process_images(image_paths):
 # If you have only one GPU, change "cuda:1" to "cuda:0"
 device = "cuda:0" if torch.cuda.is_available() else "cpu"
 if torch.cuda.is_available():
-    # Get the current GPU's compute capability: Ampere GPU (Compute Capability 8.0+) supports bfloat16
+    # Get the current GPU's compute capability: Ampere GPU (Compute Capability 8.0+) supports float16
     dev_capability = torch.cuda.get_device_capability(torch.cuda.current_device())
-    dtype = torch.bfloat16 if dev_capability[0] >= 8 else torch.float16
+    dtype = torch.float16 if dev_capability[0] >= 8 else torch.float16
 else:
     dtype = torch.float32
 
@@ -63,7 +63,10 @@ else:
 # Initialize the VGGT model and load pretrained weights
 # -------------------------------
 model = VGGT()
-checkpoint = torch.load('../../models/vggt/model.pt', map_location=device)
+# checkpoint = torch.load('../../models/vggt/model.pt', map_location=device)
+# checkpoint = torch.load('/mnt/sevenT/zixiaoy/checkpoints/facebook/VGGT-1B/model.safetensors')
+from safetensors.torch import load_file
+checkpoint = load_file('/mnt/sevenT/zixiaoy/checkpoints/facebook/VGGT-1B/model.safetensors')
 msg = model.load_state_dict(checkpoint)
 print('loading status:', msg)
 model = model.to(device).eval()
@@ -71,8 +74,8 @@ model = model.to(device).eval()
 # -------------------------------
 # Data storage path settings
 # -------------------------------
-root_save_3d_feature = '../../data/feature_vggt'
-file_path = '../../data/idx.jsonl'
+root_save_3d_feature = '/mnt/sevenT/zixiaoy/code/Learn_VLM/Project/3DThinker/data/feature_vggt'
+file_path = '/mnt/sevenT/zixiaoy/code/Learn_VLM/Project/3DThinker/data/idx.jsonl'
 
 if not os.path.exists(root_save_3d_feature):
     os.makedirs(root_save_3d_feature)
@@ -90,7 +93,7 @@ with open(file_path, 'r', encoding='utf-8') as file:
             os.makedirs(scene_save_dir)
 
         # 输出新图片的文件夹路径
-        output_folder = "../../data/resized_images"
+        output_folder = "/mnt/sevenT/zixiaoy/code/Learn_VLM/Project/3DThinker/data/resized_images"
 
         # 调用函数处理图片，并返回新的图片路径
         new_image_paths = process_images(image_input)
@@ -108,7 +111,7 @@ with open(file_path, 'r', encoding='utf-8') as file:
                 aggregated_tokens_list, ps_idx = model.aggregator(images)
 
         # -------------------------------
-        # Save aggregated_tokens_list[-1] and ps_idx
+        # Save aggregated_tokens_list[-1] and ps_idx: patch start idx
         # -------------------------------
         # Move the output to CPU and convert to numpy format
         print(aggregated_tokens_list[-1].shape)

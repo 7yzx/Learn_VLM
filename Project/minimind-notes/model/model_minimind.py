@@ -437,7 +437,7 @@ class MOEFeedForward(nn.Module):
             ])
 
     def forward(self, x):
-        identity = x
+        identity = x                         # 用于 residual 加上共享专家输出
         orig_shape = x.shape
         bsz, seq_len, _ = x.shape
 

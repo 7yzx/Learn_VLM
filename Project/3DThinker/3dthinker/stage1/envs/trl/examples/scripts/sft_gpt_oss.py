@@ -28,7 +28,7 @@ Example:
 accelerate launch \
     --config_file examples/accelerate_configs/deepspeed_zero3.yaml \
     examples/scripts/sft_gpt_oss.py \
-    --dtype bfloat16 \
+    --dtype float16 \
     --model_name_or_path openai/gpt-oss-20b \
     --packing true packing_strategy wrapped \
     --run_name 20b-full-eager \

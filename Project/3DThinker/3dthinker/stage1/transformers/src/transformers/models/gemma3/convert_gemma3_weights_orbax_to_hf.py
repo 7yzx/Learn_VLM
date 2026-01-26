@@ -21,7 +21,7 @@ python -m transformers.models.gemma3.convert_gemma3_weights_orbax_to_hf \
     --tokenizer_path="$HOME/gemma3/tokenizer/gemma3_cleaned_262144_v2.spiece.model" \
     --checkpoint_path="$HOME/gemma3/gemma3_4b_pt_orbax/" \
     --output_path="$HOME/gemma3/gemma3_4b_pt_safetensors/" \
-    --precision='bfloat16'
+    --precision='float16'
 """
 
 import dataclasses
@@ -97,7 +97,7 @@ _CHAT_TEMPLATE = """{{ bos_token }}
 
 _DTYPES = {
     "float32": torch.float32,
-    "bfloat16": torch.bfloat16,
+    "float16": torch.float16,
     "float16": torch.float16,
 }
 

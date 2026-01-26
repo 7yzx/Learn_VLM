@@ -129,7 +129,7 @@ class ModelLoader:
                 'max_model_len': max_model_len,
                 'max_num_seqs': max_num_seqs,
                 'trust_remote_code': True,
-                'dtype': 'bfloat16',
+                'dtype': 'float16',
                 'enforce_eager': False,  # Enable CUDA graphs for performance
                 'enable_chunked_prefill': True,  # Enable for throughput optimization
                 'enable_prefix_caching': True,  # Enable for efficiency

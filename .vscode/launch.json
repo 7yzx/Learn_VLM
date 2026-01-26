@@ -1,0 +1,29 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Python Debugger: DPO ",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "/mnt/sevenT/zixiaoy/code/Learn_VLM/Project/minimind/trainer/train_dpo.py",
+            "console": "integratedTerminal",
+            "args": [
+                ""
+            ],
+        },
+        {
+            "name": "Minimind eval vlm ",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "./Project/minimind-v/eval_vlm.py",
+            "console": "integratedTerminal",
+            "args": [
+                "--load_from", "/mnt/sevenT/zixiaoy/checkpoints/jingyaogong/MiniMind2-V",
+                "--image_dir", "./Project/minimind-v/dataset/eval_images/"
+            ],
+        }
+    ]
+}

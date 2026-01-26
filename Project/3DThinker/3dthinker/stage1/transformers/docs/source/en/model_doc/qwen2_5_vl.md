@@ -250,7 +250,7 @@ First, make sure to install the latest version of Flash Attention 2:
 pip install -U flash-attn --no-build-isolation
 ```
 
-Also, you should have hardware that is compatible with FlashAttention 2. Read more about it in the official documentation of the [flash attention repository](https://github.com/Dao-AILab/flash-attention). FlashAttention-2 can only be used when a model is loaded in `torch.float16` or `torch.bfloat16`.
+Also, you should have hardware that is compatible with FlashAttention 2. Read more about it in the official documentation of the [flash attention repository](https://github.com/Dao-AILab/flash-attention). FlashAttention-2 can only be used when a model is loaded in `torch.float16` or `torch.float16`.
 
 To load and run a model using FlashAttention-2, add `attn_implementation="flash_attention_2"` when loading the model:
 
@@ -259,7 +259,7 @@ from transformers import Qwen2_5_VLForConditionalGeneration
 
 model = Qwen2_5_VLForConditionalGeneration.from_pretrained(
     "Qwen/Qwen2.5-VL-7B-Instruct", 
-    torch_dtype=torch.bfloat16, 
+    torch_dtype=torch.float16, 
     attn_implementation="flash_attention_2",
 )
 ```

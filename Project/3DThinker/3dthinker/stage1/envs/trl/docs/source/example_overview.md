@@ -7,7 +7,7 @@ The examples should work in any of the following settings (with the same script)
    - single GPU
    - multi GPUs (using PyTorch distributed mode)
    - multi GPUs (using DeepSpeed ZeRO-Offload stages 1, 2, & 3)
-   - fp16 (mixed-precision), fp32 (normal precision), or bf16 (bfloat16 precision)
+   - fp16 (mixed-precision), fp32 (normal precision), or bf16 (float16 precision)
 
 To run it in each of these various modes, first initialize the accelerate
 configuration with `accelerate config`

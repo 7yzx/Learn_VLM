@@ -772,7 +772,7 @@ class InstructBlipModelIntegrationTest(unittest.TestCase):
         processor = InstructBlipProcessor.from_pretrained("Salesforce/instructblip-flan-t5-xl")
         model = InstructBlipForConditionalGeneration.from_pretrained(
             "Salesforce/instructblip-flan-t5-xl",
-            torch_dtype=torch.bfloat16,
+            torch_dtype=torch.float16,
             low_cpu_mem_usage=True,
         ).to(torch_device)
 
@@ -783,7 +783,7 @@ class InstructBlipModelIntegrationTest(unittest.TestCase):
 
         for k, v in inputs.items():
             if torch.is_floating_point(v):
-                inputs[k] = v.to(torch.bfloat16)
+                inputs[k] = v.to(torch.float16)
 
         outputs = model.generate(
             **inputs,
@@ -812,7 +812,7 @@ class InstructBlipModelIntegrationTest(unittest.TestCase):
         processor = InstructBlipProcessor.from_pretrained("Salesforce/instructblip-flan-t5-xl")
         model = InstructBlipForConditionalGeneration.from_pretrained(
             "Salesforce/instructblip-flan-t5-xl",
-            torch_dtype=torch.bfloat16,
+            torch_dtype=torch.float16,
             low_cpu_mem_usage=True,
         ).to(torch_device)
         processor.image_processor.size = {"height": 500, "width": 500}
@@ -833,7 +833,7 @@ class InstructBlipModelIntegrationTest(unittest.TestCase):
         processor = InstructBlipProcessor.from_pretrained("Salesforce/instructblip-flan-t5-xl")
         model = InstructBlipForConditionalGeneration.from_pretrained(
             "Salesforce/instructblip-flan-t5-xl",
-            torch_dtype=torch.bfloat16,
+            torch_dtype=torch.float16,
             low_cpu_mem_usage=True,
         ).to(torch_device)
 

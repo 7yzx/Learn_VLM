@@ -280,6 +280,6 @@ class FlaxModelUtilsTest(unittest.TestCase):
             FlaxBertModel.from_pretrained("hf-internal-testing/tiny-bert-pt-safetensors-bf16")
 
         self.assertTrue(
-            "Some of the weights of FlaxBertModel were initialized in bfloat16 precision from the model checkpoint"
+            "Some of the weights of FlaxBertModel were initialized in float16 precision from the model checkpoint"
             in cl.out
         )

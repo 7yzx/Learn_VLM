@@ -59,7 +59,7 @@ DINOV2_START_DOCSTRING = r"""
             configuration. Check out the [`~FlaxPreTrainedModel.from_pretrained`] method to load the model weights.
         dtype (`jax.numpy.dtype`, *optional*, defaults to `jax.numpy.float32`):
             The data type of the computation. Can be one of `jax.numpy.float32`, `jax.numpy.float16` (on GPUs) and
-            `jax.numpy.bfloat16` (on TPUs).
+            `jax.numpy.float16` (on TPUs).
 
             This can be used to enable mixed-precision training or half-precision inference on GPUs or TPUs. If
             specified all the computation will be performed with the given `dtype`.

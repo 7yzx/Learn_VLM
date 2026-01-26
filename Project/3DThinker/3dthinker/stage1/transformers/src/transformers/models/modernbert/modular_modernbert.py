@@ -556,16 +556,16 @@ def flash_attention_forward(
     local_attention: Tuple[int, int],
     bs: int,
     dim: int,
-    target_dtype: torch.dtype = torch.bfloat16,
+    target_dtype: torch.dtype = torch.float16,
     **_kwargs,
 ) -> Tuple[torch.Tensor]:
     # (total_seqlen, 3, nheads, headdim)
     qkv = rotary_emb(qkv, cu_seqlens=cu_seqlens, max_seqlen=max_seqlen)
 
-    convert_dtype = qkv.dtype not in (torch.float16, torch.bfloat16)
+    convert_dtype = qkv.dtype not in (torch.float16, torch.float16)
     if convert_dtype:
         # FA2 implementation only supports fp16 and bf16. If FA2 is supported,
-        # bfloat16 must be supported as of FA2 2.5.7. (Turing GPUs not supported)
+        # float16 must be supported as of FA2 2.5.7. (Turing GPUs not supported)
         orig_dtype = qkv.dtype
         qkv = qkv.to(target_dtype)
 

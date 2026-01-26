@@ -195,7 +195,7 @@ class Qwen2VLVisionText2TextModelTester:
             input_ids=input_ids,
             attention_mask=attention_mask,
             image_grid_thw=image_grid_thw,
-            pixel_values=pixel_values.to(torch.bfloat16),
+            pixel_values=pixel_values.to(torch.float16),
             return_dict=True,
         )["logits"]
         self.parent.assertFalse(torch.isnan(logits).any().item())
@@ -212,7 +212,7 @@ class Qwen2VLVisionText2TextModelTester:
                 input_ids=input_ids,
                 attention_mask=attention_mask,
                 image_grid_thw=image_grid_thw,
-                pixel_values=pixel_values.to(torch.bfloat16),
+                pixel_values=pixel_values.to(torch.float16),
                 return_dict=True,
             )["logits"]
         self.parent.assertFalse(torch.isnan(logits).any().item())
@@ -507,7 +507,7 @@ class Qwen2VLIntegrationTest(unittest.TestCase):
     def test_small_model_integration_test_batch_flashatt2(self):
         model = Qwen2VLForConditionalGeneration.from_pretrained(
             "Qwen/Qwen2-VL-7B-Instruct",
-            torch_dtype=torch.bfloat16,
+            torch_dtype=torch.float16,
             attn_implementation="flash_attention_2",
             device_map="auto",
         )
@@ -534,7 +534,7 @@ class Qwen2VLIntegrationTest(unittest.TestCase):
     def test_small_model_integration_test_batch_wo_image_flashatt2(self):
         model = Qwen2VLForConditionalGeneration.from_pretrained(
             "Qwen/Qwen2-VL-7B-Instruct",
-            torch_dtype=torch.bfloat16,
+            torch_dtype=torch.float16,
             attn_implementation="flash_attention_2",
             device_map="auto",
         )

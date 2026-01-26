@@ -188,7 +188,7 @@ class AutomaticSpeechRecognitionPipeline(ChunkPipeline):
             model on the associated CUDA device id.
         torch_dtype (Union[`int`, `torch.dtype`], *optional*):
             The data-type (dtype) of the computation. Setting this to `None` will use float32 precision. Set to
-            `torch.float16` or `torch.bfloat16` to use half-precision in the respective dtypes.
+            `torch.float16` or `torch.float16` to use half-precision in the respective dtypes.
 
     """
 
@@ -574,7 +574,7 @@ class AutomaticSpeechRecognitionPipeline(ChunkPipeline):
         key = "logits" if self.type == "ctc_with_lm" else "tokens"
         stride = None
         for outputs in model_outputs:
-            if self.framework == "pt" and outputs[key].dtype in (torch.bfloat16, torch.float16):
+            if self.framework == "pt" and outputs[key].dtype in (torch.float16, torch.float16):
                 items = outputs[key].to(torch.float32).numpy()
             else:
                 items = outputs[key].numpy()

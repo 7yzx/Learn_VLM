@@ -70,7 +70,7 @@ source $torch_ccl_path/env/setvars.sh
 
 #### IPEX 설치: [[ipex-installation]]
 
-IPEX는 Float32와 BFloat16을 모두 사용하는 CPU 훈련을 위한 성능 최적화를 제공합니다. [single CPU section](./perf_train_cpu)을 참조하세요.
+IPEX는 Float32와 float16을 모두 사용하는 CPU 훈련을 위한 성능 최적화를 제공합니다. [single CPU section](./perf_train_cpu)을 참조하세요.
 
 
 이어서 나오는 "Trainer에서의 사용"은 Intel® MPI 라이브러리의 mpirun을 예로 들었습니다.

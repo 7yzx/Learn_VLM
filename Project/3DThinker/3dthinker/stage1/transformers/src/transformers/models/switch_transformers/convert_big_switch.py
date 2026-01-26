@@ -159,7 +159,7 @@ if __name__ == "__main__":
         help="Path to a directory containing a folder per layer. Follows the original Google format.",
     )
     parser.add_argument("--max_shard_size", default="10GB", required=False, help="Max shard size")
-    parser.add_argument("--dtype", default="bfloat16", type=str, required=False, help="dtype of the saved model")
+    parser.add_argument("--dtype", default="float16", type=str, required=False, help="dtype of the saved model")
     parser.add_argument(
         "--pytorch_dump_folder_path",
         default="/mnt/disks/disk_switch/original_checkpoints/switch-xxl-128-converted",

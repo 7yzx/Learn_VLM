@@ -1,8 +1,10 @@
 # lr: 1e-4
 # latent: 12
 # best model: work-3dthinker-Qwen2.5-VL-3B-Instruct_begin_align_vggt_mlp6_lr1e-4_latent12_flash_74000_best
-python src/main.py \
-    --model /mnt/dolphinfs/ssd_pool/docker/user/hadoop-hldy-nlp/3A/multimodal/zhangquan/models/Qwen2.5-VL-3B-Instruct --epochs 10 \
+# huggingface data is in /mnt/sevenT/zixiaoy/dataset/jankin123/3DThinker-10K/data_output3d_begin_10k_resized.jsonl
+# 
+CUDA_VISIBLE_DEVICES=3 python 3dthinker/stage1/src/main.py \
+    --model /mnt/sevenT/zixiaoy/checkpoints/Qwen/Qwen2.5-VL-3B-Instruct --epochs 10 \
     --task mindcube \
     --latent_size 12 \
     --per_device_train_batch_size 1 \
@@ -13,7 +15,7 @@ python src/main.py \
     --save_steps 2000 \
     --save_total_limit 1 \
     --stage stage1 \
-    --data_path ../../data/example.jsonl \
+    --data_path /mnt/sevenT/zixiaoy/code/Learn_VLM/Project/3DThinker/data/example.jsonl \
     --log_file ./log.txt \
-    --save_model_path ../../models/3DThinker-S1-Qwen2.5-VL-3B_mlp6_lr1e-4_latent12 \
-    --wandb_name 3DThinker-S1-Qwen2.5-VL-3B_mlp6_lr1e-4_latent12
+    --save_model_path ./models/3DThinker-S1-Qwen2.5-VL-3B_mlp6_lr1e-4_latent12 \
+    --wandb_name 3DThinker-S1-Qwen2.5-VL-3B_mlp6_lr1e-4_latent12 \

@@ -49,7 +49,7 @@ class CustomTrainerStage1(SFTTrainer):
         # sim_loss = torch.nn.functional.cosine_similarity(gt_embeddings, shift_predict_embeddings).mean()
         # sim_loss = 1 - sim_loss
 
-        data = np.load('../../data/feature_vggt/' + str(idx[0]) + '/vggt.npz')
+        data = np.load('/mnt/sevenT/zixiaoy/code/Learn_VLM/Project/3DThinker/data/feature_vggt/' + str(idx[0]) + '/vggt.npz')
         feature_3d = data['feature'] # [1,N=4,P_3D = 1374,2048]
         feature_3d = torch.tensor(feature_3d).to(device=shift_predict_embeddings.device, dtype=shift_predict_embeddings.dtype)
         feature_3d = feature_3d.squeeze()

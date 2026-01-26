@@ -46,7 +46,7 @@ alt="drawing" width="600"/>
 
 ### 단일 이미지 추론 [[single-image-inference]]
 
-Chameleon은 게이티드(gated) 모델이므로 Hugging Face Hub에 대한 액세스 권한이 있고 토큰으로 로그인했는지 확인하세요. 다음은 모델을 로드하고 반정밀도(`torch.bfloat16`)로 추론하는 방법입니다:
+Chameleon은 게이티드(gated) 모델이므로 Hugging Face Hub에 대한 액세스 권한이 있고 토큰으로 로그인했는지 확인하세요. 다음은 모델을 로드하고 반정밀도(`torch.float16`)로 추론하는 방법입니다:
 
 ```python
 from transformers import ChameleonProcessor, ChameleonForConditionalGeneration
@@ -55,14 +55,14 @@ from PIL import Image
 import requests
 
 processor = ChameleonProcessor.from_pretrained("facebook/chameleon-7b")
-model = ChameleonForConditionalGeneration.from_pretrained("facebook/chameleon-7b", torch_dtype=torch.bfloat16, device_map="cuda")
+model = ChameleonForConditionalGeneration.from_pretrained("facebook/chameleon-7b", torch_dtype=torch.float16, device_map="cuda")
 
 # 이미지와 텍스트 프롬프트 준비
 url = 'http://images.cocodataset.org/val2017/000000039769.jpg'
 image = Image.open(requests.get(url, stream=True).raw)
 prompt = "이 이미지에서 무엇을 보나요?<image>"
 
-inputs = processor(images=image, text=prompt, return_tensors="pt").to(model.device, dtype=torch.bfloat16)
+inputs = processor(images=image, text=prompt, return_tensors="pt").to(model.device, dtype=torch.float16)
 
 # 프롬프트를 자기회귀적으로 완성
 output = model.generate(**inputs, max_new_tokens=50)
@@ -81,7 +81,7 @@ import requests
 
 processor = ChameleonProcessor.from_pretrained("facebook/chameleon-7b")
 
-model = ChameleonForConditionalGeneration.from_pretrained("facebook/chameleon-7b", torch_dtype=torch.bfloat16, device_map="cuda")
+model = ChameleonForConditionalGeneration.from_pretrained("facebook/chameleon-7b", torch_dtype=torch.float16, device_map="cuda")
 
 # 세 가지 다른 이미지 가져오기
 url = "https://www.ilankelman.org/stopsigns/australia.jpg"
@@ -101,7 +101,7 @@ prompts = [
 
 # 이미지들을 텍스트 프롬프트에서 사용되어야 하는 순서대로 입력할 수 있습니다
 # 각 "<image>" 토큰은 하나의 이미지를 사용하며, 다음 "<image>" 토큰은 다음 이미지를 사용합니다
-inputs = processor(images=[image_stop, image_cats, image_snowman], text=prompts, padding=True, return_tensors="pt").to(device="cuda", dtype=torch.bfloat16)
+inputs = processor(images=[image_stop, image_cats, image_snowman], text=prompts, padding=True, return_tensors="pt").to(device="cuda", dtype=torch.float16)
 
 # 생성
 generate_ids = model.generate(**inputs, max_new_tokens=50)
@@ -131,7 +131,7 @@ from transformers import ChameleonForConditionalGeneration, BitsAndBytesConfig
 quantization_config = BitsAndBytesConfig(
     load_in_4bit=True,
     bnb_4bit_quant_type="nf4",
-    bnb_4bit_compute_dtype=torch.bfloat16,
+    bnb_4bit_compute_dtype=torch.float16,
 )
 
 model = ChameleonForConditionalGeneration.from_pretrained("facebook/chameleon-7b", quantization_config=quantization_config, device_map="cuda")
@@ -147,7 +147,7 @@ from transformers import ChameleonForConditionalGeneration
 model_id = "facebook/chameleon-7b"
 model = ChameleonForConditionalGeneration.from_pretrained(
     model_id,
-    torch_dtype=torch.bfloat16,
+    torch_dtype=torch.float16,
     low_cpu_mem_usage=True,
     attn_implementation="flash_attention_2"
 ).to(0)

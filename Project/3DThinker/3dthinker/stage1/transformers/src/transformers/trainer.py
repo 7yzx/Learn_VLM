@@ -752,7 +752,7 @@ class Trainer:
             # deepspeed and SageMaker Model Parallel manage their own half precision
             if args.half_precision_backend == "cpu_amp":
                 self.use_cpu_amp = True
-                self.amp_dtype = torch.bfloat16
+                self.amp_dtype = torch.float16
             elif args.half_precision_backend == "apex":
                 if not is_apex_available():
                     raise ImportError(
@@ -1552,7 +1552,7 @@ class Trainer:
                         "momentum_dtype": getattr(torch, optim_args.get("momentum_dtype", "float32")),
                         "variance_dtype": getattr(torch, optim_args.get("variance_dtype", "float32")),
                         "compensation_buffer_dtype": getattr(
-                            torch, optim_args.get("compensation_buffer_dtype", "bfloat16")
+                            torch, optim_args.get("compensation_buffer_dtype", "float16")
                         ),
                     }
                 )
@@ -1946,7 +1946,7 @@ class Trainer:
 
         if not training:
             model.eval()
-            dtype = torch.bfloat16 if not self.is_in_train and self.args.bf16_full_eval else dtype
+            dtype = torch.float16 if not self.is_in_train and self.args.bf16_full_eval else dtype
             # conv_bn_folding is disabled as it fails in symbolic tracing, resulting in ipex warnings
             model = ipex.optimize(model, dtype=dtype, level="O1", conv_bn_folding=False, inplace=not self.is_in_train)
         else:
@@ -1988,7 +1988,7 @@ class Trainer:
 
     def _wrap_model(self, model, training=True, dataloader=None):
         if self.args.use_ipex:
-            dtype = torch.bfloat16 if self.use_cpu_amp else torch.float32
+            dtype = torch.float16 if self.use_cpu_amp else torch.float32
             model = self.ipex_optimize_model(model, training, dtype=dtype)
 
         if is_sagemaker_mp_enabled():
@@ -4281,7 +4281,7 @@ class Trainer:
             if args.fp16_full_eval:
                 model = model.to(dtype=torch.float16, device=args.device)
             elif args.bf16_full_eval:
-                model = model.to(dtype=torch.bfloat16, device=args.device)
+                model = model.to(dtype=torch.float16, device=args.device)
 
         batch_size = self.args.eval_batch_size
 
@@ -4883,7 +4883,7 @@ class Trainer:
             if args.fp16_full_eval:
                 model = model.to(dtype=torch.float16, device=args.device)
             elif args.bf16_full_eval:
-                model = model.to(dtype=torch.bfloat16, device=args.device)
+                model = model.to(dtype=torch.float16, device=args.device)
 
         batch_size = (
             dataloader.total_batch_size

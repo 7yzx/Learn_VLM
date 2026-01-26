@@ -593,7 +593,7 @@ def peft_module_casting_to_bf16(model):
         elif any(x in name for x in ["lm_head", "embed_tokens", "wte", "wpe"]):
             if hasattr(module, "weight"):
                 if module.weight.dtype == torch.float32:
-                    module = module.to(torch.bfloat16)
+                    module = module.to(torch.float16)
 
 
 def get_quantization_config(model_args: ModelConfig) -> Optional[BitsAndBytesConfig]:
@@ -1463,7 +1463,7 @@ def selective_log_softmax(logits, index) -> torch.Tensor:
         logsumexp_values = torch.stack([torch.logsumexp(lg, dim=-1) for lg in logits])
         per_token_logps = selected_logits - logsumexp_values  # log_softmax(x_i) = x_i - logsumexp(x)
     else:
-        # logsumexp approach is unstable with bfloat16, fall back to slightly less efficient approach
+        # logsumexp approach is unstable with float16, fall back to slightly less efficient approach
         per_token_logps = []
         for row_logits, row_labels in zip(logits, index):  # loop to reduce peak mem consumption
             row_logps = F.log_softmax(row_logits, dim=-1)

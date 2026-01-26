@@ -53,7 +53,7 @@ The original code can be found [here](https://github.com/baaivision/Emu3).
 
 ### Text generation inference
 
-Here's how to load the model and perform inference in half-precision (`torch.bfloat16`) to generate textual output from text or text and image inputs:
+Here's how to load the model and perform inference in half-precision (`torch.float16`) to generate textual output from text or text and image inputs:
 
 ```python
 from transformers import Emu3Processor, Emu3ForConditionalGeneration
@@ -62,14 +62,14 @@ from PIL import Image
 import requests
 
 processor = Emu3Processor.from_pretrained("BAAI/Emu3-Chat-hf")
-model = Emu3ForConditionalGeneration.from_pretrained("BAAI/Emu3-Chat-hf", torch_dtype=torch.bfloat16, device_map="cuda")
+model = Emu3ForConditionalGeneration.from_pretrained("BAAI/Emu3-Chat-hf", torch_dtype=torch.float16, device_map="cuda")
 
 # prepare image and text prompt
 url = 'http://images.cocodataset.org/val2017/000000039769.jpg'
 image = Image.open(requests.get(url, stream=True).raw)
 prompt = "What do you see in this image?<image>"
 
-inputs = processor(images=image, text=prompt, return_tensors="pt").to(model.device, dtype=torch.bfloat16)
+inputs = processor(images=image, text=prompt, return_tensors="pt").to(model.device, dtype=torch.float16)
 
 # autoregressively complete prompt
 output = model.generate(**inputs, max_new_tokens=50)
@@ -82,7 +82,7 @@ Emu3 can also generate images from textual input. Here is how you can do it:
 
 ```python
 processor = Emu3Processor.from_pretrained("BAAI/Emu3-Gen-hf")
-model = Emu3ForConditionalGeneration.from_pretrained("BAAI/Emu3-Gen-hf", torch_dtype="bfloat16", device_map="auto", attn_implementation="flash_attention_2")
+model = Emu3ForConditionalGeneration.from_pretrained("BAAI/Emu3-Gen-hf", torch_dtype="float16", device_map="auto", attn_implementation="flash_attention_2")
 
 
 inputs = processor(
@@ -91,7 +91,7 @@ inputs = processor(
     return_tensors="pt",
     return_for_image_generation=True,
 )
-inputs = inputs.to(device="cuda:0", dtype=torch.bfloat16)
+inputs = inputs.to(device="cuda:0", dtype=torch.float16)
 
 neg_prompt = "lowres, bad anatomy, bad hands, text, error, missing fingers, extra digit, fewer digits, cropped, worst quality, low quality, normal quality, jpeg artifacts, signature, watermark, username, blurry."
 neg_inputs = processor(text=[neg_prompt] * 2, return_tensors="pt").to(device="cuda:0")

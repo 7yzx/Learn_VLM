@@ -59,13 +59,13 @@ chat = [
 한번 `LLaMA-3`를 사용하여 이를 시연해 보겠습니다. 
 우선 `LLaMA-3`를 사용하기 위해서는 승인이 필요합니다. [권한 신청](https://huggingface.co/meta-llama/Meta-Llama-3-8B-Instruct)을 하고 Hugging Face 계정으로 로그인한 후에 사용할 수 있습니다. 
 또한 우리는 `device_map="auto"`를 사용합니다. GPU 메모리가 충분하다면 로드될 것입니다. 
-그리고 메모리 절약을 위해 dtype을 `torch.bfloat16`으로 설정할 것입니다.
+그리고 메모리 절약을 위해 dtype을 `torch.float16`으로 설정할 것입니다.
 
 ```python
 import torch
 from transformers import pipeline
 
-pipe = pipeline("text-generation", "meta-llama/Meta-Llama-3-8B-Instruct", torch_dtype=torch.bfloat16, device_map="auto")
+pipe = pipeline("text-generation", "meta-llama/Meta-Llama-3-8B-Instruct", torch_dtype=torch.float16, device_map="auto")
 response = pipe(chat, max_new_tokens=512)
 print(response[0]['generated_text'][-1]['content'])
 ```
@@ -188,7 +188,7 @@ chat = [
 ]
 
 # 1: 모델과 토크나이저를 불러옵니다
-model = AutoModelForCausalLM.from_pretrained("meta-llama/Meta-Llama-3-8B-Instruct", device_map="auto", torch_dtype=torch.bfloat16)
+model = AutoModelForCausalLM.from_pretrained("meta-llama/Meta-Llama-3-8B-Instruct", device_map="auto", torch_dtype=torch.float16)
 tokenizer = AutoTokenizer.from_pretrained("meta-llama/Meta-Llama-3-8B-Instruct")
 
 # 2: 채팅 템플릿에 적용합니다
@@ -231,9 +231,9 @@ Hugging Face 클래스는 모델을 `float32` 정밀도(Precision)로 로드합�
 이는 파라미터당 4바이트(32비트)를 필요로 하므로, 
 80억 개의 파라미터를 가진 "8B" 모델은 약 32GB의 메모리를 필요로 한다는 것을 의미합니다. 
 하지만 이는 낭비일 수 있습니다! 
-대부분의 최신 언어 모델은 파라미터당 2바이트를 사용하는 "bfloat16" 정밀도(Precision)로 학습됩니다. 
+대부분의 최신 언어 모델은 파라미터당 2바이트를 사용하는 "float16" 정밀도(Precision)로 학습됩니다. 
 하드웨어가 이를 지원하는 경우(Nvidia 30xx/Axxx 이상), 
-`torch_dtype` 파라미터로 위와 같이 `bfloat16` 정밀도(Precision)로 모델을 로드할 수 있습니다.
+`torch_dtype` 파라미터로 위와 같이 `float16` 정밀도(Precision)로 모델을 로드할 수 있습니다.
 
 또한, 16비트보다 더 낮은 정밀도(Precision)로 모델을 압축하는 
 "양자화(quantization)" 방법을 사용할 수도 있습니다. 
@@ -278,7 +278,7 @@ pipe = pipeline("text-generation", "meta-llama/Meta-Llama-3-8B-Instruct", device
 이는 모델이 토큰을 하나씩 생성할 때마다 파라미터를 메모리에서 읽어야 하기 때문입니다. 
 따라서 채팅 모델에서 초당 생성할 수 있는 토큰 수는 모델이 위치한 메모리의 대역폭을 모델의 크기로 나눈 값에 비례합니다.
 
-위의 예제에서는 모델이 bfloat16 정밀도(Precision)로 로드될 때 용량이 약 16GB였습니다. 
+위의 예제에서는 모델이 float16 정밀도(Precision)로 로드될 때 용량이 약 16GB였습니다. 
 이 경우, 모델이 생성하는 각 토큰마다 16GB를 메모리에서 읽어야 한다는 의미입니다. 
 총 메모리 대역폭은 소비자용 CPU에서는 20-100GB/sec, 
 소비자용 GPU나 Intel Xeon, AMD Threadripper/Epyc, 

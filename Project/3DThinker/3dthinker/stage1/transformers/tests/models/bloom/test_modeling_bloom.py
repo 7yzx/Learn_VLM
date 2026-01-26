@@ -543,7 +543,7 @@ class BloomEmbeddingTest(unittest.TestCase):
 
     @require_torch
     def test_embeddings(self):
-        # The config in this checkpoint has `bfloat16` as `torch_dtype` -> model in `bfloat16`
+        # The config in this checkpoint has `float16` as `torch_dtype` -> model in `float16`
         model = BloomForCausalLM.from_pretrained(self.path_bigscience_model, torch_dtype="auto")
         model.eval()
 
@@ -671,7 +671,7 @@ class BloomEmbeddingTest(unittest.TestCase):
         EMBEDDINGS_DS_BEFORE_LN_F_32_SUM = {"value": 0.08217757940292358}
 
         TEST_EMBEDDINGS = {
-            "torch.bfloat16": {
+            "torch.float16": {
                 "mean": EMBEDDINGS_DS_BEFORE_LN_BF_16_MEAN,
                 "max": EMBEDDINGS_DS_BEFORE_LN_BF_16_MAX,
                 "min": EMBEDDINGS_DS_BEFORE_LN_BF_16_MIN,

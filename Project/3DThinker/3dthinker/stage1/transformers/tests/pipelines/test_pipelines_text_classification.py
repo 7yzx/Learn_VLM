@@ -146,7 +146,7 @@ class TextClassificationPipelineTests(unittest.TestCase):
             model="hf-internal-testing/tiny-random-distilbert",
             framework="pt",
             device=torch_device,
-            torch_dtype=torch.bfloat16,
+            torch_dtype=torch.float16,
         )
 
         outputs = text_classifier("This is great !")

@@ -662,7 +662,7 @@ class TestEntropyFromLogits(TrlTestCase):
     @parameterized.expand(
         [
             (dtype, chunk_size)
-            for dtype in (torch.float64, torch.float32, torch.float16, torch.bfloat16)
+            for dtype in (torch.float64, torch.float32, torch.float16, torch.float16)
             for chunk_size in (1, 16)
         ]
     )
@@ -745,7 +745,7 @@ class TestPrintPromptCompletionsSample(TrlTestCase):
 
 
 class TestSelectiveLogSoftmax(TrlTestCase):
-    @parameterized.expand([(torch.float64,), (torch.float32,), (torch.float16,), (torch.bfloat16,)])
+    @parameterized.expand([(torch.float64,), (torch.float32,), (torch.float16,), (torch.float16,)])
     def test_selective_log_softmax(self, dtype):
         """Test selective_log_softmax with logits of different dtypes"""
         vocab_size = 1024
@@ -758,7 +758,7 @@ class TestSelectiveLogSoftmax(TrlTestCase):
         expected_output = torch.gather(logits.log_softmax(-1), dim=-1, index=input_ids.unsqueeze(-1)).squeeze(-1)
         actual_output = selective_log_softmax(logits, input_ids)
 
-        if dtype in [torch.float16, torch.bfloat16]:
+        if dtype in [torch.float16, torch.float16]:
             # half-precision dtypes fall back to an exact method
             self.assertTrue(torch.equal(actual_output, expected_output))
         else:

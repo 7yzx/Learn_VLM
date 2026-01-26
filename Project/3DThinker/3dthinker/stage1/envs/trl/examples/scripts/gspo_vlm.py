@@ -34,7 +34,7 @@ accelerate launch \
     --model_name_or_path Qwen/Qwen2.5-VL-3B-Instruct \
     --output_dir gspo-Qwen2.5-VL-3B-Instruct \
     --learning_rate 1e-5 \
-    --dtype bfloat16 \
+    --dtype float16 \
     --max_prompt_length 2048 \
     --max_completion_length 1024 \
     --use_peft \

@@ -135,7 +135,7 @@ model = OPTForCausalLM.from_pretrained("facebook/opt-350m", torch_dtype=torch.fl
 ...
 ```
 
-For the best speedups, we recommend loading the model in half-precision (e.g. `torch.float16` or `torch.bfloat16`).
+For the best speedups, we recommend loading the model in half-precision (e.g. `torch.float16` or `torch.float16`).
 
 On a local benchmark (L40S-45GB, PyTorch 2.4.0, OS Debian GNU/Linux 11) using `float16` with
 [facebook/opt-350m](https://huggingface.co/facebook/opt-350m), we saw the

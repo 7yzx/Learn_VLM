@@ -2007,7 +2007,7 @@ class Blip2VisionModelWithProjection(Blip2PreTrainedModel):
 
     <Tip>
 
-    Note that Flan-T5 checkpoints cannot be cast to float16. They are pre-trained using bfloat16.
+    Note that Flan-T5 checkpoints cannot be cast to float16. They are pre-trained using float16.
 
     </Tip>
     """,
@@ -2154,10 +2154,10 @@ class Blip2ForConditionalGeneration(Blip2PreTrainedModel, GenerationMixin):
 
         ```python
         >>> model = Blip2ForConditionalGeneration.from_pretrained(
-        ...     "Salesforce/blip2-opt-2.7b", load_in_8bit=True, device_map={"": 0}, torch_dtype=torch.bfloat16
+        ...     "Salesforce/blip2-opt-2.7b", load_in_8bit=True, device_map={"": 0}, torch_dtype=torch.float16
         ... )  # doctest: +IGNORE_RESULT
 
-        >>> inputs = processor(images=image, text=prompt, return_tensors="pt").to(device="cuda", dtype=torch.bfloat16)
+        >>> inputs = processor(images=image, text=prompt, return_tensors="pt").to(device="cuda", dtype=torch.float16)
 
         >>> generated_ids = model.generate(**inputs)
         >>> generated_text = processor.batch_decode(generated_ids, skip_special_tokens=True)[0].strip()

@@ -893,7 +893,8 @@ def format_reward(completions, **kwargs):
             for content, match in zip(completion_contents, matches):
                 f.write(f"Content: {content}\n")
                 f.write(f"Has format: {bool(match)}\n")
-
+    # 只要格式对就给 1.0 分，否则 0.0 分。
+    # 这在训练初期非常重要，强迫模型学会 CoT (Chain of Thought)。
     return [1.0 if match else 0.0 for match in matches]
 
 

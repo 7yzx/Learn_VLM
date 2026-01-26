@@ -250,7 +250,7 @@ class MllamaVisionText2TextModelTester:
             logits = model(
                 input_ids=input_ids,
                 attention_mask=attention_mask,
-                pixel_values=pixel_values.to(torch.bfloat16),
+                pixel_values=pixel_values.to(torch.float16),
                 return_dict=True,
             )["logits"]
         self.parent.assertFalse(torch.isnan(logits).any().item())
@@ -705,7 +705,7 @@ class MllamaForConditionalGenerationIntegrationTest(unittest.TestCase):
         decoded_output = processor.decode(generated_output, skip_special_tokens=False)
 
         # model should response about "stop sign", however it responses about "dock"
-        # this happens only in quantized version, bfloat16 works fine
+        # this happens only in quantized version, float16 works fine
         expected_output = "This image shows a long wooden dock extending out into a lake. The dock is made of wooden planks and has a railing"
 
         self.assertEqual(

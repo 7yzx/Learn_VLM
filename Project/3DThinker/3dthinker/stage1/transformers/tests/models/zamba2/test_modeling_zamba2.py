@@ -547,7 +547,7 @@ class Zamba2ModelTest(ModelTesterMixin, GenerationTesterMixin, PipelineTesterMix
 
                 for _, param in model.named_parameters():
                     # upcast only layer norms
-                    if (param.dtype == torch.float16) or (param.dtype == torch.bfloat16):
+                    if (param.dtype == torch.float16) or (param.dtype == torch.float16):
                         param.data = param.data.to(torch.float32)
 
                 _ = model(dummy_input)

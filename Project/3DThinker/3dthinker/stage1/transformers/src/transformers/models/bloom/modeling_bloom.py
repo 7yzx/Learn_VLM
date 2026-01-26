@@ -70,7 +70,7 @@ def build_alibi_tensor(attention_mask: torch.Tensor, num_heads: int, dtype: torc
             Token-wise attention mask, this should be of shape (batch_size, max_seq_len).
         num_heads (`int`):
             number of heads
-        dtype (`torch.dtype`, *optional*, default=`torch.bfloat16`):
+        dtype (`torch.dtype`, *optional*, default=`torch.float16`):
             dtype of the output tensor
     """
     batch_size, seq_length = attention_mask.shape

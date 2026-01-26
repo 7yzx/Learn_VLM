@@ -31,10 +31,10 @@ class ModelConfig:
             Model checkpoint for weights initialization.
         model_revision (`str`, *optional*, defaults to `"main"`):
             Specific model version to use. It can be a branch name, a tag name, or a commit id.
-        dtype (`Literal["auto", "bfloat16", "float16", "float32"]` or `None`, *optional*, defaults to `None`):
+        dtype (`Literal["auto", "float16", "float16", "float32"]` or `None`, *optional*, defaults to `None`):
             Override the default `torch.dtype` and load the model under this dtype. Possible values are
 
-                - `"bfloat16"`: `torch.bfloat16`
+                - `"float16"`: `torch.float16`
                 - `"float16"`: `torch.float16`
                 - `"float32"`: `torch.float32`
                 - `"auto"`: Automatically derive the dtype from the model's weights.
@@ -94,7 +94,7 @@ class ModelConfig:
         default=None,
         metadata={
             "help": "Override the default `torch.dtype` and load the model under this dtype.",
-            "choices": ["auto", "bfloat16", "float16", "float32"],
+            "choices": ["auto", "float16", "float16", "float32"],
         },
     )
     trust_remote_code: bool = field(
@@ -182,7 +182,7 @@ class ModelConfig:
         default=None,
         metadata={
             "help": "Override the default `torch.dtype` and load the model under this dtype.",
-            "choices": ["auto", "bfloat16", "float16", "float32"],
+            "choices": ["auto", "float16", "float16", "float32"],
         },
     )
 

@@ -1300,7 +1300,7 @@ class GRPOTrainer(Trainer):
             ):
                 # Cast to the appropriate dtype based on training configuration
                 if self.args.bf16:
-                    unwrapped_model.to(torch.bfloat16)
+                    unwrapped_model.to(torch.float16)
                 elif self.args.fp16:
                     unwrapped_model.to(torch.float16)
                 with torch.inference_mode():

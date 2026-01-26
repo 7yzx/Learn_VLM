@@ -1,5 +1,28 @@
 import torch
-from transformers import Qwen2_5_VLForConditionalGeneration, Qwen2_5_VLConfig, AutoTokenizer, AutoProcessor
+import sys, os
+# 获取 main.py 的目录
+current_dir = os.path.dirname(os.path.abspath(__file__)) 
+# 回退两层到 stage1 (main.py -> src -> stage1)
+stage1_dir = os.path.dirname(current_dir)
+# 拼接出 transformers 的源码根目录
+transformers_root = os.path.join(stage1_dir, "transformers", "src")
+sys.path.insert(0, transformers_root)
+
+# from transformers import Qwen2_5_VLForConditionalGeneration, Qwen2_5_VLConfig, AutoTokenizer, AutoProcessor
+# # ✅ 修改后的写法（直接从子模块导入）
+try:
+    # 尝试从具体文件路径导入
+    from transformers.models.qwen2_5_vl.modeling_qwen2_5_vl import Qwen2_5_VLForConditionalGeneration
+    from transformers.models.qwen2_5_vl.configuration_qwen2_5_vl import Qwen2_5_VLConfig
+    from transformers.models.qwen2_5_vl.processing_qwen2_5_vl import Qwen2_5_VLProcessor
+    from transformers import AutoProcessor
+except ImportError:
+    # 如果路径不对，打印一下 transformers 到底装在哪了
+    import transformers
+    import os
+    print("当前 Transformers 安装路径:", os.path.dirname(transformers.__file__))
+    raise
+
 from PIL import Image
 import os
 import logging
@@ -11,7 +34,10 @@ from utils import *
 from task import *
 from trainer_single import CustomTrainerStage1, CustomTrainerStage2
 from multimodal_projector.mmprojector import projector
-import wandb  # Add this line
+
+# import wandb  # Add this line
+import wandb
+
         
 # def setup_wandb(args):
 #     wandb.init(
@@ -119,9 +145,9 @@ config.latent_size = args.latent_size
 config.stage = args.stage
 
 if args.stage in ['stage1']:
-    model = Qwen2_5_VLForConditionalGeneration.from_pretrained(model_path, config=config, device_map="auto", torch_dtype=torch.bfloat16, cache_dir=cache_dir)
+    model = Qwen2_5_VLForConditionalGeneration.from_pretrained(model_path, config=config, device_map="auto", torch_dtype=torch.float32, cache_dir=cache_dir)
 elif args.stage in ['stage2']:
-    model = Qwen2_5_VLForConditionalGeneration.from_pretrained(model_path, config=config, device_map="auto", torch_dtype=torch.bfloat16)
+    model = Qwen2_5_VLForConditionalGeneration.from_pretrained(model_path, config=config, device_map="auto", torch_dtype=torch.float32)
 
 # 3B:mm_hidden_size=2048
 # 7B:mm_hidden_size=3584
@@ -290,7 +316,8 @@ training_args = SFTConfig(
     save_steps=args.save_steps,
     save_total_limit=args.save_total_limit,
     optim="adamw_torch_fused",
-    bf16=True,
+    bf16=False,
+    fp16=True,
     push_to_hub=False,
     remove_unused_columns=False,
     gradient_checkpointing=grad_checkpointing,
@@ -307,7 +334,7 @@ trainer = CustomTrainer(
     args=training_args,
     train_dataset=train_dataset,
     data_collator=collate_fn,
-    tokenizer=processor.tokenizer
+    processing_class=processor.tokenizer
 )
 
 trainer.train()

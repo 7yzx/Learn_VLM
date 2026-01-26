@@ -1,0 +1,16 @@
+{"time":"2026-01-15T13:22:03.400945384Z","level":"INFO","msg":"using version","core version":"0.18.3"}
+{"time":"2026-01-15T13:22:03.400999838Z","level":"INFO","msg":"created symlink","path":"/mnt/sevenT/zixiaoy/code/Learn_VLM/Project/3DThinker/3dthinker/stage1/wandb/offline-run-20260115_132203-7igrxa9j/logs/debug-core.log"}
+{"time":"2026-01-15T13:22:03.543677243Z","level":"INFO","msg":"created new stream","id":"7igrxa9j"}
+{"time":"2026-01-15T13:22:03.543788154Z","level":"INFO","msg":"stream: started","id":"7igrxa9j"}
+{"time":"2026-01-15T13:22:03.54389327Z","level":"INFO","msg":"sender: started","stream_id":{"value":"7igrxa9j"}}
+{"time":"2026-01-15T13:22:03.54385224Z","level":"INFO","msg":"writer: Do: started","stream_id":{"value":"7igrxa9j"}}
+{"time":"2026-01-15T13:22:03.54386387Z","level":"INFO","msg":"handler: started","stream_id":{"value":"7igrxa9j"}}
+{"time":"2026-01-15T13:22:03.59565519Z","level":"INFO","msg":"wandb-core","!BADKEY":null}
+{"time":"2026-01-15T13:22:03.597973821Z","level":"INFO","msg":"Starting system monitor"}
+{"time":"2026-01-15T13:23:08.337526089Z","level":"INFO","msg":"stream: closing","id":"7igrxa9j"}
+{"time":"2026-01-15T13:23:08.337640127Z","level":"INFO","msg":"Stopping system monitor"}
+{"time":"2026-01-15T13:23:08.342476476Z","level":"INFO","msg":"Stopped system monitor"}
+{"time":"2026-01-15T13:23:08.343202734Z","level":"INFO","msg":"handler: closed","stream_id":{"value":"7igrxa9j"}}
+{"time":"2026-01-15T13:23:08.343257904Z","level":"INFO","msg":"writer: Close: closed","stream_id":{"value":"7igrxa9j"}}
+{"time":"2026-01-15T13:23:08.343298357Z","level":"INFO","msg":"sender: closed","stream_id":{"value":"7igrxa9j"}}
+{"time":"2026-01-15T13:23:08.343419617Z","level":"INFO","msg":"stream: closed","id":"7igrxa9j"}

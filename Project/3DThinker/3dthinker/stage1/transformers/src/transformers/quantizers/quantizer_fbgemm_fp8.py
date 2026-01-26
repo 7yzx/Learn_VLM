@@ -94,18 +94,18 @@ class FbgemmFp8HfQuantizer(HfQuantizer):
 
     def update_torch_dtype(self, torch_dtype: "torch.dtype") -> "torch.dtype":
         if torch_dtype is None:
-            torch_dtype = torch.bfloat16
+            torch_dtype = torch.float16
             logger.info(
                 "Overriding torch_dtype=%s with `torch_dtype=torch.bloat16` due to "
                 "requirements of `fbgemm-gpu` to enable model loading in fp8. "
                 "Pass your own torch_dtype to specify the dtype of the remaining non-linear layers or pass"
-                " torch_dtype=torch.bfloat16 to remove this warning.",
+                " torch_dtype=torch.float16 to remove this warning.",
                 torch_dtype,
             )
         elif torch_dtype == torch.float16:
             raise ValueError(
                 "You cannot use FP8 with torch_dtype=torch.float16."
-                "We recommend you passing torch_dtype=torch.bfloat16"
+                "We recommend you passing torch_dtype=torch.float16"
             )
         return torch_dtype
 

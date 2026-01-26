@@ -419,7 +419,7 @@ class TrainingArguments:
             use CPU/CUDA AMP or APEX depending on the PyTorch version detected, while the other choices will force the
             requested backend.
         bf16_full_eval (`bool`, *optional*, defaults to `False`):
-            Whether to use full bfloat16 evaluation instead of 32-bit. This will be faster and save memory but can harm
+            Whether to use full float16 evaluation instead of 32-bit. This will be faster and save memory but can harm
             metric values. This is an experimental API and it may change.
         fp16_full_eval (`bool`, *optional*, defaults to `False`):
             Whether to use full float16 evaluation instead of 32-bit. This will be faster and save memory but can harm
@@ -1102,7 +1102,7 @@ class TrainingArguments:
         default=False,
         metadata={
             "help": (
-                "Whether to use full bfloat16 evaluation instead of 32-bit. This is an experimental API and it may"
+                "Whether to use full float16 evaluation instead of 32-bit. This is an experimental API and it may"
                 " change."
             )
         },

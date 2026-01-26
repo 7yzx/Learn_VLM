@@ -16,7 +16,7 @@ class CustomTrainerStage1(SFTTrainer):
         )
         predicted_ids = outputs.logits.argmax(dim=-1)
         decoded_text = self.tokenizer.batch_decode(predicted_ids, skip_special_tokens=False)
-        predict_embeddings = outputs.hidden_states
+        predict_embeddings = outputs.hidden_states.to(torch.float32)
         
         # all: 620
         image_out_mask = inputs["image_out_mask"]
@@ -29,7 +29,7 @@ class CustomTrainerStage1(SFTTrainer):
         # decoded_text = self.tokenizer.batch_decode(torch.tensor(x).to("cuda:0"), skip_special_tokens=False)
         
         ## the same
-        input_embeddings = outputs.inputs_embeds
+        input_embeddings = outputs.inputs_embeds.to(torch.float32)
         
         mask = (inputs["input_ids"][0] == 151655).int()
         mask = mask.unsqueeze(0)
@@ -41,7 +41,7 @@ class CustomTrainerStage1(SFTTrainer):
         patch_size = int(image_tokens/image_number)
         image_embeddings = image_embeddings.view(image_number, patch_size, image_embed_dim).unsqueeze(0)
         
-        feature_proj = model.projector_model(shift_predict_embeddings, image_embeddings)
+        feature_proj = model.projector_model(shift_predict_embeddings, image_embeddings).to(torch.float32)
         feature_proj_norm = feature_proj / feature_proj.norm(dim=-1, p=2, keepdim=True)
         
         # input_embeddings = outputs.inputs_embeds
@@ -50,17 +50,52 @@ class CustomTrainerStage1(SFTTrainer):
         # sim_loss = torch.nn.functional.cosine_similarity(gt_embeddings, shift_predict_embeddings).mean()
         # sim_loss = 1 - sim_loss
 
-        data = np.load('../../data/feature_vggt/' + str(idx[0]) + '/vggt.npz')
+        data = np.load('/mnt/sevenT/zixiaoy/code/Learn_VLM/Project/3DThinker/data/feature_vggt/' + str(idx[0]) + '/vggt.npz')
         feature_3d = data['feature'] # [1,N=4,P_3D = 1374,2048]
-        feature_3d = torch.tensor(feature_3d).to(device=shift_predict_embeddings.device, dtype=shift_predict_embeddings.dtype)
-        feature_3d = feature_3d.squeeze()
-        feature_3d_norm = feature_3d / feature_3d.norm(dim=-1, p=2, keepdim=True)
         
-        # print(feature_proj_norm.shape)
-        # print(feature_3d_norm.shape)
+        # [检查点 1] 源数据是否有问题
+        if np.isnan(feature_3d).any() or np.isinf(feature_3d).any():
+            print(f"!!! CRITICAL: GT Data contains NaN/Inf at idx {idx} !!!")
+            feature_3d = np.nan_to_num(feature_3d)
+        
+        feature_3d = torch.tensor(feature_3d).to(device=shift_predict_embeddings.device, dtype=torch.float32)
+        feature_3d = feature_3d.squeeze()
+        
+        # [检查点 2] Projector 输出是否有问题
+        if torch.isnan(feature_proj).any() or torch.isinf(feature_proj).any():
+            print(f"!!! CRITICAL: Projector output contains NaN/Inf at Step {self.state.global_step} !!!")
+            print(f"Input stats: Min={shift_predict_embeddings.min()}, Max={shift_predict_embeddings.max()}")
+            # 紧急补救：重置为0，防止训练崩溃
+            feature_proj = torch.nan_to_num(feature_proj, nan=0.0, posinf=1.0, neginf=-1.0)
+
+        # 再次 Clamp
+        feature_proj = torch.clamp(feature_proj, min=-100.0, max=100.0)
+        feature_3d = torch.clamp(feature_3d, min=-100.0, max=100.0)
+        
+        # [检查点 3] 计算平方差
+        diff = feature_proj - feature_3d.detach()
+        squared_diff = diff ** 2
+        
+        if torch.isinf(squared_diff).any():
+             print(f"!!! CRITICAL: Squared diff overflow at Step {self.state.global_step} !!!")
+             squared_diff = torch.clamp(squared_diff, max=1e5) #再一次截断
+             
+        feature_sim = squared_diff.sum(dim=-1)
+        # feature_3d = torch.tensor(feature_3d).to(device=shift_predict_embeddings.device, dtype=torch.float32)
+        # feature_3d = feature_3d.squeeze()
+        # feature_3d_norm = feature_3d / feature_3d.norm(dim=-1, p=2, keepdim=True)
+        
+        # # print(feature_proj_norm.shape)
+        # # print(feature_3d_norm.shape)
         # feature_sim = ((feature_proj_norm - feature_3d_norm.detach()) ** 2).sum(dim=-1)
-        feature_sim = ((feature_proj - feature_3d.detach()) ** 2).sum(dim=-1)
+        
+        # feature_proj = torch.clamp(feature_proj, min=-100.0, max=100.0)
+        # feature_3d = torch.clamp(feature_3d, min=-100.0, max=100.0)
+        # feature_sim = ((feature_proj - feature_3d.detach()) ** 2).sum(dim=-1)
         sim_loss = feature_sim.mean()*0.0005
+        
+        if torch.isnan(sim_loss):
+            print(f"!!! Warning: NaN detected in Sim Loss at Step {self.state.global_step} !!!")
         
         loss = 0.1 * ce_loss + sim_loss
         # loss = ce_loss + sim_loss

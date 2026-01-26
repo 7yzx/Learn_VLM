@@ -135,7 +135,7 @@ def convert_mamba2_checkpoint_file_to_huggingface_model_file(
     hf_model.load_state_dict(original_state_dict)
 
     # Save new model to pytorch_dump_path
-    dtype = torch.float32 if precision == "fp32" else (torch.bfloat16 if precision == "bf16" else torch.float16)
+    dtype = torch.float32 if precision == "fp32" else (torch.float16 if precision == "bf16" else torch.float16)
     save_model(hf_model.to(dtype), path.join(output_dir, "model.safetensors"), metadata={"format": "pt"})
 
     # Load and save tokenizer

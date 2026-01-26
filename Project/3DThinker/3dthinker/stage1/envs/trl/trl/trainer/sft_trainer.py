@@ -589,7 +589,7 @@ class SFTTrainer(Trainer):
             dtype = model_init_kwargs.get("dtype")
             if isinstance(dtype, torch.dtype) or dtype == "auto" or dtype is None:
                 pass  # dtype is already a torch.dtype or "auto" or None
-            elif isinstance(dtype, str) and dtype in ["bfloat16", "float16", "float32"]:
+            elif isinstance(dtype, str) and dtype in ["float16", "float16", "float32"]:
                 dtype = getattr(torch, dtype)
                 model_init_kwargs["dtype"] = dtype
             else:

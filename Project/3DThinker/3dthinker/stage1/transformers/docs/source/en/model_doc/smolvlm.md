@@ -61,7 +61,7 @@ from transformers import AutoProcessor, AutoModelForImageTextToText
 processor = AutoProcessor.from_pretrained("HuggingFaceTB/SmolVLM2-256M-Video-Instruct")
 model = AutoModelForImageTextToText.from_pretrained(
     "HuggingFaceTB/SmolVLM2-256M-Video-Instruct",
-    torch_dtype=torch.bfloat16,
+    torch_dtype=torch.float16,
     device_map="cuda"
 )
 
@@ -81,7 +81,7 @@ inputs = processor.apply_chat_template(
     tokenize=True,
     return_dict=True,
     return_tensors="pt",
-).to(model.device, dtype=torch.bfloat16)
+).to(model.device, dtype=torch.float16)
 
 output_ids = model.generate(**inputs, max_new_tokens=128)
 generated_texts = processor.batch_decode(output_ids, skip_special_tokens=True)
@@ -105,7 +105,7 @@ inputs = processor.apply_chat_template(
     tokenize=True,
     return_dict=True,
     return_tensors="pt",
-).to(model.device, dtype=torch.bfloat16)
+).to(model.device, dtype=torch.float16)
 
 generated_ids = model.generate(**inputs, do_sample=False, max_new_tokens=100)
 generated_texts = processor.batch_decode(generated_ids, skip_special_tokens=True)
@@ -123,7 +123,7 @@ from transformers import AutoProcessor, AutoModelForImageTextToText
 processor = AutoProcessor.from_pretrained("HuggingFaceTB/SmolVLM2-256M-Video-Instruct")
 model = AutoModelForImageTextToText.from_pretrained(
     "HuggingFaceTB/SmolVLM2-256M-Video-Instruct",
-    torch_dtype=torch.bfloat16,
+    torch_dtype=torch.float16,
     device_map="cuda"
 )
 
@@ -163,7 +163,7 @@ inputs = processor.apply_chat_template(
     tokenize=True,
     return_dict=True,
     return_tensors="pt",
-).to(model.device, dtype=torch.bfloat16)
+).to(model.device, dtype=torch.float16)
 
 generated_ids = model.generate(**inputs, do_sample=False, max_new_tokens=100)
 generated_texts = processor.batch_decode(generated_ids, skip_special_tokens=True)

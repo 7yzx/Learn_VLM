@@ -130,8 +130,8 @@ def _w8a8_block_fp8_matmul(
         a_ptrs += BLOCK_SIZE_K * stride_ak
         b_ptrs += BLOCK_SIZE_K * stride_bk
 
-    if C.dtype.element_ty == tl.bfloat16:
-        c = accumulator.to(tl.bfloat16)
+    if C.dtype.element_ty == tl.float16:
+        c = accumulator.to(tl.float16)
     elif C.dtype.element_ty == tl.float16:
         c = accumulator.to(tl.float16)
     else:

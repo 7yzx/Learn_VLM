@@ -35,17 +35,17 @@ Throughout this guide, we will offer an analysis of auto-regressive generation f
 
 Memory requirements of LLMs can be best understood by seeing the LLM as a set of weight matrices and vectors and the text inputs as a sequence of vectors. In the following, the definition *weights* will be used to signify all model weight matrices and vectors.
 
-At the time of writing this guide, LLMs consist of at least a couple billion parameters. Each parameter thereby is made of a decimal number, e.g. `4.5689` which is usually stored in either [float32](https://en.wikipedia.org/wiki/Single-precision_floating-point_format), [bfloat16](https://en.wikipedia.org/wiki/Bfloat16_floating-point_format), or [float16](https://en.wikipedia.org/wiki/Half-precision_floating-point_format) format. This allows us to easily compute the memory requirement to load the LLM into memory:
+At the time of writing this guide, LLMs consist of at least a couple billion parameters. Each parameter thereby is made of a decimal number, e.g. `4.5689` which is usually stored in either [float32](https://en.wikipedia.org/wiki/Single-precision_floating-point_format), [float16](https://en.wikipedia.org/wiki/float16_floating-point_format), or [float16](https://en.wikipedia.org/wiki/Half-precision_floating-point_format) format. This allows us to easily compute the memory requirement to load the LLM into memory:
 
 > *Loading the weights of a model having X billion parameters requires roughly 4 * X GB of VRAM in float32 precision*
 
-Nowadays, models are however rarely trained in full float32 precision, but usually in bfloat16 precision or less frequently in float16 precision. Therefore the rule of thumb becomes:
+Nowadays, models are however rarely trained in full float32 precision, but usually in float16 precision or less frequently in float16 precision. Therefore the rule of thumb becomes:
 
-> *Loading the weights of a model having X billion parameters requires roughly 2 * X GB of VRAM in bfloat16/float16 precision*
+> *Loading the weights of a model having X billion parameters requires roughly 2 * X GB of VRAM in float16/float16 precision*
 
 For shorter text inputs (less than 1024 tokens), the memory requirement for inference is very much dominated by the memory requirement to load the weights. Therefore, for now, let's assume that the memory requirement for inference is equal to the memory requirement to load the model into the GPU VRAM.
 
-To give some examples of how much VRAM it roughly takes to load a model in bfloat16:
+To give some examples of how much VRAM it roughly takes to load a model in float16:
 
 -   **GPT3** requires 2 \* 175 GB = **350 GB** VRAM
 -   [**Bloom**](https://huggingface.co/bigscience/bloom) requires 2 \* 176 GB = **352 GB** VRAM
@@ -76,7 +76,7 @@ By using `device_map="auto"` the attention layers would be equally distributed o
 
 In this guide, we will use [bigcode/octocoder](https://huggingface.co/bigcode/octocoder) as it can be run on a single 40 GB A100 GPU device chip. Note that all memory and speed optimizations that we will apply going forward, are equally applicable to models that require model or tensor parallelism.
 
-Since the model is loaded in bfloat16 precision, using our rule of thumb above, we would expect the memory requirement to run inference with `bigcode/octocoder` to be around 31 GB VRAM. Let's give it a try.
+Since the model is loaded in float16 precision, using our rule of thumb above, we would expect the memory requirement to run inference with `bigcode/octocoder` to be around 31 GB VRAM. Let's give it a try.
 
 We first load the model and tokenizer and then pass both to Transformers' [pipeline](https://huggingface.co/docs/transformers/main_classes/pipelines) object.
 
@@ -84,7 +84,7 @@ We first load the model and tokenizer and then pass both to Transformers' [pipel
 from transformers import AutoModelForCausalLM, AutoTokenizer, pipeline
 import torch
 
-model = AutoModelForCausalLM.from_pretrained("bigcode/octocoder", torch_dtype=torch.bfloat16, device_map="auto", pad_token_id=0)
+model = AutoModelForCausalLM.from_pretrained("bigcode/octocoder", torch_dtype=torch.float16, device_map="auto", pad_token_id=0)
 tokenizer = AutoTokenizer.from_pretrained("bigcode/octocoder")
 
 pipe = pipeline("text-generation", model=model, tokenizer=tokenizer)
@@ -123,9 +123,9 @@ bytes_to_giga_bytes(torch.cuda.max_memory_allocated())
 Close enough to our back-of-the-envelope computation! We can see the number is not exactly correct as going from bytes to kilobytes requires a multiplication of 1024 instead of 1000. Therefore the back-of-the-envelope formula can also be understood as an "at most X GB" computation.
 Note that if we had tried to run the model in full float32 precision, a whopping 64 GB of VRAM would have been required.
 
-> Almost all models are trained in bfloat16 nowadays, there is no reason to run the model in full float32 precision if [your GPU supports bfloat16](https://discuss.pytorch.org/t/bfloat16-native-support/117155/5). Float32 won't give better inference results than the precision that was used to train the model.
+> Almost all models are trained in float16 nowadays, there is no reason to run the model in full float32 precision if [your GPU supports float16](https://discuss.pytorch.org/t/float16-native-support/117155/5). Float32 won't give better inference results than the precision that was used to train the model.
 
-If you are unsure in which format the model weights are stored on the Hub, you can always look into the checkpoint's config under `"torch_dtype"`, *e.g.* [here](https://huggingface.co/meta-llama/Llama-2-7b-hf/blob/6fdf2e60f86ff2481f2241aaee459f85b5b0bbb9/config.json#L21). It is recommended to set the model to the same precision type as written in the config when loading with `from_pretrained(..., torch_dtype=...)` except when the original type is float32 in which case one can use both `float16` or `bfloat16` for inference.
+If you are unsure in which format the model weights are stored on the Hub, you can always look into the checkpoint's config under `"torch_dtype"`, *e.g.* [here](https://huggingface.co/meta-llama/Llama-2-7b-hf/blob/6fdf2e60f86ff2481f2241aaee459f85b5b0bbb9/config.json#L21). It is recommended to set the model to the same precision type as written in the config when loading with `from_pretrained(..., torch_dtype=...)` except when the original type is float32 in which case one can use both `float16` or `float16` for inference.
 
 
 Let's define a `flush(...)` function to free all allocated memory so that we can accurately measure the peak allocated GPU memory.
@@ -160,15 +160,15 @@ release_memory(model)
 Now what if your GPU does not have 32 GB of VRAM? It has been found that model weights can be quantized to 8-bit or 4-bits without a significant loss in performance (see [Dettmers et al.](https://arxiv.org/abs/2208.07339)).
 Model can be quantized to even 3 or 2 bits with an acceptable loss in performance as shown in the recent [GPTQ paper](https://arxiv.org/abs/2210.17323) 🤯.
 
-Without going into too many details, quantization schemes aim at reducing the precision of weights while trying to keep the model's inference results as accurate as possible (*a.k.a* as close as possible to bfloat16).
+Without going into too many details, quantization schemes aim at reducing the precision of weights while trying to keep the model's inference results as accurate as possible (*a.k.a* as close as possible to float16).
 Note that quantization works especially well for text generation since all we care about is choosing the *set of most likely next tokens* and don't really care about the exact values of the next token *logit* distribution.
 All that matters is that the next token *logit* distribution stays roughly the same so that an `argmax` or `topk` operation gives the same results.
 
 There are various quantization techniques, which we won't discuss in detail here, but in general, all quantization techniques work as follows:
 
 -   1.  Quantize all weights to the target precision
--   2.  Load the quantized weights, and pass the input sequence of vectors in bfloat16 precision
--   3.  Dynamically dequantize weights to bfloat16 to perform the computation with their input vectors in bfloat16 precision
+-   2.  Load the quantized weights, and pass the input sequence of vectors in float16 precision
+-   3.  Dynamically dequantize weights to float16 to perform the computation with their input vectors in float16 precision
 
 In a nutshell, this means that *inputs-weight matrix* multiplications, with \\( X \\) being the *inputs*, \\( W \\) being a weight matrix and \\( Y \\) being the output:
 
@@ -262,7 +262,7 @@ bytes_to_giga_bytes(torch.cuda.max_memory_allocated())
 
 Just 9.5GB! That's really not a lot for a >15 billion parameter model.
 
-While we see very little degradation in accuracy for our model here, 4-bit quantization can in practice often lead to different results compared to 8-bit quantization or full `bfloat16` inference. It is up to the user to try it out.
+While we see very little degradation in accuracy for our model here, 4-bit quantization can in practice often lead to different results compared to 8-bit quantization or full `float16` inference. It is up to the user to try it out.
 
 Also note that inference here was again a bit slower compared to 8-bit quantization which is due to the more aggressive quantization method used for 4-bit quantization leading to \\( \text{quantize} \\) and \\( \text{dequantize} \\) taking longer during inference.
 
@@ -302,7 +302,7 @@ $$ \textbf{O} = \text{Attn}(\mathbf{X}) = \mathbf{V} \times \text{Softmax}(\math
 \\(  \mathbf{X} = (\mathbf{x}_1, ... \mathbf{x}_{N}) \\) is thereby the input sequence to the attention layer. The projections \\( \mathbf{Q} \\) and \\( \mathbf{K} \\) will each consist of \\( N \\) vectors resulting in the \\( \mathbf{QK}^T \\) being of size \\( N^2 \\) .
 
 LLMs usually have multiple attention heads, thus doing multiple self-attention computations in parallel.
-Assuming, the LLM has 40 attention heads and runs in bfloat16 precision, we can calculate the memory requirement to store the \\( \mathbf{QK^T} \\) matrices to be \\( 40 * 2 * N^2 \\) bytes. For \\( N=1000 \\) only around 50 MB of VRAM are needed, however, for \\( N=16000 \\) we would need 19 GB of VRAM, and for \\( N=100,000 \\) we would need almost 1TB just to store the \\( \mathbf{QK}^T \\) matrices.
+Assuming, the LLM has 40 attention heads and runs in float16 precision, we can calculate the memory requirement to store the \\( \mathbf{QK^T} \\) matrices to be \\( 40 * 2 * N^2 \\) bytes. For \\( N=1000 \\) only around 50 MB of VRAM are needed, however, for \\( N=16000 \\) we would need 19 GB of VRAM, and for \\( N=100,000 \\) we would need almost 1TB just to store the \\( \mathbf{QK}^T \\) matrices.
 
 Long story short, the default self-attention algorithm quickly becomes prohibitively memory-expensive for large input contexts.
 
@@ -391,10 +391,10 @@ We append the original text prompt `"Question: Please write a function in Python
 long_prompt = 10 * system_prompt + prompt
 ```
 
-We instantiate our model again in bfloat16 precision.
+We instantiate our model again in float16 precision.
 
 ```python
-model = AutoModelForCausalLM.from_pretrained("bigcode/octocoder", torch_dtype=torch.bfloat16, device_map="auto")
+model = AutoModelForCausalLM.from_pretrained("bigcode/octocoder", torch_dtype=torch.float16, device_map="auto")
 tokenizer = AutoTokenizer.from_pretrained("bigcode/octocoder")
 
 pipe = pipeline("text-generation", model=model, tokenizer=tokenizer)

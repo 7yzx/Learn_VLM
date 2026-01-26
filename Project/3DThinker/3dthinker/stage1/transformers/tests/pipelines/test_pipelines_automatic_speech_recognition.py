@@ -211,7 +211,7 @@ class AutomaticSpeechRecognitionPipelineTests(unittest.TestCase):
             model="facebook/s2t-small-mustc-en-fr-st",
             tokenizer="facebook/s2t-small-mustc-en-fr-st",
             framework="pt",
-            torch_dtype=torch.bfloat16,
+            torch_dtype=torch.float16,
         )
         waveform = np.tile(np.arange(1000, dtype=np.float32), 34)
         output = speech_recognizer(waveform)

@@ -99,7 +99,7 @@ def convert_hf_config(nemo_config, tokenizer, vocab_size, dtype, hf_output_path,
         "fast-swiglu": "silu",
     }
     DTYPE2HF = {
-        torch.bfloat16: "bfloat16",
+        torch.float16: "float16",
         torch.float16: "float16",
         torch.float32: "float32",
     }
@@ -164,7 +164,7 @@ def convert(input_nemo_file, output_hf_file, precision=None, cpu_only=False) -> 
     elif precision in [16, "16", "16-mixed"]:
         dtype = torch.float16
     elif precision in ["bf16", "bf16-mixed"]:
-        dtype = torch.bfloat16
+        dtype = torch.float16
     else:
         logging.warning(f"Precision string {precision} is not recognized, falling back to fp32")
         dtype = torch.float32  # fallback

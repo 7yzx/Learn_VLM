@@ -67,7 +67,7 @@ from transformers import AutoModelForCausalLM, AutoTokenizer
 
 checkpoint = "HuggingFaceH4/zephyr-7b-beta"
 tokenizer = AutoTokenizer.from_pretrained(checkpoint)
-model = AutoModelForCausalLM.from_pretrained(checkpoint)   # 여기서 bfloat16 사용 및/또는 GPU로 이동할 수 있습니다.
+model = AutoModelForCausalLM.from_pretrained(checkpoint)   # 여기서 float16 사용 및/또는 GPU로 이동할 수 있습니다.
 
 
 messages = [
@@ -283,7 +283,7 @@ from transformers import AutoModelForCausalLM, AutoTokenizer
 checkpoint = "NousResearch/Hermes-2-Pro-Llama-3-8B"
 
 tokenizer = AutoTokenizer.from_pretrained(checkpoint, revision="pr/13")
-model = AutoModelForCausalLM.from_pretrained(checkpoint, torch_dtype=torch.bfloat16, device_map="auto")
+model = AutoModelForCausalLM.from_pretrained(checkpoint, torch_dtype=torch.float16, device_map="auto")
 ```
 
 다음으로, 도구 목록을 정의해 보겠습니다:

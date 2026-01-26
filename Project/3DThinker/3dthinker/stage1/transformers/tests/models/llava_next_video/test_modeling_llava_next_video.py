@@ -199,8 +199,8 @@ class LlavaNextVideoVisionText2TextModelTester:
             input_ids=input_ids,
             attention_mask=attention_mask,
             image_sizes=image_sizes,
-            pixel_values=pixel_values.to(torch.bfloat16),
-            pixel_values_videos=pixel_values_videos.to(torch.bfloat16),
+            pixel_values=pixel_values.to(torch.float16),
+            pixel_values_videos=pixel_values_videos.to(torch.float16),
             return_dict=True,
         )["logits"]
         self.parent.assertFalse(torch.isnan(logits).any().item())
@@ -217,8 +217,8 @@ class LlavaNextVideoVisionText2TextModelTester:
                 input_ids=input_ids,
                 attention_mask=attention_mask,
                 image_sizes=image_sizes,
-                pixel_values=pixel_values.to(torch.bfloat16),
-                pixel_values_videos=pixel_values_videos.to(torch.bfloat16),
+                pixel_values=pixel_values.to(torch.float16),
+                pixel_values_videos=pixel_values_videos.to(torch.float16),
                 return_dict=True,
             )["logits"]
         self.parent.assertFalse(torch.isnan(logits).any().item())

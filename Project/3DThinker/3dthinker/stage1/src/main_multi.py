@@ -112,9 +112,9 @@ config.latent_size = args.latent_size
 config.stage = args.stage
 
 if args.stage in ['stage1']:
-    model = Qwen2_5_VLForConditionalGeneration.from_pretrained(model_path, config=config, torch_dtype=torch.bfloat16, cache_dir=cache_dir)
+    model = Qwen2_5_VLForConditionalGeneration.from_pretrained(model_path, config=config, torch_dtype=torch.float16, cache_dir=cache_dir)
 elif args.stage in ['stage2']:
-    model = Qwen2_5_VLForConditionalGeneration.from_pretrained(model_path, config=config, torch_dtype=torch.bfloat16)
+    model = Qwen2_5_VLForConditionalGeneration.from_pretrained(model_path, config=config, torch_dtype=torch.float16)
 
 local_rank = int(os.environ.get("LOCAL_RANK", 0))
 device = torch.device(f"cuda:{local_rank}")

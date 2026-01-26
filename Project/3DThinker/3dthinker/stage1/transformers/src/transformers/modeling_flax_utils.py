@@ -328,11 +328,11 @@ class FlaxPreTrainedModel(PushToHubMixin, FlaxGenerationMixin):
 
     def to_bf16(self, params: Union[Dict, FrozenDict], mask: Any = None):
         r"""
-        Cast the floating-point `params` to `jax.numpy.bfloat16`. This returns a new `params` tree and does not cast
+        Cast the floating-point `params` to `jax.numpy.float16`. This returns a new `params` tree and does not cast
         the `params` in place.
 
-        This method can be used on TPU to explicitly convert the model parameters to bfloat16 precision to do full
-        half-precision training or to save weights in bfloat16 for inference in order to save memory and improve speed.
+        This method can be used on TPU to explicitly convert the model parameters to float16 precision to do full
+        half-precision training or to save weights in float16 for inference in order to save memory and improve speed.
 
         Arguments:
             params (`Union[Dict, FrozenDict]`):
@@ -348,7 +348,7 @@ class FlaxPreTrainedModel(PushToHubMixin, FlaxGenerationMixin):
 
         >>> # load model
         >>> model = FlaxBertModel.from_pretrained("google-bert/bert-base-cased")
-        >>> # By default, the model parameters will be in fp32 precision, to cast these to bfloat16 precision
+        >>> # By default, the model parameters will be in fp32 precision, to cast these to float16 precision
         >>> model.params = model.to_bf16(model.params)
         >>> # If you want don't want to cast certain parameters (for example layer norm bias and scale)
         >>> # then pass the mask as follows
@@ -363,7 +363,7 @@ class FlaxPreTrainedModel(PushToHubMixin, FlaxGenerationMixin):
         >>> mask = traverse_util.unflatten_dict(mask)
         >>> model.params = model.to_bf16(model.params, mask)
         ```"""
-        return self._cast_floating_to(params, jnp.bfloat16, mask)
+        return self._cast_floating_to(params, jnp.float16, mask)
 
     def to_fp32(self, params: Union[Dict, FrozenDict], mask: Any = None):
         r"""
@@ -551,7 +551,7 @@ class FlaxPreTrainedModel(PushToHubMixin, FlaxGenerationMixin):
                       `from_pt` should be set to `True`.
             dtype (`jax.numpy.dtype`, *optional*, defaults to `jax.numpy.float32`):
                 The data type of the computation. Can be one of `jax.numpy.float32`, `jax.numpy.float16` (on GPUs) and
-                `jax.numpy.bfloat16` (on TPUs).
+                `jax.numpy.float16` (on TPUs).
 
                 This can be used to enable mixed-precision training or half-precision inference on GPUs or TPUs. If
                 specified all the computation will be performed with the given `dtype`.
@@ -1037,7 +1037,7 @@ class FlaxPreTrainedModel(PushToHubMixin, FlaxGenerationMixin):
         param_dtypes = jax.tree_util.tree_map(lambda x: x.dtype, state)
         # extract keys of parameters not in jnp.float32
         fp16_params = [k for k in param_dtypes if param_dtypes[k] == jnp.float16]
-        bf16_params = [k for k in param_dtypes if param_dtypes[k] == jnp.bfloat16]
+        bf16_params = [k for k in param_dtypes if param_dtypes[k] == jnp.float16]
 
         # raise a warning if any of the parameters are not in jnp.float32
         if len(fp16_params) > 0:
@@ -1050,7 +1050,7 @@ class FlaxPreTrainedModel(PushToHubMixin, FlaxGenerationMixin):
 
         if len(bf16_params) > 0:
             logger.warning(
-                f"Some of the weights of {model.__class__.__name__} were initialized in bfloat16 precision from "
+                f"Some of the weights of {model.__class__.__name__} were initialized in float16 precision from "
                 f"the model checkpoint at {pretrained_model_name_or_path}:\n{bf16_params}\n"
                 "You should probably UPCAST the model weights to float32 if this was not intended. "
                 "See [`~FlaxPreTrainedModel.to_fp32`] for further information on how to do this."

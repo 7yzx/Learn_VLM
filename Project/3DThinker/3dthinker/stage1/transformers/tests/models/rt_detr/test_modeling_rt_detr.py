@@ -637,14 +637,14 @@ class RTDetrModelTest(ModelTesterMixin, PipelineTesterMixin, unittest.TestCase):
         message = "\n" + "\n".join(failed_cases)
         self.assertTrue(not failed_cases, message)
 
-    @parameterized.expand(["float32", "float16", "bfloat16"])
+    @parameterized.expand(["float32", "float16", "float16"])
     @require_torch_accelerator
     @slow
     def test_inference_with_different_dtypes(self, torch_dtype_str):
         torch_dtype = {
             "float32": torch.float32,
             "float16": torch.float16,
-            "bfloat16": torch.bfloat16,
+            "float16": torch.float16,
         }[torch_dtype_str]
 
         config, inputs_dict = self.model_tester.prepare_config_and_inputs_for_common()
@@ -659,14 +659,14 @@ class RTDetrModelTest(ModelTesterMixin, PipelineTesterMixin, unittest.TestCase):
             with torch.no_grad():
                 _ = model(**self._prepare_for_class(inputs_dict, model_class))
 
-    @parameterized.expand(["float32", "float16", "bfloat16"])
+    @parameterized.expand(["float32", "float16", "float16"])
     @require_torch_accelerator
     @slow
     def test_inference_equivalence_for_static_and_dynamic_anchors(self, torch_dtype_str):
         torch_dtype = {
             "float32": torch.float32,
             "float16": torch.float16,
-            "bfloat16": torch.bfloat16,
+            "float16": torch.float16,
         }[torch_dtype_str]
 
         config, inputs_dict = self.model_tester.prepare_config_and_inputs_for_common()

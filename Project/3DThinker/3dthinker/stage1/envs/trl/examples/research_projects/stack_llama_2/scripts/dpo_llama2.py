@@ -75,7 +75,7 @@ class ScriptArguments:
     log_freq: Optional[int] = field(default=1, metadata={"help": "the logging frequency"})
     load_in_4bit: Optional[bool] = field(default=True, metadata={"help": "whether to load the model in 4bit"})
     model_dtype: Optional[str] = field(
-        default="float16", metadata={"help": "model_dtype[float16, bfloat16, float] for loading."}
+        default="float16", metadata={"help": "model_dtype[float16, float16, float] for loading."}
     )
 
     # instrumentation
@@ -151,8 +151,8 @@ if __name__ == "__main__":
     dtype = torch.float
     if script_args.model_dtype == "float16":
         dtype = torch.float16
-    elif script_args.model_dtype == "bfloat16":
-        dtype = torch.bfloat16
+    elif script_args.model_dtype == "float16":
+        dtype = torch.float16
 
     model = AutoModelForCausalLM.from_pretrained(
         script_args.model_name_or_path,

@@ -216,9 +216,9 @@ class TFTrainingArguments(TrainingArguments):
                     tpu = None
 
             if tpu:
-                # Set to bfloat16 in case of TPU
+                # Set to float16 in case of TPU
                 if self.fp16:
-                    keras.mixed_precision.set_global_policy("mixed_bfloat16")
+                    keras.mixed_precision.set_global_policy("mixed_float16")
 
                 tf.config.experimental_connect_to_cluster(tpu)
                 tf.tpu.experimental.initialize_tpu_system(tpu)

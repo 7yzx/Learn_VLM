@@ -32,7 +32,7 @@ accelerate launch \
     --model_name_or_path llava-hf/llava-1.5-7b-hf \
     --gradient_accumulation_steps 8 \
     --output_dir LLaVA-1.5-7B-SFT \
-    --dtype bfloat16
+    --dtype float16
 
 For LLaVA-NeXT, use: (requires transformers>=4.45)
     --model_name_or_path llava-hf/llava-v1.6-mistral-7b-hf
@@ -48,7 +48,7 @@ accelerate launch \
     --per_device_train_batch_size 1 \
     --gradient_accumulation_steps 1 \
     --output_dir SmolVLM-SFT \
-    --dtype bfloat16 \
+    --dtype float16 \
     --use_peft \
     --lora_target_modules down_proj, o_proj, k_proj, q_proj, gate_proj, up_proj, v_proj
 """

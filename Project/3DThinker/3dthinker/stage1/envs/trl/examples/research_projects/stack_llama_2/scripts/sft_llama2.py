@@ -161,7 +161,7 @@ if script_args.use_bnb:
     bnb_config = BitsAndBytesConfig(
         load_in_4bit=True,
         bnb_4bit_quant_type="nf4",
-        bnb_4bit_compute_dtype=torch.bfloat16,
+        bnb_4bit_compute_dtype=torch.float16,
     )
 
 base_model = AutoModelForCausalLM.from_pretrained(
@@ -205,7 +205,7 @@ elif is_torch_npu_available():
 else:
     torch.cuda.empty_cache()
 
-model = AutoPeftModelForCausalLM.from_pretrained(output_dir, device_map="auto", dtype=torch.bfloat16)
+model = AutoPeftModelForCausalLM.from_pretrained(output_dir, device_map="auto", dtype=torch.float16)
 model = model.merge_and_unload()
 
 output_merged_dir = os.path.join(training_args.output_dir, "final_merged_checkpoint")

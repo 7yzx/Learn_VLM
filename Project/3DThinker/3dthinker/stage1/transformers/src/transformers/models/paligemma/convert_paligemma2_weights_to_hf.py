@@ -75,7 +75,7 @@ VARIANT_CONFIGS = {
     },
 }
 
-DTYPES = {"float32": torch.float32, "bfloat16": torch.bfloat16, "float16": torch.float16}
+DTYPES = {"float32": torch.float32, "float16": torch.float16, "float16": torch.float16}
 
 
 def get_paligemma2_config(variant: str, precision: str):
@@ -268,10 +268,10 @@ def slice_state_dict(state_dict, config):
     for key, value in state_dict.items():
         if not isinstance(value, torch.Tensor):
             try:
-                if value.dtype == jnp.bfloat16:
+                if value.dtype == jnp.float16:
                     value = jnp.array(value).astype(jnp.float32)
                     value = np.array(value)
-                    state_dict[key] = torch.from_numpy(value).to(torch.bfloat16)
+                    state_dict[key] = torch.from_numpy(value).to(torch.float16)
                 else:
                     state_dict[key] = torch.from_numpy(value)
             except Exception as initial_exception:
@@ -289,11 +289,11 @@ def flatten_nested_dict(params, parent_key="", sep="/", precision: int = "float3
         if isinstance(v, collections.abc.MutableMapping):
             items.extend(flatten_nested_dict(v, parent_key=new_key, sep=sep, precision=precision).items())
         else:
-            if precision == "bfloat16":
+            if precision == "float16":
                 try:
-                    v = v.view(ml_dtypes.bfloat16)
+                    v = v.view(ml_dtypes.float16)
                 except Exception as initial_exception:
-                    raise ValueError(f"Conversion failed from bfloat16 with {initial_exception}, check your inputs.")
+                    raise ValueError(f"Conversion failed from float16 with {initial_exception}, check your inputs.")
             items.append((new_key, v))
     return dict(items)
 
@@ -388,7 +388,7 @@ if __name__ == "__main__":
 
     parser.add_argument(
         "--precision",
-        choices=["float32", "bfloat16", "float16"],
+        choices=["float32", "float16", "float16"],
         type=str,
         help="Precision identifier for model conversion - should match the base checkpoint precision.",
     )

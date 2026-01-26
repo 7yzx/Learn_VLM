@@ -56,7 +56,7 @@ tokenizer = AutoTokenizer.from_pretrained(model_id)
 
 model = AutoModelForCausalLM.from_pretrained(
     model_id,
-    torch_dtype=torch.bfloat16,
+    torch_dtype=torch.float16,
     attn_implementation="flash_attention_2",
 )
 ```
@@ -248,9 +248,9 @@ Flash Attention の広範なカバレッジを持つかもしれない PyTorch �
 pip3 install -U --pre torch torchvision torchaudio --index-url https://download.pytorch.org/whl/nightly/cu118
 ```
 
-Or make sure your model is correctly casted in float16 or bfloat16
+Or make sure your model is correctly casted in float16 or float16
 
-モデルが正しくfloat16またはbfloat16にキャストされていることを確認してください。
+モデルが正しくfloat16またはfloat16にキャストされていることを確認してください。
 
 Have a look at [this detailed blogpost](https://pytorch.org/blog/out-of-the-box-acceleration/) to read more about what is possible to do with `BetterTransformer` + SDPA API.
 
@@ -332,7 +332,7 @@ model_4bit = AutoModelForCausalLM.from_pretrained(
 
 </Tip>
 
-論文[`LLM.int8()：スケーラブルなTransformer向けの8ビット行列乗算`](https://arxiv.org/abs/2208.07339)によれば、Hugging Face統合がHub内のすべてのモデルでわずか数行のコードでサポートされています。このメソッドは、半精度（`float16`および`bfloat16`）の重みの場合に`nn.Linear`サイズを2倍、単精度（`float32`）の重みの場合は4倍に縮小し、外れ値に対してほとんど影響を与えません。
+論文[`LLM.int8()：スケーラブルなTransformer向けの8ビット行列乗算`](https://arxiv.org/abs/2208.07339)によれば、Hugging Face統合がHub内のすべてのモデルでわずか数行のコードでサポートされています。このメソッドは、半精度（`float16`および`float16`）の重みの場合に`nn.Linear`サイズを2倍、単精度（`float32`）の重みの場合は4倍に縮小し、外れ値に対してほとんど影響を与えません。
 
 ![HFxbitsandbytes.png](https://cdn-uploads.huggingface.co/production/uploads/1659861207959-62441d1d9fdefb55a0b7d12c.png)
 

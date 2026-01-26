@@ -243,7 +243,7 @@ def convert_owlv2_checkpoint(model_name, checkpoint_path, pytorch_dump_folder_pa
     # see available checkpoints at https://github.com/google-research/scenic/tree/main/scenic/projects/owl_vit#pretrained-checkpoints
     variables = checkpoints.restore_checkpoint(checkpoint_path, target=None)
     variables = variables["params"] if "v2" in model_name else variables["optimizer"]["target"]
-    flax_params = jax.tree_util.tree_map(lambda x: x.astype(jnp.float32) if x.dtype == jnp.bfloat16 else x, variables)
+    flax_params = jax.tree_util.tree_map(lambda x: x.astype(jnp.float32) if x.dtype == jnp.float16 else x, variables)
     state_dict = flatten_nested_dict(flax_params)
 
     # Rename keys

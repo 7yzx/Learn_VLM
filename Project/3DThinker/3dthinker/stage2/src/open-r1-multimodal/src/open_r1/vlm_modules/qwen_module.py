@@ -406,11 +406,11 @@ class Qwen2VLModule(VLMBaseModule):
         for idx, prompt in zip(index, prompts):
             reward = 0.0
             try:
-                target_dtype = torch.float32  # 或者 torch.bfloat16
+                target_dtype = torch.float32  # 或者 torch.float16
                 decoder_feature = projector_model(extracted_emb.to(target_dtype).to("cuda:0"), image_embeddings.to(target_dtype).to("cuda:0"))
                 decoder_feature_norm = decoder_feature / decoder_feature.norm(dim=-1, p=2, keepdim=True)
 
-                data = np.load('../../data/feature_vggt/' + str(idx) + '/vggt.npz')
+                data = np.load('/mnt/sevenT/zixiaoy/code/Learn_VLM/Project/3DThinker/data/feature_vggt/' + str(idx) + '/vggt.npz')
                 feature_3d = data['feature'] # [1,N=4,P_3D = 1374,2048]
                 feature_3d = torch.tensor(feature_3d).to(device=decoder_feature.device, dtype=decoder_feature.dtype)
                 feature_3d = feature_3d.squeeze()

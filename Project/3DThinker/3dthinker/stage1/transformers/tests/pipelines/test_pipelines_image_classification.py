@@ -217,9 +217,9 @@ class ImageClassificationPipelineTests(unittest.TestCase):
         )
 
     @require_torch
-    def test_torch_bfloat16_pipeline(self):
+    def test_torch_float16_pipeline(self):
         image_classifier = pipeline(
-            "image-classification", model="hf-internal-testing/tiny-random-vit", torch_dtype=torch.bfloat16
+            "image-classification", model="hf-internal-testing/tiny-random-vit", torch_dtype=torch.float16
         )
         outputs = image_classifier("http://images.cocodataset.org/val2017/000000039769.jpg")
 

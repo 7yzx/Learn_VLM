@@ -144,7 +144,7 @@ model = AutoModelForCausalLM.from_pretrained("gpt2", torch_dtype=torch.float16, 
 ...
 ```
 
-For the best speedups, we recommend loading the model in half-precision (e.g. `torch.float16` or `torch.bfloat16`).
+For the best speedups, we recommend loading the model in half-precision (e.g. `torch.float16` or `torch.float16`).
 
 On a local benchmark (rtx3080ti-16GB, PyTorch 2.2.1, OS Ubuntu 22.04) using `float16` with
 [gpt2-large](https://huggingface.co/openai-community/gpt2-large), we saw the

@@ -1,0 +1,16 @@
+{"time":"2026-01-15T16:25:43.610792482Z","level":"INFO","msg":"using version","core version":"0.18.3"}
+{"time":"2026-01-15T16:25:43.610850377Z","level":"INFO","msg":"created symlink","path":"/mnt/sevenT/zixiaoy/code/Learn_VLM/Project/3DThinker/3dthinker/stage1/wandb/offline-run-20260115_162543-vl9ea2gb/logs/debug-core.log"}
+{"time":"2026-01-15T16:25:43.635712186Z","level":"INFO","msg":"created new stream","id":"vl9ea2gb"}
+{"time":"2026-01-15T16:25:43.635766176Z","level":"INFO","msg":"stream: started","id":"vl9ea2gb"}
+{"time":"2026-01-15T16:25:43.635822749Z","level":"INFO","msg":"handler: started","stream_id":{"value":"vl9ea2gb"}}
+{"time":"2026-01-15T16:25:43.63582834Z","level":"INFO","msg":"sender: started","stream_id":{"value":"vl9ea2gb"}}
+{"time":"2026-01-15T16:25:43.635833371Z","level":"INFO","msg":"writer: Do: started","stream_id":{"value":"vl9ea2gb"}}
+{"time":"2026-01-15T16:25:43.669046053Z","level":"INFO","msg":"wandb-core","!BADKEY":null}
+{"time":"2026-01-15T16:25:43.674115537Z","level":"INFO","msg":"Starting system monitor"}
+{"time":"2026-01-15T16:25:44.132403853Z","level":"INFO","msg":"stream: closing","id":"vl9ea2gb"}
+{"time":"2026-01-15T16:25:44.132577294Z","level":"INFO","msg":"Stopping system monitor"}
+{"time":"2026-01-15T16:25:44.136259152Z","level":"INFO","msg":"Stopped system monitor"}
+{"time":"2026-01-15T16:25:44.136886346Z","level":"INFO","msg":"handler: closed","stream_id":{"value":"vl9ea2gb"}}
+{"time":"2026-01-15T16:25:44.13694749Z","level":"INFO","msg":"writer: Close: closed","stream_id":{"value":"vl9ea2gb"}}
+{"time":"2026-01-15T16:25:44.13697051Z","level":"INFO","msg":"sender: closed","stream_id":{"value":"vl9ea2gb"}}
+{"time":"2026-01-15T16:25:44.13706378Z","level":"INFO","msg":"stream: closed","id":"vl9ea2gb"}

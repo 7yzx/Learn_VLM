@@ -3258,16 +3258,16 @@ class ModelTesterMixin:
             with tempfile.TemporaryDirectory() as tmpdirname:
                 model.save_pretrained(tmpdirname)
                 model_fa = model_class.from_pretrained(
-                    tmpdirname, torch_dtype=torch.bfloat16, attn_implementation="flash_attention_2"
+                    tmpdirname, torch_dtype=torch.float16, attn_implementation="flash_attention_2"
                 )
                 model_fa.to(torch_device)
 
-                model = model_class.from_pretrained(tmpdirname, torch_dtype=torch.bfloat16)
+                model = model_class.from_pretrained(tmpdirname, torch_dtype=torch.float16)
                 model.to(torch_device)
 
                 dummy_input = inputs_dict[model.main_input_name][:1]
                 if dummy_input.dtype in [torch.float32, torch.float16]:
-                    dummy_input = dummy_input.to(torch.bfloat16)
+                    dummy_input = dummy_input.to(torch.float16)
 
                 dummy_attention_mask = inputs_dict.get("attention_mask", None)
 
@@ -3355,16 +3355,16 @@ class ModelTesterMixin:
             with tempfile.TemporaryDirectory() as tmpdirname:
                 model.save_pretrained(tmpdirname)
                 model_fa = model_class.from_pretrained(
-                    tmpdirname, torch_dtype=torch.bfloat16, attn_implementation="flash_attention_2"
+                    tmpdirname, torch_dtype=torch.float16, attn_implementation="flash_attention_2"
                 )
                 model_fa.to(torch_device)
 
-                model = model_class.from_pretrained(tmpdirname, torch_dtype=torch.bfloat16)
+                model = model_class.from_pretrained(tmpdirname, torch_dtype=torch.float16)
                 model.to(torch_device)
 
                 dummy_input = inputs_dict[model.main_input_name][:1]
                 if dummy_input.dtype in [torch.float32, torch.float16]:
-                    dummy_input = dummy_input.to(torch.bfloat16)
+                    dummy_input = dummy_input.to(torch.float16)
 
                 dummy_attention_mask = inputs_dict.get("attention_mask", None)
 
@@ -3580,45 +3580,45 @@ class ModelTesterMixin:
         if torch_dtype == "fp16":
             torch_dtype = torch.float16
         elif torch_dtype == "bf16":
-            torch_dtype = torch.bfloat16
+            torch_dtype = torch.float16
         elif torch_dtype == "fp32":
             torch_dtype = torch.float32
 
         if not is_torch_fp16_available_on_device(torch_device) and torch_dtype == torch.float16:
             self.skipTest(f"float16 not supported on {torch_device} (on the specific device currently used)")
 
-        if not is_torch_bf16_available_on_device(torch_device) and torch_dtype == torch.bfloat16:
+        if not is_torch_bf16_available_on_device(torch_device) and torch_dtype == torch.float16:
             self.skipTest(
-                f"bfloat16 not supported on {torch_device} (on the specific device currently used, e.g. Nvidia T4 GPU)"
+                f"float16 not supported on {torch_device} (on the specific device currently used, e.g. Nvidia T4 GPU)"
             )
 
         # Dictionary of tolerances for eager <> sdpa tests. Key = (device, sdpa_kernels_enabled, dtype)
         atols = {
             ("cpu", False, torch.float32): 1e-6,
             ("cpu", False, torch.float16): 5e-3,
-            ("cpu", False, torch.bfloat16): 1e-2,
+            ("cpu", False, torch.float16): 1e-2,
             ("cpu", True, torch.float32): 1e-6,
             ("cpu", True, torch.float16): 5e-3,
-            ("cpu", True, torch.bfloat16): 1e-2,
+            ("cpu", True, torch.float16): 1e-2,
             ("cuda", False, torch.float32): 1e-6,
-            ("cuda", False, torch.bfloat16): 1e-2,
+            ("cuda", False, torch.float16): 1e-2,
             ("cuda", False, torch.float16): 5e-3,
             ("cuda", True, torch.float32): 1e-6,
-            ("cuda", True, torch.bfloat16): 1e-2,
+            ("cuda", True, torch.float16): 1e-2,
             ("cuda", True, torch.float16): 5e-3,
         }
         rtols = {
             ("cpu", False, torch.float32): 1e-4,
             ("cpu", False, torch.float16): 5e-3,
-            ("cpu", False, torch.bfloat16): 1e-2,
+            ("cpu", False, torch.float16): 1e-2,
             ("cpu", True, torch.float32): 1e-4,
             ("cpu", True, torch.float16): 5e-3,
-            ("cpu", True, torch.bfloat16): 1e-2,
+            ("cpu", True, torch.float16): 1e-2,
             ("cuda", False, torch.float32): 1e-4,
-            ("cuda", False, torch.bfloat16): 1e-2,
+            ("cuda", False, torch.float16): 1e-2,
             ("cuda", False, torch.float16): 5e-3,
             ("cuda", True, torch.float32): 1e-4,
-            ("cuda", True, torch.bfloat16): 3e-2,  # (different from others)
+            ("cuda", True, torch.float16): 3e-2,  # (different from others)
             ("cuda", True, torch.float16): 5e-3,
         }
 
@@ -3676,12 +3676,12 @@ class ModelTesterMixin:
 
                     dummy_input = inputs_dict[model.main_input_name]
 
-                    if dummy_input.dtype in [torch.float32, torch.bfloat16, torch.float16]:
+                    if dummy_input.dtype in [torch.float32, torch.float16, torch.float16]:
                         dummy_input = dummy_input.to(torch_dtype)
 
                     dummy_input = dummy_input[:input_data_batch_size]
                     if dummy_input.shape[0] != input_data_batch_size:
-                        if dummy_input.dtype in [torch.float32, torch.bfloat16, torch.float16]:
+                        if dummy_input.dtype in [torch.float32, torch.float16, torch.float16]:
                             extension = torch.rand(
                                 input_data_batch_size - dummy_input.shape[0],
                                 *dummy_input.shape[1:],
@@ -4105,7 +4105,7 @@ class ModelTesterMixin:
 
                 for _, param in model.named_parameters():
                     # upcast only layer norms
-                    if (param.dtype == torch.float16) or (param.dtype == torch.bfloat16):
+                    if (param.dtype == torch.float16) or (param.dtype == torch.float16):
                         param.data = param.data.to(torch.float32)
 
                 if model.config.is_encoder_decoder:
@@ -4144,7 +4144,7 @@ class ModelTesterMixin:
                 self.skipTest("Model dummy inputs should contain padding in their attention mask")
 
             dummy_input = inputs_dict[model_class.main_input_name]
-            if dummy_input.dtype in [torch.float32, torch.bfloat16]:
+            if dummy_input.dtype in [torch.float32, torch.float16]:
                 dummy_input = dummy_input.to(torch.float16)
 
             # make sure that all models have enough positions for generation
@@ -4215,7 +4215,7 @@ class ModelTesterMixin:
             config, _ = self.model_tester.prepare_config_and_inputs_for_common()
             # TODO: to change it in the future with other relevant auto classes
             fa2_model = model_class._from_config(
-                config, attn_implementation="flash_attention_2", torch_dtype=torch.bfloat16
+                config, attn_implementation="flash_attention_2", torch_dtype=torch.float16
             ).to(torch_device)
 
             dummy_input = torch.LongTensor([[0, 2, 3, 4], [0, 2, 3, 4]]).to(torch_device)

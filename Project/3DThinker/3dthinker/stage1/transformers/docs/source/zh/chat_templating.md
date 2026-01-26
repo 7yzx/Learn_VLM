@@ -75,7 +75,7 @@ from transformers import AutoModelForCausalLM, AutoTokenizer
 
 checkpoint = "HuggingFaceH4/zephyr-7b-beta"
 tokenizer = AutoTokenizer.from_pretrained(checkpoint)
-model = AutoModelForCausalLM.from_pretrained(checkpoint)  # You may want to use bfloat16 and/or move to GPU here
+model = AutoModelForCausalLM.from_pretrained(checkpoint)  # You may want to use float16 and/or move to GPU here
 
 messages = [
     {

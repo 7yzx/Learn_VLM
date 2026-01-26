@@ -19,9 +19,9 @@ rendered properly in your Markdown viewer.
 
 ## Mixed precision with IPEX
 
-IPEXはAVX-512以上のCPUに最適化されており、AVX2のみのCPUでも機能的に動作します。そのため、AVX-512以上のIntel CPU世代ではパフォーマンスの向上が期待されますが、AVX2のみのCPU（例：AMD CPUまたは古いIntel CPU）ではIPEXの下でより良いパフォーマンスが得られるかもしれませんが、保証されません。IPEXは、Float32とBFloat16の両方でCPUトレーニングのパフォーマンスを最適化します。以下のセクションでは、BFloat16の使用に重点を置いて説明します。
+IPEXはAVX-512以上のCPUに最適化されており、AVX2のみのCPUでも機能的に動作します。そのため、AVX-512以上のIntel CPU世代ではパフォーマンスの向上が期待されますが、AVX2のみのCPU（例：AMD CPUまたは古いIntel CPU）ではIPEXの下でより良いパフォーマンスが得られるかもしれませんが、保証されません。IPEXは、Float32とfloat16の両方でCPUトレーニングのパフォーマンスを最適化します。以下のセクションでは、float16の使用に重点を置いて説明します。
 
-低精度データ型であるBFloat16は、AVX512命令セットを備えた第3世代Xeon® Scalable Processors（別名Cooper Lake）でネイティブサポートされており、さらに高性能なIntel® Advanced Matrix Extensions（Intel® AMX）命令セットを備えた次世代のIntel® Xeon® Scalable Processorsでもサポートされます。CPUバックエンド用の自動混合精度がPyTorch-1.10以降で有効になっています。同時に、Intel® Extension for PyTorchでのCPU用BFloat16の自動混合精度サポートと、オペレーターのBFloat16最適化のサポートが大幅に向上し、一部がPyTorchのメインブランチにアップストリームされています。ユーザーはIPEX Auto Mixed Precisionを使用することで、より優れたパフォーマンスとユーザーエクスペリエンスを得ることができます。
+低精度データ型であるfloat16は、AVX512命令セットを備えた第3世代Xeon® Scalable Processors（別名Cooper Lake）でネイティブサポートされており、さらに高性能なIntel® Advanced Matrix Extensions（Intel® AMX）命令セットを備えた次世代のIntel® Xeon® Scalable Processorsでもサポートされます。CPUバックエンド用の自動混合精度がPyTorch-1.10以降で有効になっています。同時に、Intel® Extension for PyTorchでのCPU用float16の自動混合精度サポートと、オペレーターのfloat16最適化のサポートが大幅に向上し、一部がPyTorchのメインブランチにアップストリームされています。ユーザーはIPEX Auto Mixed Precisionを使用することで、より優れたパフォーマンスとユーザーエクスペリエンスを得ることができます。
 
 詳細な情報については、[Auto Mixed Precision](https://intel.github.io/intel-extension-for-pytorch/cpu/latest/tutorials/features/amp.html)を確認してください。
 

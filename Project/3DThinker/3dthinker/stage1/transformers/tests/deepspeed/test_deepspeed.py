@@ -372,7 +372,7 @@ class CoreIntegrationDeepSpeed(TestCasePlus, TrainerIntegrationCommon):
         self.assertIn("Detected DeepSpeed ZeRO-3", cl.out)
 
         # The model weights are in BF16 as per deepspeed config
-        self.assertTrue(str(model.h[0].attn.q_proj.weight.dtype) == "torch.bfloat16")
+        self.assertTrue(str(model.h[0].attn.q_proj.weight.dtype) == "torch.float16")
         good_deepspeed_sin_cos = model.h[0].attn.embed_positions
 
         # Monkeypatches the function that creates RoPE embeddings using the INCORRECT torch.arange() pattern, and
@@ -394,7 +394,7 @@ class CoreIntegrationDeepSpeed(TestCasePlus, TrainerIntegrationCommon):
                     model = AutoModel.from_pretrained(GPTJ_TINY)
         self.assertIn("Detected DeepSpeed ZeRO-3", cl.out)
 
-        self.assertTrue(str(model.h[0].attn.q_proj.weight.dtype) == "torch.bfloat16")
+        self.assertTrue(str(model.h[0].attn.q_proj.weight.dtype) == "torch.float16")
         bad_deepspeed_sin_cos = model.h[0].attn.embed_positions
 
         # Compares the two values: the two sets of values are different, and the correct one matches the torch
@@ -1209,7 +1209,7 @@ class TestDeepSpeedWithLauncher(TestCasePlus):
     @require_torch_multi_accelerator
     def test_inference(self, dtype):
         if dtype == "bf16" and not is_torch_bf16_available_on_device(torch_device):
-            self.skipTest(reason="test requires bfloat16 hardware support")
+            self.skipTest(reason="test requires float16 hardware support")
 
         if dtype == "fp16" and not is_torch_fp16_available_on_device(torch_device):
             self.skipTest(reason="test requires fp16 hardware support")

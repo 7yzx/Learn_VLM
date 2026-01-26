@@ -301,7 +301,7 @@ class TokenClassificationPipeline(ChunkPipeline):
             ignore_labels = ["O"]
         all_entities = []
         for model_outputs in all_outputs:
-            if self.framework == "pt" and model_outputs["logits"][0].dtype in (torch.bfloat16, torch.float16):
+            if self.framework == "pt" and model_outputs["logits"][0].dtype in (torch.float16, torch.float16):
                 logits = model_outputs["logits"][0].to(torch.float32).numpy()
             else:
                 logits = model_outputs["logits"][0].numpy()

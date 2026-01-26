@@ -381,14 +381,28 @@ class MiniMindModel(nn.Module):
         super().__init__()
         self.config = config
         self.vocab_size, self.num_hidden_layers = config.vocab_size, config.num_hidden_layers
+        # [Embedding Layer]
+        # 作用: 将离散的 token ID 映射为稠密向量
+        # 输入: [Batch, Seq_Len]
+        # 输出: [Batch, Seq_Len, Hidden_Size]
         self.embed_tokens = nn.Embedding(config.vocab_size, config.hidden_size)
+        
+        # [Dropout]
+        # 作用: 防止过拟合，随机置零部分神经元
         self.dropout = nn.Dropout(config.dropout)
+        # [Transformer Blocks]
+        # 作用: 堆叠 num_hidden_layers 个 MiniMindBlock
+        # nn.ModuleList 像一个列表一样存储层，但会被 PyTorch 自动识别参数
         self.layers = nn.ModuleList([MiniMindBlock(l, config) for l in range(self.num_hidden_layers)])
         self.norm = RMSNorm(config.hidden_size, eps=config.rms_norm_eps)
 
         freqs_cos, freqs_sin = precompute_freqs_cis(dim=config.hidden_size // config.num_attention_heads,
                                                     end=config.max_position_embeddings, rope_base=config.rope_theta,
                                                     rope_scaling=config.rope_scaling)
+        # [Buffer 注册]
+        # register_buffer 用于注册不参与梯度更新的张量 (非 Parameter)
+        # persistent=False 表示保存模型权重(state_dict)时，不保存这两个变量
+        # (因为它们可以通过公式重新算出来，为了节省模型文件大小)
         self.register_buffer("freqs_cos", freqs_cos, persistent=False)
         self.register_buffer("freqs_sin", freqs_sin, persistent=False)
 
@@ -398,19 +412,41 @@ class MiniMindModel(nn.Module):
                 past_key_values: Optional[List[Tuple[torch.Tensor, torch.Tensor]]] = None,
                 use_cache: bool = False,
                 **kwargs):
+        # 1. 获取输入维度
+        # T (seq_length): 
+        #   - 训练阶段: 等于句子的长度 (例如 1024)
+        #   - 推理阶段(Prefill): 等于 Prompt 长度
+        #   - 推理阶段(Decoding): 等于 1 (因为每次只生成一个新的 token)
         batch_size, seq_length = input_ids.shape
         if hasattr(past_key_values, 'layers'): past_key_values = None
+        
+        # 2. 初始化 KV Cache
+        # 如果是第一次运行(没传缓存)，为每一层创建一个 None 占位
         past_key_values = past_key_values or [None] * len(self.layers)
+        
+        # 3. 计算当前位置索引 (start_pos) - **核心逻辑**
+        # 如果 past_key_values[0] 非空，说明这是解码阶段的第 N 步
+        # start_pos = 历史缓存的长度。
+        # 例如: 缓存里有 10 个词，当前进来第 11 个词 (seq_len=1)，那么 start_pos = 10。
+        # 这样 RoPE 才能拿到第 10 号位置的位置编码，而不是第 0 号。
         start_pos = past_key_values[0][0].shape[1] if past_key_values[0] is not None else 0
 
+        # 4. Embedding
+        # [B, T] -> [B, T, Hidden_Size]
         hidden_states = self.dropout(self.embed_tokens(input_ids))
-
+        
+        # 5. 切片获取当前的 RoPE 位置编码
+        # self.freqs_cos 形状是 [Max_Pos, Head_Dim]
+        # 我们切取 [start_pos : start_pos + seq_length] 这一段
+        # 训练时: 切取 [0 : 1024]
+        # 推理(Decode)时: 切取 [10 : 11] (只取当前这一个位置的编码)
         position_embeddings = (
             self.freqs_cos[start_pos:start_pos + seq_length],
             self.freqs_sin[start_pos:start_pos + seq_length]
         )
 
-        presents = []
+        presents = [] # 用于收集更新后的 KV Cache
+        # 6. 逐层传递 (Forward Loop)
         for layer_idx, (layer, past_key_value) in enumerate(zip(self.layers, past_key_values)):
             hidden_states, present = layer(
                 hidden_states,
@@ -428,6 +464,13 @@ class MiniMindModel(nn.Module):
 
 
 class MiniMindForCausalLM(PreTrainedModel, GenerationMixin):
+    """
+    MiniMind 的完整因果语言模型。
+    继承自:
+    1. PreTrainedModel: 赋予模型保存(.save_pretrained)和加载(.from_pretrained)的能力，兼容 HF 生态。
+    2. GenerationMixin: 赋予模型 .generate() 方法，可以直接调用 model.generate("你好") 进行文本生成。
+    """
+    
     config_class = MiniMindConfig
 
     def __init__(self, config: MiniMindConfig = None):
@@ -435,6 +478,13 @@ class MiniMindForCausalLM(PreTrainedModel, GenerationMixin):
         super().__init__(self.config)
         self.model = MiniMindModel(self.config)
         self.lm_head = nn.Linear(self.config.hidden_size, self.config.vocab_size, bias=False)
+        
+        # 3. 权重绑定 (Weight Tying) - **关键优化**
+        # 将输入层的 Embedding 权重与输出层的 Linear 权重共享。
+        # 原理: 语义相近的词，其 Embedding 向量相似，作为输出时其 Logits 概率分布也应相似。
+        # 作用: 
+        #   1. 减少大量参数 (Vocab_Size * Hidden_Size)，显存占用减半。
+        #   2. 起到正则化作用，训练更稳定。
         self.model.embed_tokens.weight = self.lm_head.weight
 
     def forward(self,

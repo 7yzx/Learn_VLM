@@ -198,7 +198,7 @@ def load_model(model_path):
         #     print(f"CUDA available. Using {torch.cuda.device_count()} GPU(s)")
         # device_map = "auto"  # Let transformers automatically allocate devices
         device_map = "auto"  # Let transformers automatically allocate devices
-        torch_dtype = torch.bfloat16
+        torch_dtype = torch.float16
         
         model = AutoModel.from_pretrained(
             model_path,
@@ -287,7 +287,7 @@ def process_jsonl_file(jsonl_file_path, base_image_path="", model_path="", outpu
             
             # Ensure data type and device match
             if torch.cuda.is_available():
-                pixel_values = pixel_values.to(device=device, dtype=torch.bfloat16)
+                pixel_values = pixel_values.to(device=device, dtype=torch.float16)
             else:
                 pixel_values = pixel_values.to(device=device, dtype=torch.float32)
             

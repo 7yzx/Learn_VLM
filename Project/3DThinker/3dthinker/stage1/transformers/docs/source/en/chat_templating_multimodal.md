@@ -47,7 +47,7 @@ messages = [
 ]
 ```
 
-Create a [`ImageTextToTextPipeline`] and pass the chat to it. For large models, setting [device_map=“auto”](./models#big-model-inference) helps load the model quicker and automatically places it on the fastest device available. Changing the data type to [torch.bfloat16](./models#model-data-type) also helps save memory.
+Create a [`ImageTextToTextPipeline`] and pass the chat to it. For large models, setting [device_map=“auto”](./models#big-model-inference) helps load the model quicker and automatically places it on the fastest device available. Changing the data type to [torch.float16](./models#model-data-type) also helps save memory.
 
 > [!TIP]
 > The [`ImageTextToTextPipeline`] accepts chats in the OpenAI format to make inference easier and more accessible. 

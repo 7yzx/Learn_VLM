@@ -314,7 +314,7 @@ def convert_model(vq_model_id, llm_model_id, output_dir, hub_model_id=None, test
         # Short inference on a few examples to check if generation makes sense
         print("Loading the checkpoint in a Emu3 model...")
         print("*" * 100)
-        model = Emu3ForConditionalGeneration.from_pretrained(output_dir, torch_dtype=torch.bfloat16, device_map="auto")
+        model = Emu3ForConditionalGeneration.from_pretrained(output_dir, torch_dtype=torch.float16, device_map="auto")
         processor = Emu3Processor.from_pretrained(output_dir)
 
         conversation = [
@@ -339,7 +339,7 @@ def convert_model(vq_model_id, llm_model_id, output_dir, hub_model_id=None, test
                 "https://uploads4.wikiart.org/images/paul-klee/death-for-the-idea-1915.jpg!Large.jpg", stream=True
             ).raw
         )
-        inputs = processor(images=image, text=prompt, return_tensors="pt").to(model.device, torch.bfloat16)
+        inputs = processor(images=image, text=prompt, return_tensors="pt").to(model.device, torch.float16)
         length = inputs.input_ids.shape[1]
 
         out = model.generate(**inputs, max_new_tokens=40, do_sample=False)
@@ -349,7 +349,7 @@ def convert_model(vq_model_id, llm_model_id, output_dir, hub_model_id=None, test
         print("*" * 100)
     elif test_inference and llm_model_id.endswith("Gen"):
         processor = Emu3Processor.from_pretrained(output_dir)
-        model = Emu3ForConditionalGeneration.from_pretrained(output_dir, torch_dtype=torch.bfloat16, device_map="auto")
+        model = Emu3ForConditionalGeneration.from_pretrained(output_dir, torch_dtype=torch.float16, device_map="auto")
 
         inputs = processor(
             text=[
@@ -360,7 +360,7 @@ def convert_model(vq_model_id, llm_model_id, output_dir, hub_model_id=None, test
             return_tensors="pt",
             return_for_image_generation=True,
         )
-        inputs = inputs.to(device="cuda:0", dtype=torch.bfloat16)
+        inputs = inputs.to(device="cuda:0", dtype=torch.float16)
 
         neg_prompt = "lowres, bad anatomy, bad hands, text, error, missing fingers, extra digit, fewer digits, cropped, worst quality, low quality, normal quality, jpeg artifacts, signature, watermark, username, blurry."
         neg_inputs = processor(text=[neg_prompt] * 2, return_tensors="pt").to(device="cuda:0")

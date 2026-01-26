@@ -156,8 +156,8 @@ class SwitchTransformersConfig(PretrainedConfig):
         self.expert_capacity = expert_capacity
         self.router_bias = router_bias
         self.router_jitter_noise = router_jitter_noise
-        if router_dtype not in ["float32", "float16", "bfloat16"]:
-            raise ValueError(f"`router_dtype` must be one of 'float32', 'float16' or 'bfloat16', got {router_dtype}")
+        if router_dtype not in ["float32", "float16", "float16"]:
+            raise ValueError(f"`router_dtype` must be one of 'float32', 'float16' or 'float16', got {router_dtype}")
         self.router_dtype = router_dtype
 
         self.router_ignore_padding_tokens = router_ignore_padding_tokens

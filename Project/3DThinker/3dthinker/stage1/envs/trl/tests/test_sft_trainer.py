@@ -1294,7 +1294,7 @@ class SFTTrainerTester(TrlTestCase):
             max_length=None,
             per_device_train_batch_size=1,
             gradient_checkpointing=True,
-            model_init_kwargs={"dtype": "bfloat16"},
+            model_init_kwargs={"dtype": "float16"},
             report_to="none",
         )
         trainer = SFTTrainer(model="google/gemma-3n-E2B-it", args=training_args, train_dataset=dataset)

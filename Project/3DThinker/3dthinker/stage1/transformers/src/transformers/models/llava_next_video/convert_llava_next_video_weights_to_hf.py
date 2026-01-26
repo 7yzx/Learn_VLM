@@ -146,7 +146,7 @@ def convert_state_dict_to_hf(state_dict):
             if key_to_modify in key:
                 key = key.replace(key_to_modify, new_key)
 
-        new_state_dict[key] = value.to(torch.bfloat16)
+        new_state_dict[key] = value.to(torch.float16)
     return new_state_dict
 
 
@@ -177,7 +177,7 @@ def convert_llava_to_hf(model_id, pytorch_dump_folder_path, push_to_hub=False):
 
     vision_model_id = data["mm_vision_tower"]
 
-    torch.set_default_dtype(torch.bfloat16)
+    torch.set_default_dtype(torch.float16)
     text_config = AutoConfig.from_pretrained(text_model_id)
     text_config = text_config.to_dict()
     text_config.update(overwrite_text_config)

@@ -551,9 +551,9 @@ def process_images(image_paths):
 # If you have only one GPU, change "cuda:1" to "cuda:0"
 device = "cuda:0" if torch.cuda.is_available() else "cpu"
 if torch.cuda.is_available():
-    # Get the current GPU's compute capability: Ampere GPU (Compute Capability 8.0+) supports bfloat16
+    # Get the current GPU's compute capability: Ampere GPU (Compute Capability 8.0+) supports float32
     dev_capability = torch.cuda.get_device_capability(torch.cuda.current_device())
-    dtype = torch.bfloat16 if dev_capability[0] >= 8 else torch.float16
+    dtype = torch.float32 if dev_capability[0] >= 8 else torch.float32
 else:
     dtype = torch.float32
 
@@ -563,7 +563,7 @@ else:
 
 load_model_path = "../models/3DThinker-S1-Qwen2.5-VL-3B_mlp6_lr1e-4_latent12"
 processor = AutoProcessor.from_pretrained(load_model_path, trust_remote_code=True)
-model = Qwen2_5_VLForConditionalGeneration.from_pretrained(load_model_path, device_map="auto", torch_dtype=torch.bfloat16)
+model = Qwen2_5_VLForConditionalGeneration.from_pretrained(load_model_path, device_map="auto", torch_dtype=torch.float32)
 processor.tokenizer.add_tokens("<|latent_pad|>", special_tokens=True)
 processor.tokenizer.add_tokens("<|latent_start|>", special_tokens=True)
 processor.tokenizer.add_tokens("<|latent_end|>", special_tokens=True)
@@ -671,7 +671,7 @@ with open(file_path, 'r', encoding='utf-8') as file:
             # extracted_emb, start_pos, end_pos = extract_embeddings_between_ids(predict_embeddings, output_ids, start_id=latent_start_idx, end_id=latent_end_idx)
             extracted_emb, start_pos, end_pos = extract_embeddings_between_ids_default(predict_embeddings, output_ids, latent_size, start_id=latent_start_idx, end_id=latent_end_idx)
             if extracted_emb.shape[1] == latent_size:
-                target_dtype = torch.float32  # 或者 torch.bfloat16
+                target_dtype = torch.float32  # 或者 torch.float32
                 decoder_feature = projector_model(extracted_emb.to(target_dtype), image_embeddings.to(target_dtype))
                 
                 images = load_and_preprocess_images(new_image_paths)

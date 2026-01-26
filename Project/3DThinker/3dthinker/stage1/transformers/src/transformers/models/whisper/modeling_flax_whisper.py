@@ -90,7 +90,7 @@ WHISPER_START_DOCSTRING = r"""
             configuration. Check out the [`~FlaxPreTrainedModel.from_pretrained`] method to load the model weights.
         dtype (`jax.numpy.dtype`, *optional*, defaults to `jax.numpy.float32`):
             The data type of the computation. Can be one of `jax.numpy.float32`, `jax.numpy.float16` (on GPUs) and
-            `jax.numpy.bfloat16` (on TPUs). This can be used to enable mixed-precision training or half-precision
+            `jax.numpy.float16` (on TPUs). This can be used to enable mixed-precision training or half-precision
             inference on GPUs or TPUs. If specified all the computation will be performed with the given `dtype`.
             **Note that this only specifies the dtype of the computation and does not influence the dtype of model
             parameters.** If you wish to change the dtype of the model parameters, see [`~FlaxPreTrainedModel.to_fp16`]

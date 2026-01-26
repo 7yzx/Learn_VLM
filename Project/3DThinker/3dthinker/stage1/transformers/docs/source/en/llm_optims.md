@@ -350,7 +350,7 @@ quant_config = BitsAndBytesConfig(load_in_8bit=True)
 model = AutoModelForCausalLM.from_pretrained(
     "google/gemma-2b",
     quantization_config=quant_config,
-    torch_dtype=torch.bfloat16,
+    torch_dtype=torch.float16,
     attn_implementation="flash_attention_2",
 )
 ```
@@ -371,7 +371,7 @@ from transformers import AutoModelForCausalLM
 
 model = AutoModelForCausalLM.from_pretrained(
     "google/gemma-2b",
-    torch_dtype=torch.bfloat16,
+    torch_dtype=torch.float16,
 )
 
 with sdpa_kernel(SDPBackend.FLASH_ATTENTION):
@@ -396,14 +396,14 @@ Use the Model Memory Calculator below to estimate and compare how much memory is
 	height="450"
 ></iframe>
 
-To load a model in half-precision, set the [torch_dtype](https://hf.co/docs/transformers/main/en/main_classes/text_generation#transformers.PreTrainedModel.from_pretrained.torch_dtype) parameter in [`~transformers.AutoModelForCausalLM.from_pretrained`] to `torch.bfloat16`. This requires 13.74GB of memory.
+To load a model in half-precision, set the [torch_dtype](https://hf.co/docs/transformers/main/en/main_classes/text_generation#transformers.PreTrainedModel.from_pretrained.torch_dtype) parameter in [`~transformers.AutoModelForCausalLM.from_pretrained`] to `torch.float16`. This requires 13.74GB of memory.
 
 ```py
 from transformers import AutoTokenizer, AutoModelForCausalLM
 import torch
 
 model = AutoModelForCausalLM.from_pretrained(
-    "mistralai/Mistral-7B-v0.1", torch_dtype=torch.bfloat16, device_map="auto",
+    "mistralai/Mistral-7B-v0.1", torch_dtype=torch.float16, device_map="auto",
 )
 ```
 

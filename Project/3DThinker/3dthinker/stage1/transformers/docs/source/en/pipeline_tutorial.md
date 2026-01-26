@@ -328,7 +328,7 @@ for out in pipeline(data()):
 
 The `device_map="auto"` setting is useful for automatically distributing the model across the fastest devices (GPUs) first before dispatching to other slower devices if available (CPU, hard drive).
 
-[`Pipeline`] supports half-precision weights (torch.float16), which can be significantly faster and save memory. Performance loss is negligible for most models, especially for larger ones. If your hardware supports it, you can enable torch.bfloat16 instead for more range.
+[`Pipeline`] supports half-precision weights (torch.float16), which can be significantly faster and save memory. Performance loss is negligible for most models, especially for larger ones. If your hardware supports it, you can enable torch.float16 instead for more range.
 
 > [!TIP]
 > Inputs are internally converted to torch.float16 and it only works for models with a PyTorch backend.
@@ -339,7 +339,7 @@ Lastly, [`Pipeline`] also accepts quantized models to reduce memory usage even f
 import torch
 from transformers import pipeline, BitsAndBytesConfig
 
-pipeline = pipeline(model="google/gemma-7b", torch_dtype=torch.bfloat16, device_map="auto", model_kwargs={"quantization_config": BitsAndBytesConfig(load_in_8bit=True)})
+pipeline = pipeline(model="google/gemma-7b", torch_dtype=torch.float16, device_map="auto", model_kwargs={"quantization_config": BitsAndBytesConfig(load_in_8bit=True)})
 pipeline("the secret to baking a good cake is ")
 [{'generated_text': 'the secret to baking a good cake is 1. the right ingredients 2. the right'}]
 ```

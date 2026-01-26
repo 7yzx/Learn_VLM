@@ -51,7 +51,7 @@ model_name = "vidore/colpali-v1.2-hf"
 
 model = ColPaliForRetrieval.from_pretrained(
     model_name,
-    torch_dtype=torch.bfloat16,
+    torch_dtype=torch.float16,
     device_map="cuda:0",  # or "mps" if on Apple Silicon
 ).eval()
 

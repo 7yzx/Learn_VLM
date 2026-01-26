@@ -215,8 +215,8 @@ class CommonPipelineTest(unittest.TestCase):
         self.assertEqual(pipe.torch_dtype, torch.float16)
 
         # If the underlying model changes dtype, the property should return the new type
-        pipe.model.to(torch.bfloat16)
-        self.assertEqual(pipe.torch_dtype, torch.bfloat16)
+        pipe.model.to(torch.float16)
+        self.assertEqual(pipe.torch_dtype, torch.float16)
 
         # If dtype is NOT specified in the pipeline constructor, the property should just return
         # the dtype of the underlying model (default)

@@ -37,7 +37,7 @@ AWQ方法已经在[*AWQ: Activation-aware Weight Quantization for LLM Compressio
 
 ### 加载一个量化的模型
 
-您可以使用`from_pretrained`方法从Hub加载一个量化模型。通过检查模型配置文件（`configuration.json`）中是否存在`quantization_config`属性，来进行确认推送的权重是量化的。您可以通过检查字段`quantization_config.quant_method`来确认模型是否以AWQ格式进行量化，该字段应该设置为`"awq"`。请注意，为了性能原因，默认情况下加载模型将设置其他权重为`float16`。如果您想更改这种设置，可以通过将`torch_dtype`参数设置为`torch.float32`或`torch.bfloat16`。在下面的部分中，您可以找到一些示例片段和notebook。
+您可以使用`from_pretrained`方法从Hub加载一个量化模型。通过检查模型配置文件（`configuration.json`）中是否存在`quantization_config`属性，来进行确认推送的权重是量化的。您可以通过检查字段`quantization_config.quant_method`来确认模型是否以AWQ格式进行量化，该字段应该设置为`"awq"`。请注意，为了性能原因，默认情况下加载模型将设置其他权重为`float16`。如果您想更改这种设置，可以通过将`torch_dtype`参数设置为`torch.float32`或`torch.float16`。在下面的部分中，您可以找到一些示例片段和notebook。
 
 
 ## 示例使用
@@ -401,7 +401,7 @@ print(model.get_memory_footprint())
 import torch
 from transformers import BitsAndBytesConfig
 
-quantization_config = BitsAndBytesConfig(load_in_4bit=True, bnb_4bit_compute_dtype=torch.bfloat16)
+quantization_config = BitsAndBytesConfig(load_in_4bit=True, bnb_4bit_compute_dtype=torch.float16)
 ```
 
 #### 使用 NF4（普通浮点数 4）数据类型

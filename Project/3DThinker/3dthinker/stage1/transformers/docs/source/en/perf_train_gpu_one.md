@@ -126,7 +126,7 @@ fp16 isn't memory-optimized because the gradients that are computed in fp16 are 
 </hfoption>
 <hfoption id="bf16">
 
-[bf16](https://cloud.google.com/blog/products/ai-machine-learning/bfloat16-the-secret-to-high-performance-on-cloud-tpus) trades off some precision for a much larger dynamic range, which is helpful for avoiding overflow and underflow errors. You can use bf16 without adding any loss scaling methods like you would with fp16. bf16 is supported by NVIDIAs Ampere architecture or newer.
+[bf16](https://cloud.google.com/blog/products/ai-machine-learning/float16-the-secret-to-high-performance-on-cloud-tpus) trades off some precision for a much larger dynamic range, which is helpful for avoiding overflow and underflow errors. You can use bf16 without adding any loss scaling methods like you would with fp16. bf16 is supported by NVIDIAs Ampere architecture or newer.
 
 Configure [`~TrainingArguments.fp16`] in [`TrainingArguments`] to enable mixed precision training with the bf16 data type.
 

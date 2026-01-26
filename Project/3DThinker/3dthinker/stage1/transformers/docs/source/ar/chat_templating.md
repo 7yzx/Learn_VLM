@@ -62,7 +62,7 @@ from transformers import AutoModelForCausalLM, AutoTokenizer
 
 checkpoint = "HuggingFaceH4/zephyr-7b-beta"
 tokenizer = AutoTokenizer.from_pretrained(checkpoint)
-model = AutoModelForCausalLM.from_pretrained(checkpoint) # قد ترغب في استخدام bfloat16 و/أو الانتقال إلى GPU هنا
+model = AutoModelForCausalLM.from_pretrained(checkpoint) # قد ترغب في استخدام float16 و/أو الانتقال إلى GPU هنا
 
 messages = [
     {
@@ -304,7 +304,7 @@ from transformers import AutoModelForCausalLM, AutoTokenizer
 checkpoint = "NousResearch/Hermes-2-Pro-Llama-3-8B"
 
 tokenizer = AutoTokenizer.from_pretrained(checkpoint)
-model = AutoModelForCausalLM.from_pretrained(checkpoint, torch_dtype=torch.bfloat16, device_map="auto")
+model = AutoModelForCausalLM.from_pretrained(checkpoint, torch_dtype=torch.float16, device_map="auto")
 
 ```python
 messages = [

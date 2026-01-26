@@ -224,7 +224,7 @@ class GRPOTrainerSlowTester(TrlTestCase):
         - Short sequences (max_completion_length=8)
         - Only 4 training samples
         - Only 1 training step
-        - Gradient checkpointing and bfloat16
+        - Gradient checkpointing and float16
         """
 
         # Create processor once outside the data generator
@@ -255,15 +255,15 @@ class GRPOTrainerSlowTester(TrlTestCase):
         # reduce memory requirements as much as possible
         quantization_config = BitsAndBytesConfig(
             load_in_4bit=True,
-            bnb_4bit_compute_dtype="bfloat16",
+            bnb_4bit_compute_dtype="float16",
             bnb_4bit_quant_type="nf4",
             bnb_4bit_use_double_quant=True,
-            bnb_4bit_quant_storage="bfloat16",
+            bnb_4bit_quant_storage="float16",
         )
         model = AutoModelForImageTextToText.from_pretrained(
             model_name,
             attn_implementation="flash_attention_2",
-            dtype="bfloat16",
+            dtype="float16",
             device_map=get_kbit_device_map(),
             quantization_config=quantization_config,
         )
@@ -280,7 +280,7 @@ class GRPOTrainerSlowTester(TrlTestCase):
             num_generations=2,
             max_completion_length=8,  # Much shorter completions
             max_prompt_length=None,  # Don't limit prompt length for VLM
-            bf16=True,  # Use bfloat16 precision
+            bf16=True,  # Use float16 precision
             max_steps=1,  # Only do 1 training step to save time and memory
             report_to="none",
             logging_strategy="no",
@@ -348,7 +348,7 @@ class GRPOTrainerSlowTester(TrlTestCase):
         - LoRA (Low-Rank Adaptation) with minimal rank (r=4)
         - 4-bit quantization with BitsAndBytesConfig
         - Gradient checkpointing
-        - bfloat16 precision
+        - float16 precision
         - Minimal batch sizes and sequence lengths
         - Very low GPU memory utilization (5%)
         """
@@ -365,7 +365,7 @@ class GRPOTrainerSlowTester(TrlTestCase):
             vllm_mode="colocate",  # Use colocate mode to avoid server dependency
             vllm_gpu_memory_utilization=0.05,  # Use minimal GPU memory (5%)
             gradient_checkpointing=True,  # Enable gradient checkpointing to save memory
-            bf16=True,  # Use bfloat16 to reduce memory
+            bf16=True,  # Use float16 to reduce memory
             report_to="none",
             logging_strategy="no",
         )
@@ -393,7 +393,7 @@ class GRPOTrainerSlowTester(TrlTestCase):
         # Use 4-bit quantization for further memory reduction
         quantization_config = BitsAndBytesConfig(
             load_in_4bit=True,
-            bnb_4bit_compute_dtype=torch.bfloat16,
+            bnb_4bit_compute_dtype=torch.float16,
             bnb_4bit_quant_type="nf4",
             bnb_4bit_use_double_quant=True,
         )
@@ -421,7 +421,7 @@ class GRPOTrainerSlowTester(TrlTestCase):
                     model = AutoModelForCausalLM.from_pretrained(
                         "trl-internal-testing/tiny-Qwen2ForCausalLM-2.5",
                         quantization_config=quantization_config,
-                        dtype=torch.bfloat16,
+                        dtype=torch.float16,
                     )
 
                     trainer = GRPOTrainer(

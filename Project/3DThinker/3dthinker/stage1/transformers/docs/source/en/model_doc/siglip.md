@@ -182,7 +182,7 @@ You may set `attn_implementation="sdpa"` in `from_pretrained()` to explicitly re
 ... )
 ```
 
-For the best speedups, we recommend loading the model in half-precision (e.g. `torch.float16` or `torch.bfloat16`).
+For the best speedups, we recommend loading the model in half-precision (e.g. `torch.float16` or `torch.float16`).
 
 
 ## Expected speedups

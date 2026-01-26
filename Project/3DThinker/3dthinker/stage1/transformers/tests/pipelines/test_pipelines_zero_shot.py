@@ -228,7 +228,7 @@ class ZeroShotClassificationPipelineTests(unittest.TestCase):
             "zero-shot-classification",
             model="sshleifer/tiny-distilbert-base-cased-distilled-squad",
             framework="pt",
-            torch_dtype=torch.bfloat16,
+            torch_dtype=torch.float16,
         )
         outputs = zero_shot_classifier(
             "Who are you voting for in 2020?", candidate_labels=["politics", "public health", "science"]

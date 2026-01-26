@@ -366,7 +366,7 @@ def get_train_args(args: Optional[Union[dict[str, Any], list[str]]] = None) -> _
 
     # Post-process model arguments
     if training_args.bf16 or finetuning_args.pure_bf16:
-        model_args.compute_dtype = torch.bfloat16
+        model_args.compute_dtype = torch.float16
     elif training_args.fp16:
         model_args.compute_dtype = torch.float16
 

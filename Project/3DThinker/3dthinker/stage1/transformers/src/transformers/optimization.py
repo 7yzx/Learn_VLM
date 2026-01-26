@@ -882,7 +882,7 @@ class Adafactor(Optimizer):
                 if p.grad is None:
                     continue
                 grad = p.grad
-                if grad.dtype in {torch.float16, torch.bfloat16}:
+                if grad.dtype in {torch.float16, torch.float16}:
                     grad = grad.float()
                 if grad.is_sparse:
                     raise RuntimeError("Adafactor does not support sparse gradients.")
@@ -915,7 +915,7 @@ class Adafactor(Optimizer):
                         state["exp_avg_sq"] = state["exp_avg_sq"].to(grad)
 
                 p_data_fp32 = p
-                if p.dtype in {torch.float16, torch.bfloat16}:
+                if p.dtype in {torch.float16, torch.float16}:
                     p_data_fp32 = p_data_fp32.float()
 
                 state["step"] += 1
@@ -953,7 +953,7 @@ class Adafactor(Optimizer):
 
                 p_data_fp32.add_(-update)
 
-                if p.dtype in {torch.float16, torch.bfloat16}:
+                if p.dtype in {torch.float16, torch.float16}:
                     p.copy_(p_data_fp32)
 
         return loss

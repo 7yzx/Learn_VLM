@@ -9,12 +9,12 @@ from transformers import BertConfig, FlaxBertModel
 
 
 parser = ArgumentParser()
-parser.add_argument("--precision", type=str, choices=["float32", "bfloat16"], default="float32")
+parser.add_argument("--precision", type=str, choices=["float32", "float16"], default="float32")
 args = parser.parse_args()
 
 dtype = jax.numpy.float32
-if args.precision == "bfloat16":
-    dtype = jax.numpy.bfloat16
+if args.precision == "float16":
+    dtype = jax.numpy.float16
 
 VOCAB_SIZE = 30522
 BS = 32

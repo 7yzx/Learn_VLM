@@ -62,7 +62,7 @@ model = BertModel.from_pretrained("bert-base-uncased", torch_dtype=torch.float16
 ...
 ```
 
-최적 성능 향상을 위해 모델을 반정밀도(예: `torch.float16` 또는 `torch.bfloat16`)로 불러오는 것을 권장합니다.
+최적 성능 향상을 위해 모델을 반정밀도(예: `torch.float16` 또는 `torch.float16`)로 불러오는 것을 권장합니다.
 
 로컬 벤치마크 (A100-80GB, CPUx12, RAM 96.6GB, PyTorch 2.2.0, OS Ubuntu 22.04)에서 `float16`을 사용해 학습 및 추론을 수행한 결과, 다음과 같은 속도 향상이 관찰되었습니다.
 

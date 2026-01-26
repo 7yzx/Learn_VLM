@@ -219,7 +219,7 @@ def write_model(
         params = json.load(f)
 
     params = params.get("model", params)
-    torch_dtype = "bfloat16"
+    torch_dtype = "float16"
 
     # ------------------------------------------------------------
     # Text model params and config
@@ -449,7 +449,7 @@ def write_model(
     # Safety check: reload the converted model
     gc.collect()
     print("Reloading the model to check if it's saved correctly.")
-    MllamaForConditionalGeneration.from_pretrained(model_path, torch_dtype=torch.bfloat16, device_map="auto")
+    MllamaForConditionalGeneration.from_pretrained(model_path, torch_dtype=torch.float16, device_map="auto")
     print("Model reloaded successfully.")
 
     # generation config

@@ -183,8 +183,8 @@ class PretrainedConfig(PushToHubMixin):
 
         > TensorFlow specific parameters
 
-        use_bfloat16 (`bool`, *optional*, defaults to `False`):
-            Whether or not the model should use BFloat16 scalars (only used by some TensorFlow models).
+        use_float16 (`bool`, *optional*, defaults to `False`):
+            Whether or not the model should use float16 scalars (only used by some TensorFlow models).
         tf_legacy_loss (`bool`, *optional*, defaults to `False`):
             Whether the model should use legacy TensorFlow losses. Legacy losses have variable output shapes and may
             not be XLA-compatible. This option is here for backward compatibility and will be removed in Transformers
@@ -220,7 +220,7 @@ class PretrainedConfig(PushToHubMixin):
         self.output_attentions = kwargs.pop("output_attentions", False)
         self.torchscript = kwargs.pop("torchscript", False)  # Only used by PyTorch models
         self.torch_dtype = kwargs.pop("torch_dtype", None)  # Only used by PyTorch models
-        self.use_bfloat16 = kwargs.pop("use_bfloat16", False)
+        self.use_float16 = kwargs.pop("use_float16", False)
         self.tf_legacy_loss = kwargs.pop("tf_legacy_loss", False)  # Only used by TensorFlow models
         self.pruned_heads = kwargs.pop("pruned_heads", {})
         self.tie_word_embeddings = kwargs.pop(

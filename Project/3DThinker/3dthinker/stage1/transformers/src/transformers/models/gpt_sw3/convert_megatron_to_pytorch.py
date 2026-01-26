@@ -81,7 +81,7 @@ def convert_megatron_checkpoint(sd_megatron, config):
         causal_mask = torch.tril(torch.ones((n_positions, n_positions), dtype=torch.bool))
         causal_mask = causal_mask.view(1, 1, n_positions, n_positions)
         sd_hf[f"transformer.h.{i}.attn.bias"] = causal_mask
-        sd_hf[f"transformer.h.{i}.attn.masked_bias"] = torch.tensor(-1e4, dtype=torch.bfloat16)
+        sd_hf[f"transformer.h.{i}.attn.masked_bias"] = torch.tensor(-1e4, dtype=torch.float16)
 
         sd_hf[f"transformer.h.{i}.ln_1.weight"] = sd_megatron[f"{pf}{i}.input_layernorm.weight"]
         sd_hf[f"transformer.h.{i}.ln_1.bias"] = sd_megatron[f"{pf}{i}.input_layernorm.bias"]

@@ -425,7 +425,7 @@ class Olmo2IntegrationTest(unittest.TestCase):
 
         # Load model
         device = "cpu"
-        dtype = torch.bfloat16
+        dtype = torch.float16
         cache_implementation = "static"
         attn_implementation = "sdpa"
         batch_size = 1

@@ -419,9 +419,9 @@ class BitsAndBytesConfig(QuantizationConfigMixin):
         if bnb_4bit_quant_storage is None:
             self.bnb_4bit_quant_storage = torch.uint8
         elif isinstance(bnb_4bit_quant_storage, str):
-            if bnb_4bit_quant_storage not in ["float16", "float32", "int8", "uint8", "float64", "bfloat16"]:
+            if bnb_4bit_quant_storage not in ["float16", "float32", "int8", "uint8", "float64", "float16"]:
                 raise ValueError(
-                    "`bnb_4bit_quant_storage` must be a valid string (one of 'float16', 'float32', 'int8', 'uint8', 'float64', 'bfloat16') "
+                    "`bnb_4bit_quant_storage` must be a valid string (one of 'float16', 'float32', 'int8', 'uint8', 'float64', 'float16') "
                 )
             self.bnb_4bit_quant_storage = getattr(torch, bnb_4bit_quant_storage)
         elif isinstance(bnb_4bit_quant_storage, torch.dtype):
@@ -1475,8 +1475,8 @@ class TorchAoConfig(QuantizationConfigMixin):
 
     # specific quantization method
     quantization_config = TorchAoConfig("int4_weight_only", group_size=32)
-    # int4_weight_only quant is only working with *torch.bfloat16* dtype right now
-    model = AutoModelForCausalLM.from_pretrained(model_id, device_map="cuda", torch_dtype=torch.bfloat16, quantization_config=quantization_config)
+    # int4_weight_only quant is only working with *torch.float16* dtype right now
+    model = AutoModelForCausalLM.from_pretrained(model_id, device_map="cuda", torch_dtype=torch.float16, quantization_config=quantization_config)
 
     # autoquant
     # `autoquant` is a convenient way for users to search for the best quantization for each layer
@@ -1485,7 +1485,7 @@ class TorchAoConfig(QuantizationConfigMixin):
     # defaults to None, which means we'll try to get the best performing quantized model without
     # considering accuracy
     quantization_config = TorchAoConfig("autoquant", min_sqnr=30)
-    model = AutoModelForCausalLM.from_pretrained(model_id, device_map="cuda", torch_dtype=torch.bfloat16, quantization_config=quantization_config)
+    model = AutoModelForCausalLM.from_pretrained(model_id, device_map="cuda", torch_dtype=torch.float16, quantization_config=quantization_config)
     # run through example inputs, quantization methods will be selected based on the shape of example input
     tokenizer = AutoTokenizer.from_pretrained(model_name)
     input_text = "What are we having for dinner?"

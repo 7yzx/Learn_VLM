@@ -67,7 +67,7 @@ model = ViTForImageClassification.from_pretrained("google/vit-base-patch16-224",
 ...
 ```
 
-최적의 속도 향상을 위해 모델을 반정밀도(예: `torch.float16` 또는 `torch.bfloat16`)로 로드하는 것을 권장합니다.
+최적의 속도 향상을 위해 모델을 반정밀도(예: `torch.float16` 또는 `torch.float16`)로 로드하는 것을 권장합니다.
 
 로컬 벤치마크(A100-40GB, PyTorch 2.3.0, OS Ubuntu 22.04)에서 `float32`와 `google/vit-base-patch16-224` 모델을 사용한 추론 시, 다음과 같은 속도 향상을 확인했습니다.
 

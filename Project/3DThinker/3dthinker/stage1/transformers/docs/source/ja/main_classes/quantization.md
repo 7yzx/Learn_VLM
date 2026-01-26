@@ -281,7 +281,7 @@ compute dtype は、計算中に使用される dtype を変更するために�
 import torch
 from transformers import BitsAndBytesConfig
 
-quantization_config = BitsAndBytesConfig(load_in_4bit=True, bnb_4bit_compute_dtype=torch.bfloat16)
+quantization_config = BitsAndBytesConfig(load_in_4bit=True, bnb_4bit_compute_dtype=torch.float16)
 ```
 
 ##### Using NF4 (Normal Float 4) data type 

@@ -572,7 +572,7 @@ class LlamaIntegrationTest(unittest.TestCase):
 
         tokenizer = AutoTokenizer.from_pretrained("meta-llama/Meta-Llama-3.1-8B-Instruct")
         model = LlamaForCausalLM.from_pretrained(
-            "meta-llama/Meta-Llama-3.1-8B-Instruct", device_map="auto", torch_dtype=torch.bfloat16
+            "meta-llama/Meta-Llama-3.1-8B-Instruct", device_map="auto", torch_dtype=torch.float16
         )
         input_text = ["Tell me about the french revolution."]
         model_inputs = tokenizer(input_text, return_tensors="pt").to(model.device)
@@ -587,7 +587,7 @@ class LlamaIntegrationTest(unittest.TestCase):
         input_ids = [1, 306, 4658, 278, 6593, 310, 2834, 338]
 
         model = LlamaForCausalLM.from_pretrained(
-            "meta-llama/Llama-2-7b-hf", device_map="auto", torch_dtype=torch.bfloat16, attn_implementation="eager"
+            "meta-llama/Llama-2-7b-hf", device_map="auto", torch_dtype=torch.float16, attn_implementation="eager"
         )
 
         with torch.no_grad():
@@ -769,7 +769,7 @@ class LlamaIntegrationTest(unittest.TestCase):
 
             # Load model
             device = "cpu"
-            dtype = torch.bfloat16
+            dtype = torch.float16
             cache_implementation = "static"
             attn_implementation = "sdpa"
             batch_size = 1

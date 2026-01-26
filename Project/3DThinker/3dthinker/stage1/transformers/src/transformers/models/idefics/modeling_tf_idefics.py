@@ -525,7 +525,7 @@ class TFIdeficsRMSNorm(tf.keras.layers.Layer):
         hidden_states = hidden_states * tf.math.rsqrt(variance + self.variance_epsilon)
 
         # convert into half-precision if necessary
-        if self.weight.dtype in [tf.float16, tf.bfloat16]:
+        if self.weight.dtype in [tf.float16, tf.float16]:
             hidden_states = tf.cast(hidden_states, self.weight.dtype)
 
         return self.weight * hidden_states

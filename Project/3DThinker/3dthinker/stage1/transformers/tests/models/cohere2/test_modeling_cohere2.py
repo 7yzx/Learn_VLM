@@ -156,7 +156,7 @@ class Cohere2IntegrationTest(unittest.TestCase):
         ]
 
         model = AutoModelForCausalLM.from_pretrained(
-            model_id, low_cpu_mem_usage=True, torch_dtype=torch.bfloat16, attn_implementation="eager"
+            model_id, low_cpu_mem_usage=True, torch_dtype=torch.float16, attn_implementation="eager"
         ).to(torch_device)
 
         tokenizer = AutoTokenizer.from_pretrained(model_id)
@@ -196,7 +196,7 @@ class Cohere2IntegrationTest(unittest.TestCase):
         ]
 
         model = AutoModelForCausalLM.from_pretrained(
-            model_id, low_cpu_mem_usage=True, torch_dtype=torch.bfloat16, attn_implementation="flex_attention"
+            model_id, low_cpu_mem_usage=True, torch_dtype=torch.float16, attn_implementation="flex_attention"
         ).to(torch_device)
         tokenizer = AutoTokenizer.from_pretrained(model_id)
         pipe = pipeline("text-generation", model=model, tokenizer=tokenizer)
@@ -244,7 +244,7 @@ class Cohere2IntegrationTest(unittest.TestCase):
         tokenizer = AutoTokenizer.from_pretrained(model_id, pad_token="<PAD>", padding_side="right")
         # Load model
         device = "cpu"
-        dtype = torch.bfloat16
+        dtype = torch.float16
         cache_implementation = "static"
         attn_implementation = "sdpa"
         batch_size = 1

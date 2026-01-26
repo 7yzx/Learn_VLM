@@ -92,33 +92,130 @@ import numpy as np
 
 #     return loss_vis
 
-class MLP(nn.Module):
-    def __init__(self, input_dim, output_dim, hidden_dims = [], bias = True, act = nn.ELU()):
-        super().__init__()
-        self.input_dim = input_dim
-        self.output_dim = output_dim
-        self.hidden_dims = hidden_dims
-        self.act = act
-        if len(hidden_dims)>0:
-            fc = [nn.Linear(input_dim, self.hidden_dims[0], bias = bias)]
-            fc.append(act)
-            for i in range(len(self.hidden_dims)-1):
-                fc.append(nn.Linear(self.hidden_dims[i], self.hidden_dims[i+1], bias = bias))
-                fc.append(act)
-            fc.append(nn.Linear(self.hidden_dims[-1], output_dim, bias = bias))
-        else:
-            fc = [nn.Linear(input_dim, output_dim, bias = bias), act]
-        self.linear = nn.Sequential(*fc)
+
+import torch
+import torch.nn as nn
+
+# class projector(nn.Module):
+#     def __init__(self, mlp_depth, mm_hidden_size, hidden_size, latent_size, fusion_input, fusion_output):
+#         super().__init__()
+#         self.mlp_depth = mlp_depth
+#         self.mm_hidden_size = mm_hidden_size
+#         self.hidden_size = hidden_size
+#         self.latent_size = latent_size
+#         self.fusion_input = fusion_input
+#         self.fusion_output = fusion_output
+        
+#         # --- 模块 1: proj_3d_model ---
+#         modules = [nn.Linear(mm_hidden_size, hidden_size)]
+#         for _ in range(1, mlp_depth):
+#             modules.append(nn.GELU())
+#             modules.append(nn.Linear(hidden_size, hidden_size))
+#         self.proj_3d_model = nn.Sequential(*modules)
+        
+#         # --- 模块 2: prompte_model ---
+#         modules = [nn.Linear(latent_size, 64)]
+#         for _ in range(1, 2):
+#             modules.append(nn.GELU())
+#             modules.append(nn.Linear(64, 64))
+#         self.prompte_model = nn.Sequential(*modules)
+        
+#         # --- 模块 3: fusion_model ---
+#         modules = [nn.Linear(fusion_input+64, fusion_output)]
+#         for _ in range(1, mlp_depth):
+#             modules.append(nn.GELU())
+#             modules.append(nn.Linear(fusion_output, fusion_output))
+#         self.fusion_model = nn.Sequential(*modules)
+        
+#     def forward(self, hidden_states_feature, image_embeddings):
+#         # 1. 记录原始精度，以便最后转回
+#         target_dtype = hidden_states_feature.dtype 
+        
+#         # 2. hidden_states_feature 通常很小 ([1, 12, 2048])，先转 FP32 没问题，保证 Latent 处理不溢出
+#         hidden_states_feature = hidden_states_feature.float()
+        
+#         # [T=12, 2048] -> [1, T=12, 2048]
+#         if hidden_states_feature.dim() == 2:
+#             hidden_states_feature = hidden_states_feature.unsqueeze(0)
+            
+#         # --- Prompte Model (FP32) ---
+#         # [1, 12, 2048] -> [12, 2048] -> [2048, 12]
+#         x_latent = hidden_states_feature.squeeze(0).permute(1, 0) 
+#         x_latent = self.prompte_model(x_latent)  # [2048, 64]
+#         hidden_states_feature_processed = x_latent.permute(1, 0).unsqueeze(0) # [1, 64, 2048]
+
+#         outputs = []
+        
+#         # 3. 【关键修改】不要在循环外把整个 image_embeddings 转 FP32
+#         # image_embeddings 保持原样 (FP16)，我们在循环里“切片”时再转
+        
+#         for i in range(image_embeddings.shape[1]):
+#             # -----------------------------------------------------------
+#             # 优化点：取出当前视角的切片后，立刻转 float()，用完即焚
+#             # -----------------------------------------------------------
+#             image_feature = image_embeddings[:, i, :, :].float() # [B, P, C] (FP32)
+            
+#             # [B, 64, C] cat [B, P, C] -> [B, 64+P, C]
+#             x = torch.cat((hidden_states_feature_processed, image_feature), dim=1)
+            
+#             # Fusion Model (FP32)
+#             x_in = x.squeeze(0).permute(1, 0)
+#             x_unify = self.fusion_model(x_in) # [2048, 1374]
+#             x_unify = x_unify.permute(1, 0)   # [1374, 2048]
+            
+#             # 3D Projector (FP32)
+#             x_output = self.proj_3d_model(x_unify) # [1374, 2048]
+            
+#             # -----------------------------------------------------------
+#             # 优化点：算完立刻转回 FP16 (如果原精度是FP16)
+#             # 这样存入 list 的 tensor 是省显存的，而不是占显存的 FP32
+#             # -----------------------------------------------------------
+#             if target_dtype == torch.float16:
+#                 # 钳位防止溢出，然后转回 FP16 存起来
+#                 x_output = x_output.clamp(-65500, 65500).to(target_dtype)
+            
+#             outputs.append(x_output)
+            
+#             # 手动释放临时的大 tensor（可选，Python GC 会做，但显存紧张时显式删除更好）
+#             del x, x_in, x_unify, image_feature
+
+#         # 堆叠
+#         feature_proj = torch.stack(outputs, dim=0)
+
+#         # 最后一道防线：NaN 检查 (虽然此时已经转回 FP16，但检查一下更安全)
+#         if torch.isnan(feature_proj).any():
+#              feature_proj = torch.nan_to_num(feature_proj, nan=0.0)
+
+#         return feature_proj
+
+
+# class MLP(nn.Module):
+#     def __init__(self, input_dim, output_dim, hidden_dims = [], bias = True, act = nn.ELU()):
+#         super().__init__()
+#         self.input_dim = input_dim
+#         self.output_dim = output_dim
+#         self.hidden_dims = hidden_dims
+#         self.act = act
+#         if len(hidden_dims)>0:
+#             fc = [nn.Linear(input_dim, self.hidden_dims[0], bias = bias)]
+#             fc.append(act)
+#             for i in range(len(self.hidden_dims)-1):
+#                 fc.append(nn.Linear(self.hidden_dims[i], self.hidden_dims[i+1], bias = bias))
+#                 fc.append(act)
+#             fc.append(nn.Linear(self.hidden_dims[-1], output_dim, bias = bias))
+#         else:
+#             fc = [nn.Linear(input_dim, output_dim, bias = bias), act]
+#         self.linear = nn.Sequential(*fc)
     
-    def forward(self, x):
-        return self.linear(x)
+#     def forward(self, x):
+#         return self.linear(x)
     
-def build_vision_projector(mlp_depth, mm_hidden_size, hidden_size):
-    modules = [nn.Linear(mm_hidden_size, hidden_size)]
-    for _ in range(1, mlp_depth):
-        modules.append(nn.GELU())
-        modules.append(nn.Linear(hidden_size, hidden_size))
-    return nn.Sequential(*modules)
+# def build_vision_projector(mlp_depth, mm_hidden_size, hidden_size):
+#     modules = [nn.Linear(mm_hidden_size, hidden_size)]
+#     for _ in range(1, mlp_depth):
+#         modules.append(nn.GELU())
+#         modules.append(nn.Linear(hidden_size, hidden_size))
+#     return nn.Sequential(*modules)
     
     
 class projector(nn.Module):
@@ -126,87 +223,63 @@ class projector(nn.Module):
         # [N, mm_hidden_size] -> [N, hidden_size]
         super().__init__()
         ## mm_hidden_size不可改，mlp_depth和hidden_size可以
-        self.mlp_depth = mlp_depth
-        self.mm_hidden_size = mm_hidden_size
-        self.hidden_size = hidden_size
-        self.latent_size = latent_size
-        self.fusion_input = fusion_input # P_image
+        self.mlp_depth = mlp_depth # MLP的深度（层数）
+        self.mm_hidden_size = mm_hidden_size # 输入特征维度 (2048)
+        self.hidden_size = hidden_size # 输入特征维度 (2048)
+        self.latent_size = latent_size # 输入的Latent Token数量 (例如 12)
+        self.fusion_input = fusion_input # P_image # 图片的 Patch 数量 (例如 391)
         self.fusion_output = fusion_output # P_3D = 1374
         # self.bn0 = nn.BatchNorm1d(64)
         # self.bn = nn.BatchNorm1d(fusion_output)
         
+        # -----------------------------------------------------------
+        # 模块 1: proj_3d_model (用于最后的特征变换)
+        # -----------------------------------------------------------
         modules = [nn.Linear(mm_hidden_size, hidden_size)]
         for _ in range(1, mlp_depth):
             modules.append(nn.GELU())
             modules.append(nn.Linear(hidden_size, hidden_size))
         self.proj_3d_model = nn.Sequential(*modules)
+        # 作用：对融合后的特征进行非线性变换。
+        # 输入：[B, 1374, 2048] -> 输出：[B, 1374, 2048]
         
         
-        modules = [nn.Linear(latent_size, 64)]
+        # -----------------------------------------------------------
+        # 模块 2: prompte_model (用于处理 Latent 特征)
+        # -----------------------------------------------------------
+        modules = [nn.Linear(latent_size, 64)] # 将 12 个 Token 映射为 64 个
         for _ in range(1, 2):
             modules.append(nn.GELU())
             modules.append(nn.Linear(64, 64))
         self.prompte_model = nn.Sequential(*modules)
-
+        # 作用：这个网络很特殊，它作用在“序列长度”维度上，而不是特征维度。
+        # 目标是将输入的 latent_size (12) 变长到 64。
+        
+        # -----------------------------------------------------------
+        # 模块 3: fusion_model (用于融合 Latent + Image)
+        # -----------------------------------------------------------
+        # 输入维度是：图像Patch数(391) + Latent变长后的数(64) = 455
+        # 输出维度是：目标3D特征长度(1374)
+        
         modules = [nn.Linear(fusion_input+64, fusion_output)]
         for _ in range(1, mlp_depth):
             modules.append(nn.GELU())
             modules.append(nn.Linear(fusion_output, fusion_output))
         self.fusion_model = nn.Sequential(*modules)
-        # self.conv0 = nn.Sequential(nn.Conv1d(latent_size, 64, kernel_size=1, bias=False),
-        #                            self.bn0,
-        #                            nn.LeakyReLU(negative_slope=0.2))  
-          
-        # self.conv = nn.Sequential(nn.Conv1d(fusion_input+64, fusion_output, kernel_size=1, bias=False),
-        #                            self.bn,
-        #                            nn.LeakyReLU(negative_slope=0.2))
+        # 作用：核心融合层。它也是作用在“序列长度”维度上。
+        # 它强行把 (64+391) 个 Token 混合并重采样成 1374 个 Token。
         
-    # [S, L, 2048] -> [N=16, 2048]
-    # def forward(self, idx, hidden_states_feature, image_embeddings):
-    #     data = np.load('3DThinker/posed_images_3d_feature_vggt_resized/' + str(idx[0]) + '/vggt.npz')
-    #     feature_3d = data['feature'] # [1,N=4,P_3D = 1374,2048]
-    #     feature_3d = torch.tensor(feature_3d).to(device=hidden_states_feature.device, dtype=hidden_states_feature.dtype)
-    #     feature_3d = feature_3d.squeeze()
-    #     hidden_states_feature = hidden_states_feature.unsqueeze(0) # [1, T=12, 2048]
-    #     hidden_states_feature = self.prompte_model(hidden_states_feature.squeeze().permute(1,0)) # [B,64,C]   
-    #     hidden_states_feature = hidden_states_feature.permute(1,0).unsqueeze(0)
-    #     # hidden_states_feature = self.conv0(hidden_states_feature) # [B,64,C]
-    #     # image_embeddings: [1,N=4,P=391,2048]
-    #     x_list = torch.tensor([]).to(hidden_states_feature.device, dtype=hidden_states_feature.dtype)
-    #     # print(image_embeddings.shape) # [1, 4, 391, 2048]
-    #     for i in range(image_embeddings.shape[1]):
-    #         image_feature = image_embeddings[:,i,:,:] # [B,P,C]
-    #         # hidden_states_feature: [B,64,C], image_feature: [B,P,C]
-    #         x = torch.cat((hidden_states_feature, image_feature), dim=1) # [B,64+P,C]
-    #         x_unify = self.fusion_model(x.squeeze().permute(1,0)) # [B,P_3D,C]
-    #         x_unify = x_unify.permute(1,0)
-    #         # x_unify = self.conv(x) # [B,P_3D,C]
-    #         x_output = self.proj_3d_model(x_unify) # [B,P_3D,C]
-    #         # Append x_output to x_list
-    #         if x_list.numel() == 0:
-    #             x_list = x_output.unsqueeze(0)
-    #         else:
-    #             x_list = torch.cat((x_list, x_output.unsqueeze(0)), dim=0)
-    #     feature_proj = x_list.squeeze(0)
-    #     # print(feature_proj.shape)
-    #     # print(feature_3d.shape)
-    #     # x_list # [N,P_3D,C]
-    #     feature_proj_norm = feature_proj / feature_proj.norm(dim=-1, p=2, keepdim=True)
-    #     feature_3d_norm = feature_3d / feature_3d.norm(dim=-1, p=2, keepdim=True)
 
-    #     print(feature_proj_norm.shape)
-    #     print(feature_3d_norm.shape)
-    #     feature_sim = ((feature_proj_norm - feature_3d_norm.detach()) ** 2).sum(dim=-1)
-    #     feature_sim_loss = feature_sim.mean()
-
-    #     return feature_sim_loss
-    
     def forward(self, hidden_states_feature, image_embeddings):
         hidden_states_feature = hidden_states_feature.unsqueeze(0) # [1, T=12, 2048]
+        # 关键操作 2: 通过 prompte_model
+        # 输入: [2048, 12] -> Linear(12, 64) -> 输出: [2048, 64]
         hidden_states_feature = self.prompte_model(hidden_states_feature.squeeze().permute(1,0)) # [B,64,C]   
-        hidden_states_feature = hidden_states_feature.permute(1,0).unsqueeze(0)
+        hidden_states_feature = hidden_states_feature.permute(1,0).unsqueeze(0) # -> [1, 64, 2048]
         # hidden_states_feature = self.conv0(hidden_states_feature) # [B,64,C]
         # image_embeddings: [1,N=4,P=391,2048]
+        # 创建一个空 tensor 用于存放每个视角的处理结果
+        # x_list 最终会收集所有视角的特征
         x_list = torch.tensor([]).to(hidden_states_feature.device, dtype=hidden_states_feature.dtype)
         # print(image_embeddings.shape) # [1, 4, 391, 2048]
         for i in range(image_embeddings.shape[1]):

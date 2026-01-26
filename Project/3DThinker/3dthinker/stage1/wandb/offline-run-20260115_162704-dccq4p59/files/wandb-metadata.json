@@ -1,0 +1,94 @@
+{
+  "os":  "Linux-4.15.0-213-generic-x86_64-with-glibc2.27",
+  "python":  "3.10.18",
+  "startedAt":  "2026-01-15T16:27:04.458298Z",
+  "args":  [
+    "--model",
+    "/mnt/sevenT/zixiaoy/checkpoints/Qwen/Qwen2.5-VL-3B-Instruct",
+    "--epochs",
+    "10",
+    "--task",
+    "mindcube",
+    "--latent_size",
+    "12",
+    "--per_device_train_batch_size",
+    "1",
+    "--learning_rate",
+    "1e-4",
+    "--warmup_steps",
+    "10",
+    "--weight_decay",
+    "0.01",
+    "--logging_steps",
+    "20",
+    "--save_steps",
+    "2000",
+    "--save_total_limit",
+    "1",
+    "--stage",
+    "stage1",
+    "--data_path",
+    "/mnt/sevenT/zixiaoy/code/Learn_VLM/Project/3DThinker/data/example.jsonl",
+    "--log_file",
+    "./log.txt",
+    "--save_model_path",
+    "../../models/3DThinker-S1-Qwen2.5-VL-3B_mlp6_lr1e-4_latent12",
+    "--wandb_name",
+    "3DThinker-S1-Qwen2.5-VL-3B_mlp6_lr1e-4_latent12"
+  ],
+  "program":  "/mnt/sevenT/zixiaoy/code/Learn_VLM/Project/3DThinker/3dthinker/stage1/src/main.py",
+  "codePath":  "Project/3DThinker/3dthinker/stage1/src/main.py",
+  "git":  {
+    "remote":  "git@github.com:7yzx/Learn_VLM.git",
+    "commit":  "f699399ae0e3b80b99fde38b5823eecb33d73b2e"
+  },
+  "root":  "/mnt/sevenT/zixiaoy/code/Learn_VLM/Project/3DThinker/3dthinker/stage1",
+  "host":  "node12",
+  "username":  "zixiaoy",
+  "executable":  "/mnt/sevenT/zixiaoy/miniconda3/envs/3DThinker-stage1/bin/python",
+  "codePathLocal":  "src/main.py",
+  "cpu_count":  28,
+  "cpu_count_logical":  56,
+  "gpu":  "[Tesla V100-SXM2-32GB, Tesla V100-SXM2-32GB, Tesla V100-SXM2-32GB, Tesla V100-SXM2-32GB]",
+  "gpu_count":  4,
+  "disk":  {
+    "/":  {
+      "total":  "1887514796032",
+      "used":  "1169101127680"
+    }
+  },
+  "memory":  {
+    "total":  "270118342656"
+  },
+  "cpu":  {
+    "count":  28,
+    "countLogical":  56
+  },
+  "gpu_nvidia":  [
+    {
+      "name":  "Tesla V100-SXM2-32GB",
+      "memoryTotal":  "34359738368",
+      "cudaCores":  5120,
+      "architecture":  "Volta"
+    },
+    {
+      "name":  "Tesla V100-SXM2-32GB",
+      "memoryTotal":  "34359738368",
+      "cudaCores":  5120,
+      "architecture":  "Volta"
+    },
+    {
+      "name":  "Tesla V100-SXM2-32GB",
+      "memoryTotal":  "34359738368",
+      "cudaCores":  5120,
+      "architecture":  "Volta"
+    },
+    {
+      "name":  "Tesla V100-SXM2-32GB",
+      "memoryTotal":  "34359738368",
+      "cudaCores":  5120,
+      "architecture":  "Volta"
+    }
+  ],
+  "cudaVersion":  "12.1"
+}

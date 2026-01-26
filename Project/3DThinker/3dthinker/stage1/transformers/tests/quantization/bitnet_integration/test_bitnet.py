@@ -114,7 +114,7 @@ class BitNetTest(unittest.TestCase):
         from transformers.integrations import pack_weights, unpack_weights
 
         u = torch.randint(0, 255, (256, 256), dtype=torch.uint8)
-        unpacked_u = unpack_weights(u, dtype=torch.bfloat16)
+        unpacked_u = unpack_weights(u, dtype=torch.float16)
         repacked_u = pack_weights(unpacked_u)
         for i in range(u.shape[0]):
             for j in range(u.shape[1]):

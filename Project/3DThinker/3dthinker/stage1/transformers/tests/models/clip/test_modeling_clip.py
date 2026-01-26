@@ -238,27 +238,27 @@ class CLIPModelTesterMixin(ModelTesterMixin):
         if torch_dtype == "float16" and not is_torch_fp16_available_on_device(torch_device):
             self.skipTest(f"float16 not supported on {torch_device} (on the specific device currently used)")
 
-        if torch_dtype == "bfloat16" and not is_torch_bf16_available_on_device(torch_device):
+        if torch_dtype == "float16" and not is_torch_bf16_available_on_device(torch_device):
             self.skipTest(
-                f"bfloat16 not supported on {torch_device} (on the specific device currently used, e.g. Nvidia T4 GPU)"
+                f"float16 not supported on {torch_device} (on the specific device currently used, e.g. Nvidia T4 GPU)"
             )
 
         # Convert to torch dtype
         dtypes = {
             "float16": torch.float16,
-            "bfloat16": torch.bfloat16,
+            "float16": torch.float16,
             "float32": torch.float32,
         }
         torch_dtype = dtypes[torch_dtype]
 
         atols = {
             torch.float32: 1e-5,
-            torch.bfloat16: 3e-2,
+            torch.float16: 3e-2,
             torch.float16: 5e-3,
         }
         rtols = {
             torch.float32: 1e-4,
-            torch.bfloat16: 3e-2,
+            torch.float16: 3e-2,
             torch.float16: 5e-3,
         }
 
@@ -467,7 +467,7 @@ class CLIPVisionModelTest(CLIPModelTesterMixin, unittest.TestCase):
         self.assertIsNotNone(model)
         self.assertTrue(hasattr(model, "visual_projection"))
 
-    @parameterized.expand([("float16",), ("bfloat16",), ("float32",)])
+    @parameterized.expand([("float16",), ("float16",), ("float32",)])
     @require_torch_sdpa
     @slow
     @is_flaky()
@@ -649,7 +649,7 @@ class CLIPTextModelTest(CLIPModelTesterMixin, unittest.TestCase):
         self.assertIsNotNone(model)
         self.assertTrue(hasattr(model, "text_projection"))
 
-    @parameterized.expand([("float16",), ("bfloat16",), ("float32",)])
+    @parameterized.expand([("float16",), ("float16",), ("float32",)])
     @require_torch_sdpa
     @slow
     @is_flaky()
@@ -877,7 +877,7 @@ class CLIPModelTest(CLIPModelTesterMixin, PipelineTesterMixin, unittest.TestCase
         model = CLIPModel.from_pretrained(model_name)
         self.assertIsNotNone(model)
 
-    @parameterized.expand([("float16",), ("bfloat16",), ("float32",)])
+    @parameterized.expand([("float16",), ("float16",), ("float32",)])
     @require_torch_sdpa
     @slow
     @is_flaky()
@@ -915,14 +915,14 @@ class CLIPModelTest(CLIPModelTesterMixin, PipelineTesterMixin, unittest.TestCase
             with tempfile.TemporaryDirectory() as tmpdirname:
                 model.save_pretrained(tmpdirname)
                 model_fa = model_class.from_pretrained(
-                    tmpdirname, torch_dtype=torch.bfloat16, attn_implementation="flash_attention_2"
+                    tmpdirname, torch_dtype=torch.float16, attn_implementation="flash_attention_2"
                 )
                 model_fa.to(torch_device)
 
-                model = model_class.from_pretrained(tmpdirname, torch_dtype=torch.bfloat16)
+                model = model_class.from_pretrained(tmpdirname, torch_dtype=torch.float16)
                 model.to(torch_device)
 
-                dummy_pixel_values = inputs_dict["pixel_values"].to(torch.bfloat16)
+                dummy_pixel_values = inputs_dict["pixel_values"].to(torch.float16)
                 dummy_input_ids = inputs_dict["input_ids"]
 
                 outputs = model(pixel_values=dummy_pixel_values, input_ids=dummy_input_ids, output_hidden_states=True)
@@ -953,16 +953,16 @@ class CLIPModelTest(CLIPModelTesterMixin, PipelineTesterMixin, unittest.TestCase
             with tempfile.TemporaryDirectory() as tmpdirname:
                 model.save_pretrained(tmpdirname)
                 model_fa = model_class.from_pretrained(
-                    tmpdirname, torch_dtype=torch.bfloat16, attn_implementation="flash_attention_2"
+                    tmpdirname, torch_dtype=torch.float16, attn_implementation="flash_attention_2"
                 )
                 model_fa.to(torch_device)
 
                 model = model_class.from_pretrained(
-                    tmpdirname, torch_dtype=torch.bfloat16, attn_implementation="eager"
+                    tmpdirname, torch_dtype=torch.float16, attn_implementation="eager"
                 )
                 model.to(torch_device)
 
-                dummy_pixel_values = inputs_dict["pixel_values"].to(torch.bfloat16)
+                dummy_pixel_values = inputs_dict["pixel_values"].to(torch.float16)
                 dummy_input_ids = inputs_dict["input_ids"]
                 dummy_pixel_mask = inputs_dict["attention_mask"]
 
@@ -1050,7 +1050,7 @@ class CLIPForImageClassificationModelTest(CLIPModelTesterMixin, PipelineTesterMi
     def test_initialization(self):
         pass
 
-    @parameterized.expand([("float16",), ("bfloat16",), ("float32",)])
+    @parameterized.expand([("float16",), ("float16",), ("float32",)])
     @require_torch_sdpa
     @slow
     @is_flaky()

@@ -854,7 +854,7 @@ class Pix2StructIntegrationTest(unittest.TestCase):
         image_url = "https://huggingface.co/datasets/huggingface/documentation-images/resolve/main/transformers/tasks/ai2d-demo.jpg"
         image = Image.open(requests.get(image_url, stream=True).raw)
 
-        model = Pix2StructForConditionalGeneration.from_pretrained(model_id, torch_dtype=torch.bfloat16).to(
+        model = Pix2StructForConditionalGeneration.from_pretrained(model_id, torch_dtype=torch.float16).to(
             torch_device
         )
         processor = Pix2StructProcessor.from_pretrained(model_id)
@@ -862,7 +862,7 @@ class Pix2StructIntegrationTest(unittest.TestCase):
         # image only
         text = "What does the label 15 represent? (1) lava (2) core (3) tunnel (4) ash cloud"
 
-        inputs = processor(images=image, return_tensors="pt", text=text).to(torch_device, torch.bfloat16)
+        inputs = processor(images=image, return_tensors="pt", text=text).to(torch_device, torch.float16)
 
         predictions = model.generate(**inputs)
         self.assertEqual(processor.decode(predictions[0], skip_special_tokens=True), "ash cloud")
@@ -882,12 +882,12 @@ class Pix2StructIntegrationTest(unittest.TestCase):
             "What is the producer in the diagram? (1) Phytoplankton (2) Zooplankton (3) Large fish (4) Small fish",
         ]
 
-        model = Pix2StructForConditionalGeneration.from_pretrained(model_id, torch_dtype=torch.bfloat16).to(
+        model = Pix2StructForConditionalGeneration.from_pretrained(model_id, torch_dtype=torch.float16).to(
             torch_device
         )
         processor = Pix2StructProcessor.from_pretrained(model_id)
 
-        inputs = processor(images=images, return_tensors="pt", text=texts).to(torch_device, torch.bfloat16)
+        inputs = processor(images=images, return_tensors="pt", text=texts).to(torch_device, torch.float16)
 
         predictions = model.generate(**inputs)
         self.assertEqual(processor.decode(predictions[0], skip_special_tokens=True), "ash cloud")

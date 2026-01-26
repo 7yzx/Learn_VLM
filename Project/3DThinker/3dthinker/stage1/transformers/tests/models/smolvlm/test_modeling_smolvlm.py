@@ -575,7 +575,7 @@ class SmolVLMForConditionalGenerationIntegrationTest(unittest.TestCase):
     def test_integration_test(self):
         model = SmolVLMForConditionalGeneration.from_pretrained(
             "HuggingFaceTB/SmolVLM2-256M-Video-Instruct",
-            torch_dtype=torch.bfloat16,
+            torch_dtype=torch.float16,
             device_map="auto",
         )
 
@@ -583,7 +583,7 @@ class SmolVLMForConditionalGenerationIntegrationTest(unittest.TestCase):
         text = "<image>In this image, we see"
         images = self.image1
         inputs = self.processor(text=text, images=images, return_tensors="pt", padding=True)
-        inputs.to(device=torch_device, dtype=torch.bfloat16)
+        inputs.to(device=torch_device, dtype=torch.float16)
 
         generated_ids = model.generate(**inputs, max_new_tokens=9)
         generated_texts = self.processor.batch_decode(generated_ids, skip_special_tokens=True)

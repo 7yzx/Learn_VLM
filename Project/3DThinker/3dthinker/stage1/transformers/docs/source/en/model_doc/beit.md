@@ -95,7 +95,7 @@ model = BeitForImageClassification.from_pretrained("microsoft/beit-base-patch16-
 ...
 ```
 
-For the best speedups, we recommend loading the model in half-precision (e.g. `torch.float16` or `torch.bfloat16`).
+For the best speedups, we recommend loading the model in half-precision (e.g. `torch.float16` or `torch.float16`).
 
 On a local benchmark (NVIDIA GeForce RTX 2060-8GB, PyTorch 2.5.1, OS Ubuntu 20.04) with `float16` and 
 `microsoft/beit-base-patch16-224` model, we saw the following improvements during training and inference:
