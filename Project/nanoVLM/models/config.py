@@ -13,6 +13,7 @@ class VLMConfig:
     vit_ln_eps: float = 1e-6
     vit_cls_flag: bool = False
     vit_model_type: str = 'google/siglip2-base-patch16-512'
+    load_vit_local: str = '/mnt/sevenT/zixiaoy/checkpoints/'
 
     lm_hidden_dim: int = 960
     lm_inter_dim: int = 2560
@@ -30,10 +31,11 @@ class VLMConfig:
     lm_max_length: int = 4096
     lm_use_tokens: bool = False # Decide if the LM expects tokens or embeddings as input (if using as a backbone for the VLM, set to False)
     lm_tie_weights: bool = True # Decide if you want to tie the LM Head weight to the token embedding weights
-    lm_model_type: str = 'HuggingFaceTB/SmolLM2-360M-Instruct' #'HuggingFaceTB/SmolLM2-135M' #
-    lm_tokenizer: str = 'HuggingFaceTB/SmolLM2-360M-Instruct'
+    lm_model_type: str = 'HuggingFaceTB/SmolLM2-135M-Instruct' #'HuggingFaceTB/SmolLM2-135M' #
+    lm_tokenizer: str = '/mnt/sevenT/zixiaoy/checkpoints/HuggingFaceTB/SmolLM2-135M-Instruct'
     lm_chat_template: str = "{% for message in messages %}{{'<|im_start|>' + message['role'] + '\n' + message['content'] + '<|im_end|>' + '\n'}}{% endfor %}{% if add_generation_prompt %}{{ '<|im_start|>assistant\n' }}{% endif %}"
 
+    load_lm_local = '/mnt/sevenT/zixiaoy/checkpoints/'
     mp_pixel_shuffle_factor: int = 4
     mp_image_token_length: int = 64
 
@@ -59,8 +61,8 @@ class TrainConfig:
     lr_mp: float = 0.00512
     lr_vision_backbone: float = 5e-5 #0.0005 #
     lr_language_backbone: float = 5e-5 #0
-    val_size: int = 50000
-    batch_size: int = 2
+    val_size: int = 100
+    batch_size: int = 1
     gradient_accumulation_steps: int = 8
     max_grad_norm: float = 1.0
     eval_in_epochs: bool = True
@@ -72,8 +74,10 @@ class TrainConfig:
     max_sample_length: int = 4096
     compile: bool = False
     resume_from_vlm_checkpoint: bool = False # Indicate if the training should be resumed from a checkpoint of the whole VLM or you want to start from scratch
-    train_dataset_path: str = 'HuggingFaceM4/FineVision_concat_shuffled_2'
-    train_dataset_name: tuple[str, ...] = ("default", ) #('allava_laion', 'allava_vflan', 'cambrian(filtered)_processed', 'LLaVA_Instruct_150K', 'mmevol', 'sharegpt4o', 'sharegpt4v(coco)', 'sharegpt4v(knowledge)', 'sharegpt4v(llava)', 'sharegpt4v(sam)') # 'vision_flan(filtered)', 'lvis_instruct4v',
+    train_dataset_path: str = 'HuggingFaceM4/FineVision'
+    # train_dataset_path: str = 'HuggingFaceM4/the_cauldron'
+    # tqa
+    train_dataset_name: tuple[str, ...] = ("cambrian(filtered)_processed", ) #('allava_laion', 'allava_vflan', 'cambrian(filtered)_processed', 'LLaVA_Instruct_150K', 'mmevol', 'sharegpt4o', 'sharegpt4v(coco)', 'sharegpt4v(knowledge)', 'sharegpt4v(llava)', 'sharegpt4v(sam)') # 'vision_flan(filtered)', 'lvis_instruct4v',
     stream_dataset: bool = True
     relevance_min_rating: int = 1
     image_correspondence_min_rating: int = 1

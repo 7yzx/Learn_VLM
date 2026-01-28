@@ -7,7 +7,10 @@ from torch.utils.data import DataLoader
 torch.manual_seed(0)
 if torch.cuda.is_available():
     torch.cuda.manual_seed_all(0)
+import sys
+from pathlib import Path
 
+sys.path.append(str(Path(__file__).resolve().parent.parent))
 from data.collators import VQACollator
 from data.datasets import VQADataset
 from data.processors import get_image_processor, get_tokenizer
@@ -45,6 +48,7 @@ def measure_vram(args, vlm_cfg, train_cfg_defaults):
 
     # --- Dataset Preparation ---
     image_processor = get_image_processor(vlm_cfg.max_img_size, vlm_cfg.vit_img_size)
+    
     tokenizer = get_tokenizer(vlm_cfg.lm_tokenizer, vlm_cfg.vlm_extra_tokens)
 
     dataset_path = train_cfg_defaults.train_dataset_path
@@ -63,10 +67,11 @@ def measure_vram(args, vlm_cfg, train_cfg_defaults):
     try:
         print(f"Loading dataset: {dataset_path}, name: {dataset_name}")
         # Attempt to load only the 'train' split, adjust if dataset has different split names
-        available_splits = load_dataset(dataset_path, dataset_name).keys()
+        available_splits = load_dataset(dataset_path, dataset_name, cache_dir="/mnt/sevenT/zixiaoy/dataset/").keys()
+        
         split_to_use = 'train' if 'train' in available_splits else list(available_splits)[0]
 
-        base_ds_full = load_dataset(dataset_path, dataset_name, split=split_to_use)
+        base_ds_full = load_dataset(dataset_path, dataset_name, cache_dir="/mnt/sevenT/zixiaoy/dataset/", split=split_to_use)
 
         if len(base_ds_full) < required_samples_for_base_ds:
             print(f"Warning: Dataset '{dataset_name}' (split: {split_to_use}) has {len(base_ds_full)} samples, "
@@ -126,8 +131,7 @@ def measure_vram(args, vlm_cfg, train_cfg_defaults):
             for i, batch in enumerate(current_loader):
                 if i >= num_iterations_for_vram:
                     break
-
-                images = batch["image"].to(device)
+                images = batch["images"]
                 input_ids = batch["input_ids"].to(device)
                 labels = batch["labels"].to(device)
                 attention_mask = batch["attention_mask"].to(device)
@@ -181,7 +185,7 @@ def main():
 
     # Measurement control args
     parser.add_argument('--batch_sizes', type=str, default="1 2 4 8 16 32 64 128 256 512", help='Space-separated list of batch sizes to test (e.g., "1 2 4 8").')
-    parser.add_argument('--lm_max_length', type=int, default=128, help='Maximum length of the input sequence for the language model.')
+    parser.add_argument('--lm_max_length', type=int, default=4096, help='Maximum length of the input sequence for the language model.')
     parser.add_argument('--lm_model_type', type=str, default='HuggingFaceTB/SmolLM2-135M-Instruct', help='Model type for the language model.')
     parser.add_argument('--num_iterations', type=int, default=2, help='Number of forward/backward passes per batch size for VRAM measurement.')
 

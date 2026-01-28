@@ -272,9 +272,10 @@ class LanguageModelGroupedQueryAttention(nn.Module):
             is_causal = (T_curr == T_kv and T_curr > 1)
             y = torch.nn.functional.scaled_dot_product_attention(
                 q, k_exp, v_exp,
-                attn_mask=additive_attn_mask, 
+                # attn_mask=additive_attn_mask, 
+                attn_mask=None if is_causal else additive_attn_mask, 
                 dropout_p=self.dropout if self.training else 0.0,
-                is_causal=is_causal
+                is_causal=is_causal,
             )
         else:
             # Manual attention implementation
@@ -543,9 +544,12 @@ class LanguageModel(nn.Module):
         import torch.nn.init as init
         import json
         from huggingface_hub.utils import EntryNotFoundError
-                
+        import os
         # Load the HuggingFace config
-        hf_config = AutoConfig.from_pretrained(cfg.lm_model_type)
+        model_path = os.path.join(cfg.load_lm_local, cfg.lm_model_type) if len(cfg.load_lm_local) > 0 else cfg.lm_model_type
+
+        
+        hf_config = AutoConfig.from_pretrained(model_path)
         
         # Store original HF vocab size before we modify it
         original_vocab_size = hf_config.vocab_size
@@ -576,13 +580,16 @@ class LanguageModel(nn.Module):
         model = cls(cfg)
         
         try:
-            index_path = hf_hub_download(repo_id=cfg.lm_model_type, filename="model.safetensors.index.json")
-            with open(index_path, 'r') as f:
-                index = json.load(f)
-            # Get unique filenames from weight map
-            safetensors_filenames = sorted(list(set(index['weight_map'].values())))
-            # Download all the sharded files
-            safetensors_files = [hf_hub_download(repo_id=cfg.lm_model_type, filename=fn) for fn in safetensors_filenames]
+            if os.path.exists(model_path):
+                safetensors_files = [os.path.join(model_path, "model.safetensors")]
+            else:
+                index_path = hf_hub_download(repo_id=cfg.lm_model_type, filename="model.safetensors.index.json")
+                with open(index_path, 'r') as f:
+                    index = json.load(f)
+                # Get unique filenames from weight map
+                safetensors_filenames = sorted(list(set(index['weight_map'].values())))
+                # Download all the sharded files
+                safetensors_files = [hf_hub_download(repo_id=cfg.lm_model_type, filename=fn) for fn in safetensors_filenames]
         except EntryNotFoundError:
             safetensors_files = [hf_hub_download(repo_id=cfg.lm_model_type, filename="model.safetensors")]
 

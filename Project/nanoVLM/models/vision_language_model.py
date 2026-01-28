@@ -31,7 +31,9 @@ class VisionLanguageModel(nn.Module):
             self.decoder = LanguageModel(cfg)
         self.MP = ModalityProjector(cfg)
         self.load_backbone = load_backbone
-        self.tokenizer = get_tokenizer(cfg.lm_tokenizer, cfg.vlm_extra_tokens, cfg.lm_chat_template)
+        
+        lm_tokenizer_model = os.path.join(cfg.load_lm_local, cfg.lm_tokenizer) if len(cfg.load_lm_local) > 0 else cfg.load_lm_local
+        self.tokenizer = get_tokenizer(lm_tokenizer_model, cfg.vlm_extra_tokens, cfg.lm_chat_template)
 
     def _replace_img_tokens_with_embd(self, input_ids, token_embd, image_embd):
         """

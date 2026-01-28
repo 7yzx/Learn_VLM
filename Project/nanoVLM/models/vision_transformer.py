@@ -3,6 +3,7 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
+
 # https://github.com/huggingface/transformers/blob/main/src/transformers/models/siglip/modeling_siglip.py#L245
 class ViTPatchEmbeddings(nn.Module):
     def __init__(self, cfg):
@@ -172,9 +173,9 @@ class ViT(nn.Module):
     def from_pretrained(cls, cfg):
         from transformers import SiglipVisionConfig
         from huggingface_hub import hf_hub_download
-        import safetensors
-
-        hf_config = SiglipVisionConfig.from_pretrained(cfg.vit_model_type)
+        import safetensors, os
+        model_path = os.path.join(cfg.load_vit_local, cfg.vit_model_type) if len(cfg.load_vit_local) > 0 else cfg.vit_model_type
+        hf_config = SiglipVisionConfig.from_pretrained(model_path)
         cfg.vit_dropout=hf_config.attention_dropout
         cfg.vit_hidden_dim=hf_config.hidden_size
         cfg.vit_img_size=hf_config.image_size
@@ -184,7 +185,12 @@ class ViT(nn.Module):
         cfg.vit_n_blocks=hf_config.num_hidden_layers
         cfg.vit_patch_size=hf_config.patch_size
         model = cls(cfg)
-        safetensors_file = hf_hub_download(repo_id=cfg.vit_model_type, filename="model.safetensors")
+        
+        if os.path.exists(model_path):
+            safetensors_file = os.path.join(model_path, "model.safetensors")
+            print(f"safetensor path {safetensors_file}")
+        else:
+            safetensors_file = hf_hub_download(repo_id=cfg.vit_model_type, filename="model.safetensors")
 
         sd = model.state_dict()
         
@@ -249,3 +255,5 @@ class ViT(nn.Module):
         model.load_state_dict(sd)
         print(f"Successfully loaded {cfg.vit_model_type} weights from safetensors. Model has {sum(p.numel() for p in model.parameters()):,} parameters.")
         return model
+    
+    
