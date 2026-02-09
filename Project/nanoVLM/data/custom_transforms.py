@@ -35,7 +35,7 @@ class DynamicResize(torch.nn.Module):
         """Compute target (h, w) divisible by patch_size."""
         long, short = (w, h) if w >= h else (h, w)
 
-        # 1) upscale long side
+        # 1) upscale long side # 如果 resize_to_max_side_len=False，它会尽量保持原尺寸，只是向上取整到 patch_size 的倍数
         target_long = self.m if self.resize_to_max_side_len else min(self.m, math.ceil(long / self.p) * self.p)
 
         # 2) scale factor
@@ -92,20 +92,23 @@ class SplitImage(torch.nn.Module):
         if x.ndim == 3:            # add batch dim if missing
             x = x.unsqueeze(0)
 
-        b, c, h, w = x.shape
+        b, c, h, w = x.shape # eg:1, 3, 1024,1024
         if h % self.p or w % self.p:
             raise ValueError(f'Image size {(h,w)} not divisible by patch_size {self.p}')
 
-        n_h, n_w = h // self.p, w // self.p
+        n_h, n_w = h // self.p, w // self.p # 1024 // 512=2, 1024 // 512=2
+        # (nh ph) 表示把高度 $H$ 拆解为 $N_h$ 个块(2)，每个块高度 $P_h$(512)。
         patches = rearrange(x, 'b c (nh ph) (nw pw) -> (b nh nw) c ph pw',
                             ph=self.p, pw=self.p)
+        # patches : [4, 3, 512, 512]
+        # (n_h, n_w): (2, 2)
         return patches, (n_h, n_w)
 
 
 class GlobalAndSplitImages(torch.nn.Module):
     def __init__(self, patch_size: int):
         super().__init__()
-        self.p = patch_size
+        self.p = patch_size # 512
         self.splitter = SplitImage(patch_size)
 
     def forward(self, x: torch.Tensor) -> Tuple[torch.Tensor, Tuple[int, int]]:
@@ -117,5 +120,5 @@ class GlobalAndSplitImages(torch.nn.Module):
         if grid == (1, 1):
             return patches, grid  # Dont add global patch if there is only one patch
 
-        global_patch = resize(x, [self.p, self.p])
-        return torch.cat([global_patch, patches], dim=0), grid
+        global_patch = resize(x, [self.p, self.p]) # 直接resize 
+        return torch.cat([global_patch, patches], dim=0), grid 

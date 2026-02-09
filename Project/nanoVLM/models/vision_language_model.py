@@ -22,6 +22,8 @@ class VisionLanguageModel(nn.Module):
     def __init__(self, cfg: VLMConfig, load_backbone=True):
         super().__init__()
         self.cfg = cfg
+        # load_backbone=True: 通常用于微调，加载预训练的 SigLIP 和 SmolLM 权重
+        # load_backbone=False: 通常用于加载自己训练好的 NanoVLM Checkpoint
         if load_backbone:
             print("Loading from backbone weights")
             self.vision_encoder = ViT.from_pretrained(cfg)
@@ -29,6 +31,7 @@ class VisionLanguageModel(nn.Module):
         else:
             self.vision_encoder = ViT(cfg)
             self.decoder = LanguageModel(cfg)
+        # 桥梁: 负责把视觉特征翻译成大脑能懂的形状 (Projector 是随机初始化的，需要从头练)
         self.MP = ModalityProjector(cfg)
         self.load_backbone = load_backbone
         
@@ -40,12 +43,21 @@ class VisionLanguageModel(nn.Module):
         Replace every image-token placeholder in `input_ids` with the corresponding slice
         from `image_embd`. Supports an arbitrary number of image-token placeholders per sample.
         The first example in the batch might have 2 images and the second none.
+        
+        input_ids:  [Batch, Seq_Len] (包含文本 ID 和 <image> token ID)
+        token_embd: [Batch, Seq_Len, Dim] (LLM 原始的文本 Embedding)
+        image_embd: [Total_Images, Patch_Len, Dim] (经过 Projector 变换后的视觉特征)
+
         """
         # Clone the original embeddings to avoid in-place issues
         updated_token_embd = token_embd.clone()
 
         # Build a mask of all image-token positions: shape [B, T_seq]
+        # 找出所有位置上等于 <image> token ID 的地方
+        # mask shape: [Batch, Seq_Len] (True 表示该位置是图片占位符)
         mask = (input_ids == self.tokenizer.image_token_id)
+        # image_embd.view(-1, ...) 把所有图片的特征展平成一个长序列
+        # updated_token_embd[mask] 选中所有占位符的位置
         updated_token_embd[mask] = image_embd.view(-1, image_embd.size(-1)).to(updated_token_embd.dtype) # torch flattens before assigning
 
         return updated_token_embd
@@ -62,6 +74,7 @@ class VisionLanguageModel(nn.Module):
         return images # Already a tensor
 
     def forward(self, input_ids, images, attention_mask=None, targets=None):
+        # 1. 预处理图片：把 List[Tensor] 堆叠成一个大的 Tensor
         images_tensor = self._process_images(images, input_ids.device)
         token_embd = self.decoder.token_embedding(input_ids) # [B, T_sequence, D_lm]
 
@@ -97,13 +110,15 @@ class VisionLanguageModel(nn.Module):
         batch_size = input_ids.size(0) # Or token_embd.size(0)
         
         # --- Multimodal Prefill Phase ---
+        # 第一次前向传播
+        # kv_cache=None: 此时 Cache 是空的，模型会计算所有 Token 的 KV 值并返回
         prefill_output, kv_cache_list = self.decoder(
             token_embd,
             attention_mask=attention_mask, # Use the provided attention mask
             kv_cache=None,
             start_pos=0
         )
-        
+        # 取最后一个 Token 的输出，用来预测第一个生成的字
         last_token_output_from_prefill = prefill_output[:, -1, :] 
         
         if not self.decoder.lm_use_tokens:
