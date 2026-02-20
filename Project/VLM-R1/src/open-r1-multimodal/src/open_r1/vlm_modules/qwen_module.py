@@ -135,6 +135,7 @@ class Qwen2VLModule(VLMBaseModule):
         bbox_pattern = r'\[(\d+),\s*(\d+),\s*(\d+),\s*(\d+)]'
 
         for i, (content, sol) in enumerate(zip(contents, solution)):
+            # image_grid_thw 通常包含 (t, h, w)，即时间/帧数、Grid高度、Grid宽度。
             image_grid_thw = kwargs.get("image_grid_thw")[i]
             image_path = kwargs.get("image_path")[i][0]
             image = Image.open(image_path)
@@ -142,8 +143,8 @@ class Qwen2VLModule(VLMBaseModule):
             input_height = int(image_grid_thw[1]*14)
             input_width = int(image_grid_thw[2]*14)
             
-            sol = re.findall(answer_tag_pattern, sol, re.DOTALL)[-1]
-            sol = json.loads(sol.strip())
+            sol = re.findall(answer_tag_pattern, sol, re.DOTALL)[-1]   # "[x1,y1,x2,y2]"
+            sol = json.loads(sol.strip())                              # [x1, y1, x2, y2]
             reward = 0.0
             # Try symbolic verification first
             try:

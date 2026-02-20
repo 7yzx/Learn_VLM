@@ -6,6 +6,7 @@ Project/3DThinker/data/*
 Project/3DThinker/models/
 Project/3DThinker/swanlog/
 Project/3DThinker/wandb/*
+Project/3DThinker/3dthinker/stage1/wandb/*
 *.log
 Project/Fin3R/checkpoints
 

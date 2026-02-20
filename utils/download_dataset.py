@@ -45,6 +45,7 @@ def download_hf_dataset(repo_id, local_dir, filenames=None):
             repo_id=repo_id,  # 仓库ID
             repo_type="dataset",
             local_dir=local_dir,             # 下载到本地的文件夹名称
+            local_dir_use_symlinks=False,  # 禁用符号链接
             max_workers=8                      # 允许并发下载
         )
     else:
@@ -53,6 +54,7 @@ def download_hf_dataset(repo_id, local_dir, filenames=None):
             allow_patterns=filenames,
             repo_type="dataset",
             local_dir=local_dir,             # 下载到本地的文件夹名称
+            local_dir_use_symlinks=False,  # 禁用符号链接
             max_workers=8                      # 允许并发下载
         )
 

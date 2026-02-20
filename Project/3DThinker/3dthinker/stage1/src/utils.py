@@ -45,6 +45,18 @@ def get_args():
     parser.add_argument("--load_model_path", type=str, default='./checkpoints/model_stage1')
     
     parser.add_argument("--cache_dir", type=str, default='./cache')
+    
+    # Feature cache 加速参数
+    parser.add_argument("--feature_dir", type=str, default='/mnt/sevenT/zixiaoy/code/Learn_VLM/Project/3DThinker/data/feature_vggt/',
+                        help="VGGT 特征目录路径 (NAS 盘)")
+    parser.add_argument("--feature_cache_fp16", action='store_true', default=True,
+                        help="缓存中使用 fp16 存储特征（内存减半）")
+    parser.add_argument("--num_prefetch_workers", type=int, default=4,
+                        help="预加载并行线程数")
+    
+    # 分 chunk 训练参数
+    parser.add_argument("--num_chunks", type=int, default=2,
+                        help="把 dataset 切成几个 chunk（内存不够时增大此值）")
 
     return parser.parse_args()
 

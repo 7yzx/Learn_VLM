@@ -34,33 +34,16 @@ from utils import *
 from task import *
 from trainer_single import CustomTrainerStage1, CustomTrainerStage2
 from multimodal_projector.mmprojector import projector
+from feature_cache import VGGTFeatureCache, split_dataset_into_chunks, extract_idx_from_chunk
 
 # import wandb  # Add this line
 import wandb
 
-        
-# def setup_wandb(args):
-#     wandb.init(
-#         project="training-3dthinker-cvpr26",  # Project name, can be modified
-#         name=f"{args.wandb_name}_latent{args.latent_size}",  # Run name
-#         config={
-#             "model": args.model,
-#             "epochs": args.epochs,
-#             "task": args.task,
-#             "latent_size": args.latent_size,
-#             "stage": args.stage,
-#             "data_path": args.data_path,
-#             "save_model_path": args.save_model_path,
-#             "learning_rate": args.learning_rate,
-#             "per_device_train_batch_size": args.per_device_train_batch_size,
-#             "gradient_accumulation_steps": args.gradient_accumulation_steps,
-#         }
-#     )
 
 def setup_wandb(args):
     if not torch.distributed.is_initialized() or torch.distributed.get_rank() == 0:
         # Set offline mode
-        os.environ["WANDB_MODE"] = "offline"
+        # os.environ["WANDB_MODE"] = "offline"
         
         try:
             wandb.init(
@@ -303,41 +286,184 @@ else:
     CustomTrainer = CustomTrainerStage2
     collate_fn = collate_fn_stage2
 
-training_args = SFTConfig(
-    output_dir=args.save_model_path,
-    num_train_epochs=args.epochs,
-    per_device_train_batch_size=args.per_device_train_batch_size,
-    gradient_accumulation_steps=args.gradient_accumulation_steps,
-    warmup_steps=args.warmup_steps,
-    learning_rate=args.learning_rate,
-    weight_decay=args.weight_decay,
-    logging_steps=args.logging_steps,
-    save_strategy="steps",
-    save_steps=args.save_steps,
-    save_total_limit=args.save_total_limit,
-    optim="adamw_torch_fused",
-    bf16=False,
-    fp16=True,
-    push_to_hub=False,
-    remove_unused_columns=False,
-    gradient_checkpointing=grad_checkpointing,
-    dataset_text_field="",
-    dataset_kwargs={"skip_prepare_dataset": True},
-    report_to=["wandb"],
-    logging_dir='./logs/',
-    logging_strategy='steps',
-)
 
-# Initialize the trainer
-trainer = CustomTrainer(
-    model=model,
-    args=training_args,
-    train_dataset=train_dataset,
-    data_collator=collate_fn,
-    processing_class=processor.tokenizer
-)
+# ========================================================================
+# 分 Chunk 预加载训练（解决内存不够放全部 VGGT 特征的问题）
+# ========================================================================
+#
+# 原理：
+#   总共 ~450GB 的 VGGT 特征，内存放不下。
+#   把 dataset 切成 num_chunks 个片段（默认 2 个，即前半/后半）。
+#   每次只把一个 chunk 的 VGGT 特征加载到内存，
+#   在这个 chunk 上只训 1 个 epoch（chunk 内正常 shuffle），
+#   然后释放内存，加载下一个 chunk，训 1 个 epoch。
+#   所有 chunk 轮一遍 = 1 个等效 epoch（全部数据各看一次）。
+#   循环 args.epochs 轮 → 等效完整的 args.epochs 个 epoch。
+#
+#   这和正常训练行为一致：
+#     正常: epoch1(全部shuffle) → epoch2(全部shuffle) → ...
+#     分chunk: epoch1(chunk0_shuffle + chunk1_shuffle) → epoch2(...) → ...
+#
+#   唯一区别：同一 epoch 内，chunk0 的样本先被看到，chunk1 后被看到。
+#   但 chunk 内部是 shuffle 的，且 epoch 间顺序不同，影响很小。
+# ========================================================================
 
-trainer.train()
-trainer.save_model(training_args.output_dir)
+if args.stage in ['stage1']:
+    # 初始化特征缓存
+    feature_cache = VGGTFeatureCache(
+        feature_dir=args.feature_dir,
+        use_fp16=args.feature_cache_fp16,
+        num_workers=args.num_prefetch_workers,
+    )
+
+    # 切分 dataset 成 chunks
+    num_chunks = args.num_chunks
+    chunks = split_dataset_into_chunks(train_dataset, num_chunks)
+    
+    total_epochs = args.epochs
+    
+    logging.info(f"📦 Chunked training: {num_chunks} chunks, {total_epochs} epochs")
+    logging.info(f"📦 Each epoch = {num_chunks} chunk loads, total loads = {total_epochs * num_chunks}")
+    for i, c in enumerate(chunks):
+        logging.info(f"   Chunk {i}: {len(c)} samples")
+    
+    # checkpoint 路径：每个 chunk 训完后保存到这里，下个 chunk 从这里 resume
+    # 这样 optimizer state、scheduler state、global_step 全部保留
+    chunk_ckpt_dir = os.path.join(args.save_model_path, "chunk_checkpoint")
+    resume_from = None  # 第一个 chunk 不需要 resume
+    
+    for epoch in range(total_epochs):
+        for chunk_idx, chunk_data in enumerate(chunks):
+            logging.info(f"\n{'=='*30}")
+            logging.info(f"🔄 Epoch {epoch+1}/{total_epochs}, "
+                         f"Chunk {chunk_idx+1}/{num_chunks} "
+                         f"({len(chunk_data)} samples)")
+            logging.info(f"{'=='*30}")
+            
+            # 1. 预加载这个 chunk 的 VGGT 特征到内存
+            idx_list = extract_idx_from_chunk(chunk_data)
+            feature_cache.bulk_load(idx_list)
+            
+            # 2. 计算这个 chunk 对应的 max_steps
+            #    因为 num_train_epochs 在 resume 时会基于 global_step 判断是否跳过，
+            #    所以我们用 max_steps 来精确控制每个 chunk 训练的步数
+            chunk_steps = len(chunk_data) // args.per_device_train_batch_size
+            
+            # 3. 构建 training_args
+            training_args = SFTConfig(
+                output_dir=chunk_ckpt_dir,
+                max_steps=chunk_steps,  # 精确控制：这个 chunk 训多少步
+                per_device_train_batch_size=args.per_device_train_batch_size,
+                gradient_accumulation_steps=args.gradient_accumulation_steps,
+                warmup_steps=args.warmup_steps if (epoch == 0 and chunk_idx == 0) else 0,
+                learning_rate=args.learning_rate,
+                weight_decay=args.weight_decay,
+                logging_steps=args.logging_steps,
+                save_strategy="steps",
+                save_steps=args.save_steps,
+                save_total_limit=args.save_total_limit,
+                optim="adamw_torch_fused",
+                bf16=True,
+                push_to_hub=False,
+                remove_unused_columns=False,
+                gradient_checkpointing=grad_checkpointing,
+                dataset_text_field="",
+                dataset_kwargs={"skip_prepare_dataset": True},
+                report_to=["wandb"],
+                logging_dir='./logs/',
+                logging_strategy='steps',
+                # 关键：不让 Trainer 忽略已完成的 steps（因为我们用 max_steps 精确控制）
+                ignore_data_skip=True,
+            )
+            
+            # 4. 创建 Trainer 并注入特征缓存
+            trainer = CustomTrainer(
+                model=model,
+                args=training_args,
+                train_dataset=chunk_data,
+                data_collator=collate_fn,
+                processing_class=processor.tokenizer,
+            )
+            trainer.set_feature_cache(feature_cache)
+            
+            # 5. 训练：如果有上一个 chunk 的 checkpoint，从那里 resume
+            #    resume_from_checkpoint 会恢复 optimizer state + scheduler state + global_step
+            if resume_from is not None and os.path.isdir(resume_from):
+                logging.info(f"📂 Resuming from checkpoint: {resume_from}")
+                trainer.train(resume_from_checkpoint=resume_from)
+            else:
+                trainer.train()
+            
+            # 6. chunk 训完后保存 checkpoint（包含 model + optimizer + scheduler + global_step）
+            #    Trainer.save_model 只保存模型权重，不保存 optimizer
+            #    我们需要用 _save_checkpoint 或直接 save_state 保存完整状态
+            trainer.save_state()  # 保存到 output_dir/checkpoint-{global_step}/
+            
+            # 找到刚保存的最新 checkpoint 目录，作为下一个 chunk 的 resume 路径
+            ckpt_dirs = [
+                d for d in os.listdir(chunk_ckpt_dir) 
+                if d.startswith("checkpoint-") and os.path.isdir(os.path.join(chunk_ckpt_dir, d))
+            ]
+            if ckpt_dirs:
+                # 按 step 数排序，取最新的
+                ckpt_dirs.sort(key=lambda x: int(x.split("-")[-1]))
+                resume_from = os.path.join(chunk_ckpt_dir, ckpt_dirs[-1])
+                logging.info(f"💾 Checkpoint saved: {resume_from}")
+                
+                # 清理旧 checkpoint（只保留最新的一个，节省磁盘空间）
+                for old_ckpt in ckpt_dirs[:-1]:
+                    old_path = os.path.join(chunk_ckpt_dir, old_ckpt)
+                    import shutil
+                    shutil.rmtree(old_path, ignore_errors=True)
+                    logging.info(f"🗑️ Removed old checkpoint: {old_path}")
+            
+            # 7. 打印缓存统计
+            feature_cache.log_stats()
+            
+            logging.info(f"✅ Epoch {epoch+1}, Chunk {chunk_idx+1}/{num_chunks} done "
+                         f"(global_step={trainer.state.global_step})")
+    
+    # 训练结束，保存最终模型权重（不含 optimizer，用于推理）
+    trainer.save_model(args.save_model_path)
+    feature_cache.shutdown()
+    logging.info(f"✅ All epochs done. Final model saved to {args.save_model_path}")
+
+else:
+    # Stage2: 不需要 VGGT 特征缓存，正常训练
+    training_args = SFTConfig(
+        output_dir=args.save_model_path,
+        num_train_epochs=args.epochs,
+        per_device_train_batch_size=args.per_device_train_batch_size,
+        gradient_accumulation_steps=args.gradient_accumulation_steps,
+        warmup_steps=args.warmup_steps,
+        learning_rate=args.learning_rate,
+        weight_decay=args.weight_decay,
+        logging_steps=args.logging_steps,
+        save_strategy="steps",
+        save_steps=args.save_steps,
+        save_total_limit=args.save_total_limit,
+        optim="adamw_torch_fused",
+        bf16=False,
+        fp16=True,
+        push_to_hub=False,
+        remove_unused_columns=False,
+        gradient_checkpointing=grad_checkpointing,
+        dataset_text_field="",
+        dataset_kwargs={"skip_prepare_dataset": True},
+        report_to=["wandb"],
+        logging_dir='./logs/',
+        logging_strategy='steps',
+    )
+    
+    trainer = CustomTrainer(
+        model=model,
+        args=training_args,
+        train_dataset=train_dataset,
+        data_collator=collate_fn,
+        processing_class=processor.tokenizer,
+    )
+    trainer.train()
+    trainer.save_model(training_args.output_dir)
+
 wandb.finish()
 

@@ -4,6 +4,7 @@ import torch
 
 
 class VLMBaseModule(ABC):
+    """所有 VLM 模型的统一抽象接口"""
     def __init__(self):
         super().__init__()
     

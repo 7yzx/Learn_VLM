@@ -3,7 +3,7 @@
 # best model: work-3dthinker-Qwen2.5-VL-3B-Instruct_begin_align_vggt_mlp6_lr1e-4_latent12_flash_74000_best
 # huggingface data is in /mnt/sevenT/zixiaoy/dataset/jankin123/3DThinker-10K/data_output3d_begin_10k_resized.jsonl
 # 
-CUDA_VISIBLE_DEVICES=3 python 3dthinker/stage1/src/main.py \
+CUDA_VISIBLE_DEVICES=0 python 3dthinker/stage1/src/main.py \
     --model /mnt/sevenT/zixiaoy/checkpoints/Qwen/Qwen2.5-VL-3B-Instruct --epochs 10 \
     --task mindcube \
     --latent_size 12 \
@@ -19,3 +19,7 @@ CUDA_VISIBLE_DEVICES=3 python 3dthinker/stage1/src/main.py \
     --log_file ./log.txt \
     --save_model_path ./models/3DThinker-S1-Qwen2.5-VL-3B_mlp6_lr1e-4_latent12 \
     --wandb_name 3DThinker-S1-Qwen2.5-VL-3B_mlp6_lr1e-4_latent12 \
+    --feature_dir /mnt/sevenT/zixiaoy/code/Learn_VLM/Project/3DThinker/data/feature_vggt/ \
+    --feature_cache_fp16 \
+    --num_prefetch_workers 4 \
+    --num_chunks 2

@@ -933,7 +933,7 @@ def main(script_args, training_args, model_args):
     question_prompt = vlm_module_cls.get_question_template(task_type=script_args.task_type)
 
     # Get reward functions 
-    if script_args.is_reward_customized_from_vlm_module:
+    if script_args.is_reward_customized_from_vlm_module: # True
         reward_funcs = [vlm_module_cls.select_reward_func(func, script_args.task_type) for func in script_args.reward_funcs]
     else:
         reward_funcs = [reward_funcs_registry[func] for func in script_args.reward_funcs]
