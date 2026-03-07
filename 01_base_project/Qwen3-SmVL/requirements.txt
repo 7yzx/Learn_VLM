@@ -1,0 +1,9 @@
+datasets==4.0.0
+Pillow==11.3.0
+swanlab==0.6.8
+torch==2.7.1
+transformers==4.54.0
+accelerate==1.9.0
+num2words==0.5.14
+modelscope==1.28.1
+pyarrow==21.0.0
