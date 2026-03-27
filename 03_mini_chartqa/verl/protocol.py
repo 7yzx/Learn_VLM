@@ -542,7 +542,20 @@ class DataProto:
 
         non_tensor_batch = batch_collate([d.non_tensor_batch for d in data])
         for key, value in non_tensor_batch.items():
-            non_tensor_batch[key] = np.concatenate(value, axis=0)
+            # Skip fields with missing values in some batches
+            if len(value) < len(data):
+                continue
+
+            # Skip fields with inconsistent dimensions
+            dims = set(v.ndim for v in value)
+            if len(dims) > 1:
+                continue
+
+            try:
+                non_tensor_batch[key] = np.concatenate(value, axis=0)
+            except (ValueError, TypeError) as e:
+                # Skip fields that cannot be concatenated
+                continue
 
         return DataProto(batch=new_batch, non_tensor_batch=non_tensor_batch, meta_info=data[0].meta_info)
 

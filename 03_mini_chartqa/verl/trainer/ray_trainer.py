@@ -1300,11 +1300,10 @@ class RayPPOTrainer:
             new_batch = new_batch.repeat(repeat_times=self.config.worker.rollout.n, interleave=True)
             new_batch = new_batch.union(gen_batch_output)
 
-            if getattr(self.config.worker.reward, "double_reward", False) and "metadata" in new_batch.non_tensor_batch:
-                new_batch, _ = self.get_second_rollout_batch(
-                    gen_batch_output, new_batch, append=self.config.worker.reward.double_reward
-                )
-                new_batch.non_tensor_batch.pop("multi_modal_data", None)
+            new_batch, _ = self.get_second_rollout_batch(
+                gen_batch_output, new_batch, append=self.config.worker.reward.double_reward
+            )
+            new_batch.non_tensor_batch.pop("multi_modal_data", None)
 
             reward_tensor, reward_metrics = ray.get(self.reward_fn.compute_reward.remote(new_batch))
             new_batch.batch = new_batch.batch.clone()
